@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-03 - Long Campaign Progress Legality
+
+### Scope
+
+- Added API-side legality checks before long-campaign progression can create a turn, referee patch, snapshot, chronicle event, or memory log.
+- Invalid completed quests, base facilities, training skills, and faction fronts now return `invalid_campaign_progression` with a concrete reason.
+- Preserved the core invariant: long campaign state still changes only through valid referee-owned `state_patch` records.
+
+### Runtime Screenshot
+
+![Long campaign progression panel](screenshots/long-campaign-progress-panel-2026-06-02.png)
+
+The report keeps a runtime screenshot inline as requested. This slice protects the same long-campaign dashboard and Campaign Moves surface by rejecting requests that reference scenario hooks or world-state entries the current campaign does not expose.
+
+### Verification
+
+```bash
+npm test -- apps/api/src/server.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-03 - Long Campaign Move Choices
 
 ### Scope

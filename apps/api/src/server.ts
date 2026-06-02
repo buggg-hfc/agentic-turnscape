@@ -181,6 +181,49 @@ const LongCampaignProgressBodySchema = z.object({
     )
     .default([]),
 });
+type LongCampaignProgressBody = z.infer<typeof LongCampaignProgressBodySchema>;
+
+const invalidLongCampaignProgression = (
+  body: LongCampaignProgressBody,
+  state: WorldState,
+  scenario: ScenarioPackage,
+): string | undefined => {
+  for (const questId of body.completedQuestIds) {
+    if (!state.quests[questId]) return `Unknown completed quest: ${questId}`;
+  }
+
+  const campaignArc = scenario.campaignArc;
+  if (body.baseInvestments.length > 0) {
+    const firstInvestment = body.baseInvestments[0];
+    if (!firstInvestment) return undefined;
+    if (!campaignArc) {
+      return `Unavailable base facility: ${firstInvestment.facilityId}`;
+    }
+    const allowedFacilities = new Set(campaignArc.baseFacilities);
+    for (const investment of body.baseInvestments) {
+      if (!allowedFacilities.has(investment.facilityId)) {
+        return `Unavailable base facility: ${investment.facilityId}`;
+      }
+    }
+  }
+
+  if (body.training && !(body.training.skill in state.player.skills)) {
+    return `Unknown training skill: ${body.training.skill}`;
+  }
+
+  const allowedFronts = campaignArc && new Set(campaignArc.factionFronts);
+  for (const front of body.factionFronts) {
+    if (
+      !state.factions[front.factionId] ||
+      !allowedFronts ||
+      !allowedFronts.has(front.factionId)
+    ) {
+      return `Unavailable faction front: ${front.factionId}`;
+    }
+  }
+
+  return undefined;
+};
 
 export const buildServer = (options: ServerOptions = {}) => {
   const app = Fastify({ logger: true });
@@ -443,6 +486,17 @@ export const buildServer = (options: ServerOptions = {}) => {
     const campaign = await store.get(params.id);
     if (!campaign) return reply.code(404).send({ error: "campaign_not_found" });
     const scenario = await requireAvailableScenario(campaign.scenario);
+    const invalidProgression = invalidLongCampaignProgression(
+      body,
+      campaign.state,
+      scenario,
+    );
+    if (invalidProgression) {
+      return reply.code(400).send({
+        error: "invalid_campaign_progression",
+        message: invalidProgression,
+      });
+    }
     const turnId = crypto.randomUUID();
     const patch = resolveLongCampaignStep({
       state: campaign.state,

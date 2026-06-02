@@ -177,6 +177,61 @@ describe("campaign turn API", () => {
     await app.close();
   });
 
+  it("rejects long campaign progression requests that reference unavailable campaign hooks", async () => {
+    const store = new InMemoryCampaignStore();
+    const app = buildServer({ store });
+
+    const campaignResponse = await app.inject({
+      method: "POST",
+      url: "/campaigns",
+      headers: { "content-type": "application/json" },
+      payload: {},
+    });
+    const campaign = campaignResponse.json<{ campaignId: string }>();
+
+    const invalidPayloads = [
+      {
+        payload: { completedQuestIds: ["missing_airship"] },
+        message: "Unknown completed quest: missing_airship",
+      },
+      {
+        payload: {
+          baseInvestments: [{ facilityId: "contraband_lab", supplies: 1 }],
+        },
+        message: "Unavailable base facility: contraband_lab",
+      },
+      {
+        payload: { training: { skill: "alchemy", experience: 3 } },
+        message: "Unknown training skill: alchemy",
+      },
+      {
+        payload: {
+          factionFronts: [{ factionId: "ghost_faction", pressureDelta: -2 }],
+        },
+        message: "Unavailable faction front: ghost_faction",
+      },
+    ];
+
+    for (const { payload, message } of invalidPayloads) {
+      const response = await app.inject({
+        method: "POST",
+        url: `/campaigns/${campaign.campaignId}/campaign/progress`,
+        headers: { "content-type": "application/json" },
+        payload,
+      });
+
+      expect(response.statusCode).toBe(400);
+      expect(response.json()).toEqual({
+        error: "invalid_campaign_progression",
+        message,
+      });
+    }
+
+    expect(store.get(campaign.campaignId)?.turns).toHaveLength(0);
+    expect(store.get(campaign.campaignId)?.state.campaign).toBeUndefined();
+    await app.close();
+  });
+
   it("lists resumable campaigns with current progress summaries", async () => {
     const fakeClient: LLMClient = {
       completeJson: async ({ fallback }) => fallback(),
@@ -436,6 +491,35 @@ describe("campaign turn API", () => {
       availableActions: [
         expect.objectContaining({ label: "Use runtime creator action" }),
       ],
+    });
+    const campaign = campaignResponse.json<{ campaignId: string }>();
+
+    const unavailableFacilityResponse = await app.inject({
+      method: "POST",
+      url: `/campaigns/${campaign.campaignId}/campaign/progress`,
+      headers: { "content-type": "application/json" },
+      payload: {
+        baseInvestments: [{ facilityId: "infirmary", supplies: 1 }],
+      },
+    });
+    expect(unavailableFacilityResponse.statusCode).toBe(400);
+    expect(unavailableFacilityResponse.json()).toEqual({
+      error: "invalid_campaign_progression",
+      message: "Unavailable base facility: infirmary",
+    });
+
+    const unavailableFrontResponse = await app.inject({
+      method: "POST",
+      url: `/campaigns/${campaign.campaignId}/campaign/progress`,
+      headers: { "content-type": "application/json" },
+      payload: {
+        factionFronts: [{ factionId: "frontier_guild", pressureDelta: -1 }],
+      },
+    });
+    expect(unavailableFrontResponse.statusCode).toBe(400);
+    expect(unavailableFrontResponse.json()).toEqual({
+      error: "invalid_campaign_progression",
+      message: "Unavailable faction front: frontier_guild",
     });
 
     const duplicateResponse = await app.inject({

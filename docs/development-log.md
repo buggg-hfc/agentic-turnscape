@@ -4,6 +4,13 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-03
 
+- Added API-side legality checks for long-campaign progression requests. Unknown completed quests, unavailable base facilities, unknown training skills, and unavailable faction fronts now return `invalid_campaign_progression` before any referee patch or snapshot is created.
+- Verification used for this slice:
+  - `npm test -- apps/api/src/server.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added tested long-campaign move choices for the web dashboard. The UI now derives base-building, training, and faction-front requests from current world state and submits them through the existing referee-owned `/campaign/progress` API.
 - Verification used for this slice:
   - `npm test -- apps/web/src/campaignProgression.test.ts apps/web/src/api.test.ts --reporter=dot`
