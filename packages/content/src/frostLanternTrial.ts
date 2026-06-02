@@ -253,7 +253,7 @@ export const getFrostLanternTrialActions = (state: WorldState): PlayerAction[] =
     label: "Cross the mist gate",
     description: "Spend stamina to move deeper into the trial without forcing a duel.",
     targetId: "mist_gate",
-    leverage: ["sect_trial"],
+    leverage: ["scenario:frost-lantern-trial", "clock:inner_fire", "pressureClock:shadow_debt", "sect_trial"],
     riskLevel: "medium"
   },
   {
@@ -262,7 +262,7 @@ export const getFrostLanternTrialActions = (state: WorldState): PlayerAction[] =
     label: "Face the trial spirit",
     description: "Use force and discipline to prove your inner fire can hold.",
     targetId: "mist_gate",
-    leverage: ["inner_fire"],
+    leverage: ["scenario:frost-lantern-trial", "clock:inner_fire", "pressureClock:shadow_debt", "inner_fire"],
     riskLevel: "high"
   }
 ];

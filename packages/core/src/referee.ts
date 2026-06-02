@@ -45,6 +45,9 @@ const nextPhase = (state: WorldState): { day: number; phase: WorldState["time"][
 };
 
 const relationshipPath = (characterId: string, dimension: string): string => `relationships.player:${characterId}.${dimension}`;
+const hasRelationship = (state: WorldState, characterId: string): boolean =>
+  Boolean(state.relationships[`player:${characterId}`]);
+const hasClock = (state: WorldState, clockId: string): boolean => Boolean(state.clocks[clockId]);
 
 const check = (
   state: WorldState,
@@ -150,6 +153,9 @@ const recoveryOf = (playerAction: PlayerAction): RecoveryBranch | undefined => {
   const branch = token?.slice("recovery:".length);
   return branch === "plague" || branch === "mine" || branch === "cult" ? branch : undefined;
 };
+
+const tokenValue = (playerAction: PlayerAction, prefix: string): string | undefined =>
+  playerAction.leverage.find((item) => item.startsWith(prefix))?.slice(prefix.length);
 
 const addStrategicConsequences = (
   changes: StatePatch["changes"],
@@ -271,6 +277,65 @@ const addRecoveryConsequences = (
   }
 };
 
+const addScenarioClockConsequences = (
+  changes: StatePatch["changes"],
+  state: WorldState,
+  playerAction: PlayerAction,
+  success: boolean,
+  turnId: string
+) => {
+  const scenarioId = tokenValue(playerAction, "scenario:");
+  const stabilityClockId = tokenValue(playerAction, "clock:");
+  const pressureClockId = tokenValue(playerAction, "pressureClock:");
+  if (!scenarioId || !stabilityClockId || !state.clocks[stabilityClockId]) return;
+
+  if (success) {
+    changes.push(
+      {
+        op: "inc",
+        path: `clocks.${stabilityClockId}.progress`,
+        delta: 1,
+        reason: "剧本推进行动成功，稳定时钟前进"
+      },
+      {
+        op: "inc",
+        path: "player.momentum",
+        delta: 1,
+        reason: "剧本推进行动成功提升玩家势能"
+      },
+      {
+        op: "append",
+        path: "publicEvents",
+        value: event(state, turnId, "剧本线索推进", "玩家把当前剧本的核心危机向可控方向推进了一步。", [
+          "scenario_progress",
+          scenarioId
+        ]),
+        reason: "记录剧本推进"
+      }
+    );
+    return;
+  }
+
+  const pressurePath = pressureClockId && state.clocks[pressureClockId] ? `clocks.${pressureClockId}.progress` : "player.resources.pressure";
+  changes.push(
+    {
+      op: "inc",
+      path: pressurePath,
+      delta: 1,
+      reason: "剧本推进行动失败，压力线前进"
+    },
+    {
+      op: "append",
+      path: "publicEvents",
+      value: event(state, turnId, "剧本压力上升", "玩家没有出局，但当前剧本的反制力量获得了更多空间。", [
+        "scenario_pressure",
+        scenarioId
+      ]),
+      reason: "记录剧本压力"
+    }
+  );
+};
+
 export const adjudicateTurn = ({ state, playerAction, proposals, turnId, seed = turnId }: RefereeInput): RefereeResolution => {
   const roll = check(state, playerAction, seed);
   let visibleRoll = {
@@ -339,14 +404,20 @@ export const adjudicateTurn = ({ state, playerAction, proposals, turnId, seed = 
       hiddenSummary = "曼洛不确定玩家掌握了多少证据，因此选择加快合同。";
     }
   } else if (playerAction.actionType === "protect") {
-    changes.push({ op: "set", path: "currentLocationId", value: "clinic", reason: "玩家围绕病人安全行动" });
+    if (state.locations.clinic) {
+      changes.push({ op: "set", path: "currentLocationId", value: "clinic", reason: "玩家围绕病人安全行动" });
+    }
     if (isSuccess(roll.level)) {
       changes.push(
-        { op: "inc", path: relationshipPath("npc_mina", "trust"), delta: 2, reason: "玩家优先保护米娜" },
         { op: "tag", path: "player.reputationTags", value: "平民保护者", reason: "玩家公开保护弱者" },
-        { op: "inc", path: "clocks.martial_lockdown.progress", delta: 1, reason: "城防军因撤离行动变得紧张" },
         { op: "append", path: "publicEvents", value: event(state, turnId, "病人被转移", "玩家护送重症病人离开诊所，避免了立即冲突，但城防军开始封锁街口。", ["clinic", "protect"]), reason: "记录公共结果" }
       );
+      if (hasRelationship(state, "npc_mina")) {
+        changes.push({ op: "inc", path: relationshipPath("npc_mina", "trust"), delta: 2, reason: "玩家优先保护米娜" });
+      }
+      if (hasClock(state, "martial_lockdown")) {
+        changes.push({ op: "inc", path: "clocks.martial_lockdown.progress", delta: 1, reason: "城防军因撤离行动变得紧张" });
+      }
       publicSummary = "玩家保住了病人，也让城防军戒严压力上升。";
       hiddenSummary = "米娜更愿意透露自己的梦境线索。";
     } else {
@@ -435,6 +506,7 @@ export const adjudicateTurn = ({ state, playerAction, proposals, turnId, seed = 
   );
   changes.push(...resolveConditionUpkeep(state, playerAction.actionType).changes);
   addRecoveryConsequences(changes, state, playerAction, playerSucceeded, turnId);
+  addScenarioClockConsequences(changes, state, playerAction, playerSucceeded, turnId);
 
   return {
     roll: visibleRoll,

@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { createBorderSevenDaysWorld, evaluateBorderSevenDaysEnding } from "@agentic-turnscape/content";
+import { createBorderSevenDaysWorld, evaluateBorderSevenDaysEnding, requireScenarioPackage } from "@agentic-turnscape/content";
 import { applyStatePatch } from "@agentic-turnscape/core";
 import type { LLMClient } from "./llm.js";
-import { runBorderSevenDaysPlaythrough, type BorderSevenDaysRouteId } from "./playthrough.js";
+import { runBorderSevenDaysPlaythrough, runExpansionScenarioPlaythrough, type BorderSevenDaysRouteId } from "./playthrough.js";
 
 const fallbackLlm: LLMClient = {
   completeJson: async ({ fallback }) => fallback(),
@@ -44,6 +44,39 @@ describe("Border Seven Days deterministic playthroughs", () => {
         createBorderSevenDaysWorld()
       );
       expect(evaluateBorderSevenDaysEnding(replayed)?.id, `${routeId} replay`).toBe(endingId);
+    }
+  });
+});
+
+describe("first-wave expansion deterministic playthroughs", () => {
+  it("runs every first-wave expansion pack to a success ending and replays the same result from patches", async () => {
+    const cases = [
+      { scenarioId: "frost-lantern-trial", endingId: "inner_gate_opened" },
+      { scenarioId: "orbital-quarantine", endingId: "station_stabilized" },
+      { scenarioId: "salt-harbor-accord", endingId: "harbor_accord" },
+      { scenarioId: "rain-alley-haunting", endingId: "neighborhood_saved" },
+      { scenarioId: "emergency-ward-night", endingId: "ward_saved" }
+    ];
+
+    for (const { scenarioId, endingId } of cases) {
+      const scenario = requireScenarioPackage(scenarioId);
+      const result = await runExpansionScenarioPlaythrough({
+        scenarioId,
+        route: "success",
+        llm: fallbackLlm,
+        seed: `${scenarioId}-success`
+      });
+
+      expect(result.turns, scenarioId).toBeGreaterThanOrEqual(8);
+      expect(result.state.time, scenarioId).toEqual({ day: 3, phase: "night" });
+      expect(result.ending?.id, scenarioId).toBe(endingId);
+      expect(result.resolutions.at(-1)?.ending?.id, scenarioId).toBe(endingId);
+
+      const replayed = result.resolutions.reduce(
+        (state, resolution) => applyStatePatch(state, resolution.statePatch),
+        scenario.createWorld()
+      );
+      expect(scenario.evaluateEnding(replayed)?.id, `${scenarioId} replay`).toBe(endingId);
     }
   });
 });

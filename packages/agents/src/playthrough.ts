@@ -1,5 +1,6 @@
 import { requireScenarioPackage, type BorderSevenDaysEnding } from "@agentic-turnscape/content";
-import type { PlayerAction, TurnResolution, WorldState } from "@agentic-turnscape/shared";
+import { roll2d6 } from "@agentic-turnscape/core";
+import type { EndingSummary, PlayerAction, TurnResolution, WorldState } from "@agentic-turnscape/shared";
 import type { LLMClient } from "./llm.js";
 import { runTurn } from "./orchestrator.js";
 
@@ -21,6 +22,22 @@ export type BorderSevenDaysPlaythroughResult = {
   routeId: BorderSevenDaysRouteId;
   state: WorldState;
   ending: BorderSevenDaysEnding | undefined;
+  turns: number;
+  resolutions: TurnResolution[];
+};
+
+export type ExpansionScenarioPlaythroughInput = {
+  scenarioId: string;
+  route: "success" | "pressure";
+  llm: LLMClient;
+  seed?: string | undefined;
+};
+
+export type ExpansionScenarioPlaythroughResult = {
+  scenarioId: string;
+  route: ExpansionScenarioPlaythroughInput["route"];
+  state: WorldState;
+  ending: EndingSummary | undefined;
   turns: number;
   resolutions: TurnResolution[];
 };
@@ -84,6 +101,15 @@ const routeAction = (routeId: BorderSevenDaysRouteId, turnIndex: number): Player
 };
 
 const isFinalNight = (state: WorldState): boolean => state.time.day === 7 && state.time.phase === "night";
+const isExpansionFinalNight = (state: WorldState): boolean => state.time.day === 3 && state.time.phase === "night";
+
+const highRollSeed = (base: string, minimum = 10): string => {
+  for (let attempt = 0; attempt < 200; attempt += 1) {
+    const candidate = `${base}_high_${attempt}`;
+    if (roll2d6(candidate).total >= minimum) return candidate;
+  }
+  throw new Error(`Unable to find deterministic high-roll seed for ${base}`);
+};
 
 export const runBorderSevenDaysPlaythrough = async ({
   routeId,
@@ -120,6 +146,57 @@ export const runBorderSevenDaysPlaythrough = async ({
 
   return {
     routeId,
+    state,
+    ending: scenario.evaluateEnding(state),
+    turns: turnIndex,
+    resolutions
+  };
+};
+
+export const runExpansionScenarioPlaythrough = async ({
+  scenarioId,
+  route,
+  llm,
+  seed = scenarioId
+}: ExpansionScenarioPlaythroughInput): Promise<ExpansionScenarioPlaythroughResult> => {
+  const scenario = requireScenarioPackage(scenarioId);
+  let state = scenario.createWorld();
+  const resolutions: TurnResolution[] = [];
+  let turnIndex = 0;
+
+  while (!isExpansionFinalNight(state)) {
+    turnIndex += 1;
+    const actions = scenario.getActions(state);
+    const baseAction = route === "success" ? actions[0] : actions.at(-1);
+    if (!baseAction) throw new Error(`Expansion scenario ${scenarioId} did not provide playable actions`);
+    const action: PlayerAction = {
+      ...baseAction,
+      id: `${scenarioId}_${route}_${turnIndex}`,
+      leverage: Array.from(new Set([...baseAction.leverage, `route:${route}`, `step:${turnIndex}`]))
+    };
+    const result = await runTurn({
+      state,
+      playerAction: action,
+      llm,
+      turnId: `${scenarioId}_${route}_turn_${turnIndex}`,
+      seed: route === "success" ? highRollSeed(`${seed}_${turnIndex}`) : `${seed}_${turnIndex}`,
+      getAvailableActions: scenario.getActions,
+      evaluateEnding: scenario.evaluateEnding
+    });
+    state = result.nextState;
+    resolutions.push({
+      ...result.resolution,
+      ending: scenario.evaluateEnding(state)
+    });
+
+    if (turnIndex > 16) {
+      throw new Error(`Expansion scenario ${scenarioId} playthrough exceeded expected turn count`);
+    }
+  }
+
+  return {
+    scenarioId,
+    route,
     state,
     ending: scenario.evaluateEnding(state),
     turns: turnIndex,

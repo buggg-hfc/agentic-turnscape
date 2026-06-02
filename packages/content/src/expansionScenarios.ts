@@ -212,11 +212,23 @@ const createExpansionScenarioPackage = (definition: ExpansionScenarioDefinition)
     getActions: (state) => [
       {
         id: `${definition.id}_primary_${state.time.day}_${state.time.phase}`,
-        ...definition.firstAction
+        ...definition.firstAction,
+        leverage: [
+          `scenario:${definition.id}`,
+          `clock:${definition.id}_stability`,
+          `pressureClock:${definition.id}_pressure`,
+          ...definition.firstAction.leverage
+        ]
       },
       {
         id: `${definition.id}_secondary_${state.time.day}_${state.time.phase}`,
-        ...definition.secondAction
+        ...definition.secondAction,
+        leverage: [
+          `scenario:${definition.id}`,
+          `clock:${definition.id}_stability`,
+          `pressureClock:${definition.id}_pressure`,
+          ...definition.secondAction.leverage
+        ]
       }
     ],
     getDayPlan: (day) => days.find((plan) => plan.day === day),
