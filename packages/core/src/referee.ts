@@ -137,6 +137,20 @@ const strategyStepOf = (playerAction: PlayerAction): number => {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
 };
 
+type RecoveryBranch = "plague" | "mine" | "cult";
+
+const recoveryClockIds: Record<RecoveryBranch, string> = {
+  plague: "plague_spread",
+  mine: "mine_takeover",
+  cult: "cult_ritual"
+};
+
+const recoveryOf = (playerAction: PlayerAction): RecoveryBranch | undefined => {
+  const token = playerAction.leverage.find((item) => item.startsWith("recovery:"));
+  const branch = token?.slice("recovery:".length);
+  return branch === "plague" || branch === "mine" || branch === "cult" ? branch : undefined;
+};
+
 const addStrategicConsequences = (
   changes: StatePatch["changes"],
   state: WorldState,
@@ -180,6 +194,80 @@ const addStrategicConsequences = (
       set("clocks.mine_takeover.progress", Math.min(3, Math.ceil(step / 9)), "Balanced intervention slows mine control.");
       set("clocks.cult_ritual.progress", Math.min(5, Math.ceil(step / 6)), "Balanced intervention keeps the ritual below completion.");
       break;
+  }
+};
+
+const recoveryTitle: Record<RecoveryBranch, string> = {
+  plague: "临时隔离线建立",
+  mine: "矿区账本公开",
+  cult: "礼拜堂仪式被打断"
+};
+
+const recoveryBody: Record<RecoveryBranch, string> = {
+  plague: "玩家把诊所、礼拜堂和空屋串成临时隔离线，瘟疫扩散被压回可处理范围。",
+  mine: "玩家把矿区账本和证人推到公开场合，商会收购计划被迫降速。",
+  cult: "玩家切断礼拜堂仪式的关键环节，教团狂信派失去一次推进裂隙的机会。"
+};
+
+const addRecoveryConsequences = (
+  changes: StatePatch["changes"],
+  state: WorldState,
+  playerAction: PlayerAction,
+  success: boolean,
+  turnId: string
+) => {
+  const recovery = recoveryOf(playerAction);
+  if (!recovery) return;
+
+  const clockId = recoveryClockIds[recovery];
+  const clock = state.clocks[clockId];
+  if (!clock) return;
+
+  if (success) {
+    changes.push(
+      {
+        op: "set",
+        path: `clocks.${clockId}.progress`,
+        value: Math.max(0, clock.progress - 2),
+        reason: "恢复分支成功压低危机时钟"
+      },
+      {
+        op: "tag",
+        path: "player.reputationTags",
+        value: "危机补救者",
+        reason: "玩家在失败后的新局势中挽回局面"
+      },
+      {
+        op: "append",
+        path: "publicEvents",
+        value: event(state, turnId, recoveryTitle[recovery], recoveryBody[recovery], ["recovery", recovery]),
+        reason: "记录恢复分支结果"
+      }
+    );
+  } else {
+    changes.push(
+      {
+        op: "inc",
+        path: `clocks.${clockId}.progress`,
+        delta: 1,
+        reason: "恢复分支失败使危机继续推进"
+      },
+      {
+        op: "inc",
+        path: "player.resources.pressure",
+        delta: 1,
+        reason: "恢复分支失败增加玩家压力"
+      },
+      {
+        op: "append",
+        path: "publicEvents",
+        value: event(state, turnId, "补救失败但局势继续", "玩家没有终局出局，而是带着更高压力进入新的危机局势。", [
+          "recovery",
+          "failure"
+        ]),
+        reason: "记录恢复分支失败"
+      }
+    );
   }
 };
 
@@ -337,14 +425,16 @@ export const adjudicateTurn = ({ state, playerAction, proposals, turnId, seed = 
   }
 
   addStrategicConsequences(changes, state, playerAction, advance);
+  const playerSucceeded = isSuccess(visibleRoll.level);
   changes.push(
     ...resolveFactionPlans(state, {
       actionType: playerAction.actionType,
-      success: isSuccess(visibleRoll.level),
+      success: playerSucceeded,
       ...(playerAction.targetId ? { targetId: playerAction.targetId } : {})
     }).changes
   );
   changes.push(...resolveConditionUpkeep(state, playerAction.actionType).changes);
+  addRecoveryConsequences(changes, state, playerAction, playerSucceeded, turnId);
 
   return {
     roll: visibleRoll,

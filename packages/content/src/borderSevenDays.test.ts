@@ -3,6 +3,7 @@ import {
   borderSevenDaysScenario,
   createBorderSevenDaysWorld,
   evaluateBorderSevenDaysEnding,
+  getBorderSevenDaysActions,
   getBorderSevenDaysDayPlan
 } from "./borderSevenDays.js";
 
@@ -67,5 +68,25 @@ describe("Border Seven Days MVP acceptance content", () => {
     cureWorld.relationships["player:npc_adele"]!.trust = 4;
     cureWorld.relationships["player:npc_eve"]!.trust = 3;
     expect(evaluateBorderSevenDaysEnding(cureWorld)?.id).toBe("cure_with_exiles");
+  });
+
+  it("opens recovery branches when crisis clocks are near collapse instead of ending early", () => {
+    const plagueWorld = createBorderSevenDaysWorld();
+    plagueWorld.time = { day: 4, phase: "evening" };
+    plagueWorld.clocks.plague_spread!.progress = 6;
+    expect(evaluateBorderSevenDaysEnding(plagueWorld)).toBeUndefined();
+    expect(getBorderSevenDaysActions(plagueWorld).map((action) => action.id)).toContain("branch_quarantine_camp");
+
+    const mineWorld = createBorderSevenDaysWorld();
+    mineWorld.time = { day: 5, phase: "afternoon" };
+    mineWorld.clocks.mine_takeover!.progress = 4;
+    expect(evaluateBorderSevenDaysEnding(mineWorld)).toBeUndefined();
+    expect(getBorderSevenDaysActions(mineWorld).map((action) => action.id)).toContain("branch_public_ledger");
+
+    const cultWorld = createBorderSevenDaysWorld();
+    cultWorld.time = { day: 6, phase: "night" };
+    cultWorld.clocks.cult_ritual!.progress = 5;
+    expect(evaluateBorderSevenDaysEnding(cultWorld)).toBeUndefined();
+    expect(getBorderSevenDaysActions(cultWorld).map((action) => action.id)).toContain("branch_ritual_interruption");
   });
 });

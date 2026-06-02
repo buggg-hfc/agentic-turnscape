@@ -9,6 +9,7 @@ A multi-agent turn-based narrative simulation game. The current implementation i
 - Fastify API with campaign, state, action, turn, SSE replay, and chronicle endpoints.
 - Zod-validated world state, Agent proposal, player action, and referee patch schemas.
 - Core rules for 2d6 checks, success levels, time progression, state patches, crisis clocks, relationships, pressure, momentum, and first-scene consequences.
+- Crisis recovery branches for plague, mine control, and cult ritual clocks so near-collapse failures open new playable choices instead of an early game over.
 - Agent orchestration where NPCs only propose actions and the referee is the only code path that mutates state.
 - OpenAI-compatible LLM client with structured JSON parsing and deterministic scripted fallback for local development.
 - In-game LLM configuration for base URL, model, API key, and timeout, with browser-local saved settings.

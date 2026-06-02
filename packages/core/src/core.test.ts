@@ -77,6 +77,34 @@ describe("dice and adjudication", () => {
     expect(resolution.roll.modifier).toBe(4);
     expect(resolution.roll.total).toBe(15);
   });
+
+  it("lets recovery branch actions reduce a near-collapse crisis clock through referee rules", () => {
+    const state = createBorderSevenDaysWorld();
+    state.clocks.plague_spread!.progress = 6;
+    const action: PlayerAction = {
+      id: "branch_quarantine_camp",
+      actionType: "protect",
+      label: "组织临时隔离营",
+      description: "把诊所、礼拜堂和广场的空屋串成临时隔离线。",
+      targetId: "npc_adele",
+      leverage: ["recovery:plague", "clinic_protocol", "eve_shelter"],
+      riskLevel: "high"
+    };
+
+    const resolution = adjudicateTurn({
+      state,
+      playerAction: action,
+      proposals: [],
+      turnId: "turn-recovery-plague",
+      seed: "recovery-2"
+    });
+    const next = applyStatePatch(state, resolution.patch);
+
+    expect(resolution.roll.label).toMatch(/成功/);
+    expect(next.clocks.plague_spread?.progress).toBeLessThan(state.clocks.plague_spread!.progress);
+    expect(next.publicEvents.at(-1)?.tags).toContain("recovery");
+    expect(next.player.reputationTags).toContain("危机补救者");
+  });
 });
 
 describe("state patches", () => {

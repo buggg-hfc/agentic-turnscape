@@ -830,9 +830,63 @@ export const evaluateBorderSevenDaysEnding = (state: WorldState): BorderSevenDay
   return ending("ritual_stopped");
 };
 
+const isBeforeEndingCheck = (state: WorldState): boolean => state.time.day < 7 || state.time.phase !== "night";
+
+const getRecoveryBranchActions = (state: WorldState): PlayerAction[] => {
+  if (!isBeforeEndingCheck(state)) return [];
+
+  const actions: PlayerAction[] = [];
+  const plague = state.clocks.plague_spread;
+  const mine = state.clocks.mine_takeover;
+  const cult = state.clocks.cult_ritual;
+
+  if (plague && plague.progress >= plague.max - 2) {
+    actions.push({
+      id: "branch_quarantine_camp",
+      actionType: "protect",
+      label: "组织临时隔离营",
+      description: "把诊所、礼拜堂和广场空屋串成临时隔离线，争取把瘟疫从崩盘边缘拉回来。",
+      targetId: "npc_adele",
+      leverage: ["recovery:plague", "clinic_protocol", "eve_shelter"],
+      riskLevel: "high"
+    });
+  }
+
+  if (mine && mine.progress >= mine.max - 1) {
+    actions.push({
+      id: "branch_public_ledger",
+      actionType: "investigate",
+      label: "公开矿区账本",
+      description: "把凯尔的账本、商会走私线和矿区污染证据推到公开场合，迫使收购降速。",
+      targetId: "npc_kyle",
+      leverage: ["recovery:mine", "ledger_witness", "rowan_authority"],
+      riskLevel: "high"
+    });
+  }
+
+  if (cult && cult.progress >= cult.max - 1) {
+    actions.push({
+      id: "branch_ritual_interruption",
+      actionType: "fight",
+      label: "切断礼拜堂仪式",
+      description: "在仪式完成前破坏关键阵列，给温和派和病人争取撤离窗口。",
+      targetId: "npc_eve",
+      leverage: ["recovery:cult", "ap:maneuver", "ap:press", "eve_confession"],
+      riskLevel: "high"
+    });
+  }
+
+  return actions;
+};
+
+const withRecoveryBranchActions = (state: WorldState, actions: PlayerAction[]): PlayerAction[] => [
+  ...actions,
+  ...getRecoveryBranchActions(state)
+];
+
 export const getBorderSevenDaysActions = (state: WorldState): PlayerAction[] => {
   if (state.currentLocationId === "clinic" || state.time.day >= 2) {
-    return [
+    return withRecoveryBranchActions(state, [
       {
         actionType: "negotiate",
         label: "协助阿黛尔谈判",
@@ -864,10 +918,10 @@ export const getBorderSevenDaysActions = (state: WorldState): PlayerAction[] => 
         leverage: [],
         riskLevel: "low"
       }
-    ];
+    ]);
   }
 
-  return [
+  return withRecoveryBranchActions(state, [
     {
       actionType: "investigate",
       label: "调查失踪商队",
@@ -899,5 +953,5 @@ export const getBorderSevenDaysActions = (state: WorldState): PlayerAction[] => 
       leverage: [],
       riskLevel: "low"
     }
-  ];
+  ]);
 };
