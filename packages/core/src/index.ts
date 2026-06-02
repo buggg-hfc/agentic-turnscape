@@ -1,5 +1,6 @@
 export * from "./dice.js";
 export * from "./combat.js";
+export * from "./campaignProgression.js";
 export * from "./effects.js";
 export * from "./factions.js";
 export * from "./patch.js";

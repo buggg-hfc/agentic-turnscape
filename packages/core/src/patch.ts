@@ -10,9 +10,11 @@ const allowedRoots = new Set([
   "relationships",
   "quests",
   "clocks",
+  "campaign",
   "publicEvents",
   "hiddenEvents"
 ]);
+const optionalPatchRoots = new Set(["campaign"]);
 
 const getAtPath = (target: unknown, parts: string[]): unknown => {
   let cursor = target;
@@ -79,7 +81,7 @@ export const applyStatePatch = (state: WorldState, patch: StatePatch): WorldStat
 
     switch (change.op) {
       case "set": {
-        if (!hasPatchTarget(parent, key)) {
+        if (!hasPatchTarget(parent, key) && !optionalPatchRoots.has(change.path)) {
           throw new Error(`Cannot set missing state field at ${change.path}`);
         }
         if (Array.isArray(parent)) parent[Number(key)] = change.value;

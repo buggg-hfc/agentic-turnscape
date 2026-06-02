@@ -148,6 +148,28 @@ export const HiddenEventSchema = ChronicleEventSchema.extend({
 });
 export type HiddenEvent = z.infer<typeof HiddenEventSchema>;
 
+export const CampaignFrontSchema = z.object({
+  factionId: z.string(),
+  influence: z.number().int().min(0).max(10),
+  pressure: z.number().int().min(0).max(10),
+  status: z.enum(["contained", "active", "dominant", "broken"])
+});
+export type CampaignFrontState = z.infer<typeof CampaignFrontSchema>;
+
+export const CampaignProgressionSchema = z.object({
+  chapter: z.number().int().min(1).max(12),
+  experience: z.number().int().min(0).max(99),
+  base: z.object({
+    name: z.string(),
+    level: z.number().int().min(0).max(5),
+    facilities: z.record(z.string(), z.number().int().min(0).max(5)),
+    assets: z.record(z.string(), z.number().int().min(0).max(99))
+  }),
+  fronts: z.record(z.string(), CampaignFrontSchema),
+  legacyFlags: z.array(z.string())
+});
+export type CampaignProgressionState = z.infer<typeof CampaignProgressionSchema>;
+
 export const WorldStateSchema = z.object({
   time: z.object({
     day: z.number().int().min(1).max(7),
@@ -171,7 +193,8 @@ export const WorldStateSchema = z.object({
   quests: z.record(z.string(), QuestSchema),
   clocks: z.record(z.string(), ClockSchema),
   publicEvents: z.array(ChronicleEventSchema),
-  hiddenEvents: z.array(HiddenEventSchema)
+  hiddenEvents: z.array(HiddenEventSchema),
+  campaign: CampaignProgressionSchema.optional()
 });
 export type WorldState = z.infer<typeof WorldStateSchema>;
 

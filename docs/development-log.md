@@ -43,3 +43,10 @@ This log records tested implementation slices as the project moves from the Bord
 - Pressure routes now replay from emitted `state_patch` records to the same endings as the original run.
 - Referee checks now separate system leverage tokens (`scenario:*`, `clock:*`, `pressureClock:*`, `route:*`, `step:*`) from player-facing mechanical leverage so hidden routing markers cannot inflate dice results.
 - Verification used: `npm test -- packages/agents/src/playthrough.test.ts --reporter=dot`.
+
+## 2026-06-02 - Long campaign foundation
+
+- Added optional `campaign` state for post-MVP expansion without breaking existing Border Seven Days and first-wave expansion worlds.
+- Added referee-owned long campaign progression patches for chapter transitions, base facility upgrades, character skill growth, and faction-war front status changes.
+- State patches can initialize the optional `campaign` root while still rejecting unknown nested fields elsewhere.
+- Verification used: `npm test -- packages/core/src/campaignProgression.test.ts --reporter=dot`.
