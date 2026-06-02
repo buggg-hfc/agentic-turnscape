@@ -38,7 +38,9 @@ import {
   type CampaignArcStatusSummary,
 } from "./campaignArcStatus.js";
 import {
+  buildCampaignProgressionChoices,
   buildCampaignProgressionSummary,
+  type CampaignProgressionChoice,
   type CampaignProgressionSummary,
 } from "./campaignProgression.js";
 import { formatCampaignProgress } from "./campaignResume.js";
@@ -348,6 +350,15 @@ export const App = () => {
     () => (state ? buildCampaignProgressionSummary(state) : undefined),
     [state],
   );
+  const campaignProgressionChoices = useMemo(
+    () =>
+      state
+        ? buildCampaignProgressionChoices(state, {
+            baseFacilities: scenarioStatus?.campaignArc?.baseFacilities,
+          })
+        : [],
+    [state, scenarioStatus],
+  );
   const campaignArcStatus = useMemo(
     () => buildCampaignArcStatusSummary(scenarioStatus),
     [scenarioStatus],
@@ -404,6 +415,42 @@ export const App = () => {
       throw new Error("回合仍在队列中，请稍后刷新状态。");
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "回合执行失败");
+      setLoadState("error");
+    }
+  };
+
+  const submitCampaignProgression = async (
+    choice: CampaignProgressionChoice,
+  ) => {
+    if (!campaignId) return;
+    setLoadState("running");
+    setError(undefined);
+    setTurnProgress([
+      { event: "campaign_progress", data: { message: choice.label } },
+    ]);
+    try {
+      const payload = await api.progressCampaign(campaignId, choice.request);
+      setState(payload.state);
+      setScenarioStatus(payload.scenarioStatus);
+      setActions(payload.availableActions);
+      setSelectedAction(payload.availableActions[0]);
+      setLastResolution(payload.resolution);
+      setTurnProgress([
+        {
+          event: "done",
+          data: {
+            message:
+              payload.resolution?.publicSummary ??
+              "campaign_progression_complete",
+          },
+        },
+      ]);
+      setChronicleTimeline(
+        buildChronicleTimeline(await api.chronicle(campaignId)),
+      );
+      setLoadState("ready");
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "闀挎湡鎴樺焦鎺ㄨ繘澶辫触");
       setLoadState("error");
     }
   };
@@ -554,6 +601,13 @@ export const App = () => {
           {campaignArcStatus.available ? (
             <CampaignArcPanel summary={campaignArcStatus} />
           ) : null}
+          {campaignProgressionChoices.length > 0 ? (
+            <CampaignProgressionChoicesPanel
+              choices={campaignProgressionChoices}
+              disabled={loadState === "running"}
+              onChoose={(choice) => void submitCampaignProgression(choice)}
+            />
+          ) : null}
           {campaignProgression?.available ? (
             <CampaignProgressionPanel summary={campaignProgression} />
           ) : null}
@@ -589,6 +643,7 @@ export const App = () => {
 const progressTitle: Record<string, string> = {
   turn: "回合任务",
   pending: "队列等待",
+  campaign_progress: "Campaign Progress",
   agent_proposals: "Agent 提案",
   referee: "规则裁判",
   narration: "叙事输出",
@@ -936,6 +991,36 @@ const CampaignProgressionPanel = ({
     {summary.legacyFlags.length > 0 ? (
       <small className="legacy-flags">{summary.legacyFlags.length} 条传承记录</small>
     ) : null}
+  </section>
+);
+
+const CampaignProgressionChoicesPanel = ({
+  choices,
+  disabled,
+  onChoose,
+}: {
+  choices: CampaignProgressionChoice[];
+  disabled: boolean;
+  onChoose: (choice: CampaignProgressionChoice) => void;
+}) => (
+  <section className="module campaign-choices">
+    <div className="panel-heading compact">
+      <GitBranch size={17} />
+      <h3>Campaign Moves</h3>
+    </div>
+    <div className="campaign-choice-list">
+      {choices.slice(0, 3).map((choice) => (
+        <button
+          key={choice.id}
+          className={`campaign-choice ${choice.kind}`}
+          disabled={disabled}
+          onClick={() => onChoose(choice)}
+        >
+          <span>{choice.label}</span>
+          <small>{choice.description}</small>
+        </button>
+      ))}
+    </div>
   </section>
 );
 

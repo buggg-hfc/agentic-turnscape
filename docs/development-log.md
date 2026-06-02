@@ -4,6 +4,13 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-03
 
+- Added tested long-campaign move choices for the web dashboard. The UI now derives base-building, training, and faction-front requests from current world state and submits them through the existing referee-owned `/campaign/progress` API.
+- Verification used for this slice:
+  - `npm test -- apps/web/src/campaignProgression.test.ts apps/web/src/api.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added a tested max-token budget to the shared LLM configuration contract, browser-local saved settings, API per-turn overrides, and OpenAI-compatible request payloads.
 - Added an opt-in real-provider LLM smoke test that reads credentials only from environment variables.
 - Documented the optional `LLM_TIMEOUT_MS` and `LLM_MAX_TOKENS` environment variables and kept real provider credentials out of committed files.

@@ -537,6 +537,48 @@ button {
   margin-top: 12px;
 }
 
+.campaign-choice-list {
+  display: grid;
+  gap: 8px;
+}
+
+.campaign-choice {
+  width: 100%;
+  min-height: 58px;
+  border: 1px solid rgba(103, 160, 143, 0.26);
+  border-radius: 8px;
+  padding: 9px 10px;
+  background: rgba(103, 160, 143, 0.1);
+  text-align: left;
+}
+
+.campaign-choice:hover {
+  border-color: rgba(227, 193, 111, 0.78);
+  background: rgba(227, 193, 111, 0.13);
+}
+
+.campaign-choice:disabled {
+  cursor: wait;
+  opacity: 0.68;
+}
+
+.campaign-choice span,
+.campaign-choice small {
+  display: block;
+}
+
+.campaign-choice span {
+  color: #fff1c5;
+  font-weight: 800;
+}
+
+.campaign-choice small {
+  margin-top: 4px;
+  color: #b8c6bd;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
 .campaign-arc-status .arc-current {
   border-left: 3px solid rgba(227, 193, 111, 0.78);
   border-radius: 0 8px 8px 0;

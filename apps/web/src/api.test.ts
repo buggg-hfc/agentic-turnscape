@@ -83,6 +83,9 @@ describe("web API client", () => {
       api.progressCampaign("campaign-1", {
         baseInvestments: [{ facilityId: "infirmary", supplies: 2, money: 1 }],
         training: { skill: "medical", experience: 3 },
+        factionFronts: [
+          { factionId: "blackstone_consortium", pressureDelta: -2 },
+        ],
       }),
     ).resolves.toMatchObject({
       campaignId: "campaign-1",
@@ -102,6 +105,9 @@ describe("web API client", () => {
     expect(JSON.parse(String(init.body))).toEqual({
       baseInvestments: [{ facilityId: "infirmary", supplies: 2, money: 1 }],
       training: { skill: "medical", experience: 3 },
+      factionFronts: [
+        { factionId: "blackstone_consortium", pressureDelta: -2 },
+      ],
     });
   });
 

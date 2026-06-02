@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-03 - Long Campaign Move Choices
+
+### Scope
+
+- Added tested web view-model support for long-campaign move choices: base-building, training, and faction-front stabilization.
+- Connected the dashboard to submit those choices through the existing `/campaigns/:id/campaign/progress` API, so each move still resolves through referee-owned `state_patch` records.
+- Kept the long campaign expansion path replayable: returned state, scenario status, available actions, narration, and chronicle are refreshed after each move.
+
+### Runtime Screenshot
+
+![Long campaign progression panel](screenshots/long-campaign-progress-panel-2026-06-02.png)
+
+The report keeps a runtime screenshot inline as requested. This slice extends the same long-campaign dashboard surface with actionable Campaign Moves; behavior is covered by focused UI view-model/API tests and the full build gate below.
+
+### Verification
+
+```bash
+npm test -- apps/web/src/campaignProgression.test.ts apps/web/src/api.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-03 - OpenAI-compatible LLM Token Budget
 
 ### Scope
