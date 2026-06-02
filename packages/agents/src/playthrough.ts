@@ -111,6 +111,19 @@ const highRollSeed = (base: string, minimum = 10): string => {
   throw new Error(`Unable to find deterministic high-roll seed for ${base}`);
 };
 
+const lowRollSeed = (base: string, maximum = 4): string => {
+  for (let attempt = 0; attempt < 200; attempt += 1) {
+    const candidate = `${base}_low_${attempt}`;
+    if (roll2d6(candidate).total <= maximum) return candidate;
+  }
+  throw new Error(`Unable to find deterministic low-roll seed for ${base}`);
+};
+
+const scenarioLeverage = (leverage: string[]): string[] =>
+  leverage.filter(
+    (token) => token.startsWith("scenario:") || token.startsWith("clock:") || token.startsWith("pressureClock:")
+  );
+
 export const runBorderSevenDaysPlaythrough = async ({
   routeId,
   llm,
@@ -169,17 +182,18 @@ export const runExpansionScenarioPlaythrough = async ({
     const actions = scenario.getActions(state);
     const baseAction = route === "success" ? actions[0] : actions.at(-1);
     if (!baseAction) throw new Error(`Expansion scenario ${scenarioId} did not provide playable actions`);
+    const routeLeverage = route === "success" ? baseAction.leverage : scenarioLeverage(baseAction.leverage);
     const action: PlayerAction = {
       ...baseAction,
       id: `${scenarioId}_${route}_${turnIndex}`,
-      leverage: Array.from(new Set([...baseAction.leverage, `route:${route}`, `step:${turnIndex}`]))
+      leverage: Array.from(new Set([...routeLeverage, `route:${route}`, `step:${turnIndex}`]))
     };
     const result = await runTurn({
       state,
       playerAction: action,
       llm,
       turnId: `${scenarioId}_${route}_turn_${turnIndex}`,
-      seed: route === "success" ? highRollSeed(`${seed}_${turnIndex}`) : `${seed}_${turnIndex}`,
+      seed: route === "success" ? highRollSeed(`${seed}_${turnIndex}`) : lowRollSeed(`${seed}_${turnIndex}`),
       getAvailableActions: scenario.getActions,
       evaluateEnding: scenario.evaluateEnding
     });

@@ -48,6 +48,20 @@ const relationshipPath = (characterId: string, dimension: string): string => `re
 const hasRelationship = (state: WorldState, characterId: string): boolean =>
   Boolean(state.relationships[`player:${characterId}`]);
 const hasClock = (state: WorldState, clockId: string): boolean => Boolean(state.clocks[clockId]);
+const systemLeveragePrefixes = ["scenario:", "clock:", "pressureClock:", "route:", "step:"];
+const mechanicalLeverageOf = (leverage: string[]): string[] =>
+  leverage.filter((token) => !systemLeveragePrefixes.some((prefix) => token.startsWith(prefix)));
+const addClockInc = (
+  changes: StatePatch["changes"],
+  state: WorldState,
+  clockId: string,
+  delta: number,
+  reason: string
+) => {
+  if (hasClock(state, clockId)) {
+    changes.push({ op: "inc", path: `clocks.${clockId}.progress`, delta, reason });
+  }
+};
 
 const check = (
   state: WorldState,
@@ -78,11 +92,12 @@ const check = (
   const roll = roll2d6(seed);
   const attributeScore = state.player.attributes[config.attribute] ?? 0;
   const skillScore = state.player.skills[config.skill] ?? 0;
+  const mechanicalLeverage = mechanicalLeverageOf(playerAction.leverage);
   const socialLeverage =
     playerAction.actionType === "negotiate" || playerAction.actionType === "trade"
-      ? resolveSocialLeverage(state, playerAction.leverage)
+      ? resolveSocialLeverage(state, mechanicalLeverage)
       : undefined;
-  const leverageBonus = socialLeverage?.totalBonus ?? Math.min(2, playerAction.leverage.length);
+  const leverageBonus = socialLeverage?.totalBonus ?? Math.min(2, mechanicalLeverage.length);
   const pressurePenalty = Math.max(0, Math.floor((state.player.resources.pressure ?? 0) / 4));
   const modifier = attributeScore + skillScore + leverageBonus - pressurePenalty;
   const total = roll.total + modifier;
@@ -375,10 +390,10 @@ export const adjudicateTurn = ({ state, playerAction, proposals, turnId, seed = 
       changes.push(
         { op: "inc", path: relationshipPath("npc_adele", "trust"), delta: -1, reason: "谈判失败让阿黛尔失去空间" },
         { op: "inc", path: relationshipPath("npc_rowan", "suspicion"), delta: 1, reason: "城防军认为玩家拖延防疫" },
-        { op: "inc", path: "clocks.plague_spread.progress", delta: 1, reason: "混乱导致防疫失控" },
-        { op: "inc", path: "clocks.martial_lockdown.progress", delta: 1, reason: "冲突升级使城防军更强硬" },
         { op: "append", path: "publicEvents", value: event(state, turnId, "诊所被强制接管", "谈判破裂，城防军带走部分感染者，阿黛尔被迫交出病历。", ["clinic", "failure"]), reason: "记录公共结果" }
       );
+      addClockInc(changes, state, "plague_spread", 1, "混乱导致防疫失控");
+      addClockInc(changes, state, "martial_lockdown", 1, "冲突升级使城防军更强硬");
       publicSummary = "谈判没有压住恐慌，城防军强行接管诊所，瘟疫与戒严压力上升。";
       hiddenSummary = "商会密探成功推动人群不信任诊所。";
     }
@@ -397,9 +412,9 @@ export const adjudicateTurn = ({ state, playerAction, proposals, turnId, seed = 
       hiddenSummary = "凯尔仍在旧哨站附近躲藏，哈根的雇佣兵正在接近。";
     } else {
       changes.push(
-        { op: "inc", path: "clocks.mine_takeover.progress", delta: 1, reason: "玩家调查受阻，商会推进收购" },
         { op: "append", path: "publicEvents", value: event(state, turnId, "调查受阻", "线索被人提前清理，黑石商会趁机加快矿区合同。", ["investigation", "setback"]), reason: "记录公共结果" }
       );
+      addClockInc(changes, state, "mine_takeover", 1, "玩家调查受阻，商会推进收购");
       publicSummary = "调查被干扰，商会趁时间差推进矿区控制。";
       hiddenSummary = "曼洛不确定玩家掌握了多少证据，因此选择加快合同。";
     }
@@ -423,9 +438,11 @@ export const adjudicateTurn = ({ state, playerAction, proposals, turnId, seed = 
     } else {
       changes.push(
         { op: "inc", path: "player.resources.pressure", delta: 1, reason: "护送失败造成压力" },
-        { op: "inc", path: "clocks.plague_spread.progress", delta: 1, reason: "混乱中感染风险增加" },
         { op: "append", path: "publicEvents", value: event(state, turnId, "撤离失败", "病人撤离时被城防军拦下，街口的恐慌进一步蔓延。", ["clinic", "failure"]), reason: "记录公共结果" }
       );
+      if (hasClock(state, "plague_spread")) {
+        changes.push({ op: "inc", path: "clocks.plague_spread.progress", delta: 1, reason: "混乱中感染风险增加" });
+      }
       publicSummary = "护送失败，玩家承受压力，瘟疫风险上升。";
       hiddenSummary = "商会密探把撤离失败包装成诊所隐瞒疫情。";
     }
@@ -444,14 +461,14 @@ export const adjudicateTurn = ({ state, playerAction, proposals, turnId, seed = 
   } else if (playerAction.actionType === "rest" || playerAction.actionType === "ignore") {
     changes.push(
       { op: "inc", path: "player.resources.stamina", delta: 1, reason: "玩家降低直接消耗" },
-      { op: "inc", path: "clocks.plague_spread.progress", delta: 1, reason: "玩家不介入时危机自行推进" },
-      { op: "inc", path: "clocks.mine_takeover.progress", delta: 1, reason: "商会利用空档推进计划" },
       { op: "append", path: "publicEvents", value: event(state, turnId, "局势自行推进", "玩家暂时没有强力介入，瘟疫和矿区合同都向前走了一步。", ["downtime", "clock"]), reason: "记录公共结果" }
     );
+    addClockInc(changes, state, "plague_spread", 1, "玩家不介入时危机自行推进");
+    addClockInc(changes, state, "mine_takeover", 1, "商会利用空档推进计划");
     publicSummary = "玩家保留体力，但危机没有等待。";
     hiddenSummary = "教团和商会都把沉默视为可利用的空隙。";
   } else if (playerAction.actionType === "fight") {
-    const nonApLeverageBonus = Math.min(2, playerAction.leverage.filter((item) => !item.startsWith("ap:")).length);
+    const nonApLeverageBonus = Math.min(2, mechanicalLeverageOf(playerAction.leverage).filter((item) => !item.startsWith("ap:")).length);
     const combat = resolveCombatRound({
       state,
       plan: combatPlanOf(playerAction),
@@ -472,9 +489,7 @@ export const adjudicateTurn = ({ state, playerAction, proposals, turnId, seed = 
     };
     changes.push(...combat.patch.changes);
     if (combat.outcome === "player_setback") {
-      changes.push(
-        { op: "inc", path: "clocks.martial_lockdown.progress", delta: 1, reason: "公开冲突推动戒严" }
-      );
+      addClockInc(changes, state, "martial_lockdown", 1, "公开冲突推动戒严");
     } else {
       changes.push(
         { op: "tag", path: "player.reputationTags", value: "敢于动手的人", reason: "公开武力改变声望" }

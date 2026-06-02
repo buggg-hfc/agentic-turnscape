@@ -79,4 +79,35 @@ describe("first-wave expansion deterministic playthroughs", () => {
       expect(scenario.evaluateEnding(replayed)?.id, `${scenarioId} replay`).toBe(endingId);
     }
   });
+
+  it("runs every first-wave expansion pack to a pressure ending and replays the same result from patches", async () => {
+    const cases = [
+      { scenarioId: "frost-lantern-trial", endingId: "ash_debt_bound" },
+      { scenarioId: "orbital-quarantine", endingId: "salvage_lockdown" },
+      { scenarioId: "salt-harbor-accord", endingId: "guard_charter" },
+      { scenarioId: "rain-alley-haunting", endingId: "condemned_block" },
+      { scenarioId: "emergency-ward-night", endingId: "paperwork_burial" }
+    ];
+
+    for (const { scenarioId, endingId } of cases) {
+      const scenario = requireScenarioPackage(scenarioId);
+      const result = await runExpansionScenarioPlaythrough({
+        scenarioId,
+        route: "pressure",
+        llm: fallbackLlm,
+        seed: `${scenarioId}-pressure`
+      });
+
+      expect(result.turns, scenarioId).toBeGreaterThanOrEqual(8);
+      expect(result.state.time, scenarioId).toEqual({ day: 3, phase: "night" });
+      expect(result.ending?.id, scenarioId).toBe(endingId);
+      expect(result.resolutions.at(-1)?.ending?.id, scenarioId).toBe(endingId);
+
+      const replayed = result.resolutions.reduce(
+        (state, resolution) => applyStatePatch(state, resolution.statePatch),
+        scenario.createWorld()
+      );
+      expect(scenario.evaluateEnding(replayed)?.id, `${scenarioId} pressure replay`).toBe(endingId);
+    }
+  });
 });

@@ -36,3 +36,10 @@ This log records tested implementation slices as the project moves from the Bord
 - Added generic scenario clock consequences keyed by `scenario:*`, `clock:*`, and `pressureClock:*` leverage tokens. Successful expansion turns advance scenario stability clocks and player momentum; failures advance the pressure line without creating a hard game over.
 - Made Border Seven Days-specific referee side effects conditional on the target relationship, location, or clock existing so the same rules engine can safely adjudicate other scenario worlds.
 - Verification used: `npm test -- packages/agents/src/playthrough.test.ts --reporter=dot`.
+
+## 2026-06-02 - Expansion pressure playthroughs
+
+- Added deterministic pressure-route coverage for all first-wave expansion packages, proving cultivation, science fiction, historical, urban supernatural, and realistic profession packs can reach their failure/pressure endings.
+- Pressure routes now replay from emitted `state_patch` records to the same endings as the original run.
+- Referee checks now separate system leverage tokens (`scenario:*`, `clock:*`, `pressureClock:*`, `route:*`, `step:*`) from player-facing mechanical leverage so hidden routing markers cannot inflate dice results.
+- Verification used: `npm test -- packages/agents/src/playthrough.test.ts --reporter=dot`.

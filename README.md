@@ -16,7 +16,7 @@ A multi-agent turn-based narrative simulation game. The current implementation i
 - Three Agent transparency modes with server-side redaction so hidden reasons, hidden summaries, and hidden patches only appear in debug views.
 - Seed content for 3 factions, 10 NPCs, 6 locations, 3 visible crisis clocks, quests, and starting chronicle.
 - First-wave expansion scenario packs for cultivation, science fiction, historical, urban supernatural, and realistic profession play, all using the same tested `ScenarioPackage` contract.
-- Deterministic expansion playthrough tests for all first-wave packs, with generic scenario clock progression and replayable state patches.
+- Deterministic expansion playthrough tests for all first-wave packs, covering both success and pressure endings with generic scenario clock progression and replayable state patches.
 - Built-in scenario registry plus runtime creator scenario import, export, protected deletion, local restore, and API-side persistence.
 - Chronicle replay records, state snapshots, Agent run records, and hidden memory logs.
 - PostgreSQL/Redis Docker Compose, Prisma schema, optional `STORAGE_DRIVER=prisma` persistence, and optional `TURN_QUEUE_DRIVER=bullmq` turn workers.
