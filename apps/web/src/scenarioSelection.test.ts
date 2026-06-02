@@ -7,7 +7,12 @@ const catalog: ScenarioCatalogPayload = {
     {
       id: "frost-lantern-trial",
       title: "Frost Lantern Trial",
-      counts: { combat: 2, social: 3, endings: 2 }
+      counts: { combat: 2, social: 3, endings: 2 },
+      campaignArc: {
+        chapterCount: 3,
+        baseFacilities: ["training_hall", "archive"],
+        factionFronts: ["frost_lantern_sect", "gray_ash_cabal"]
+      }
     },
     {
       id: "border-seven-days",
@@ -20,6 +25,15 @@ const catalog: ScenarioCatalogPayload = {
 describe("scenario selection", () => {
   it("formats scenario counts for compact cards", () => {
     expect(formatScenarioCounts(catalog.scenarios[1]!.counts)).toBe("战斗 5 · 社交 8 · 结局 6");
+  });
+
+  it("formats long campaign arc metadata when a scenario exposes it", () => {
+    const selection = buildScenarioSelection(catalog, "frost-lantern-trial");
+
+    expect(selection.options[0]).toMatchObject({
+      id: "frost-lantern-trial",
+      arcSummary: "Long 3 chapters · Base 2 · Fronts 2"
+    });
   });
 
   it("keeps catalog order but defaults to border seven days when available", () => {

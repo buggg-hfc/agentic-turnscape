@@ -4,6 +4,8 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-02
 
+- Added long campaign arc metadata for Border Seven Days and all first-wave expansion packs. Built-in scenarios now declare chapter beats, base facility hooks, and faction front hooks for post-MVP expansion.
+- Exposed arc summaries through the scenario catalog and web scenario picker so players can see which scenario packs have long campaign structure.
 - Added the long campaign progression API slice: `/campaigns/:id/campaign/progress` now resolves chapter/base/growth/front changes through the rules engine, stores the resulting snapshot, and records replayable referee patches.
 - Added the web long campaign summary panel for chapter, campaign XP, base facilities, faction front pressure, and replay visibility.
 - Captured a runtime screenshot for the implementation report:
@@ -17,6 +19,13 @@ This log records tested implementation slices as the project moves from the Bord
   - `npm run typecheck`
   - `npm test -- --reporter=dot`
   - `npm run build`
+
+## 2026-06-02 - Scenario long campaign arcs
+
+- Added a `campaignArc` contract to built-in scenario packages with chapter beats, base facilities, and faction fronts.
+- Added arc metadata for `border-seven-days`, `frost-lantern-trial`, `orbital-quarantine`, `salt-harbor-accord`, `rain-alley-haunting`, and `emergency-ward-night`.
+- Exposed compact arc summaries in the API scenario catalog and web scenario selection model.
+- Verification used: `npm test -- packages/content/src/scenarioRegistry.test.ts apps/api/src/server.test.ts apps/web/src/scenarioSelection.test.ts --reporter=dot`.
 
 ## Publishing Discipline
 

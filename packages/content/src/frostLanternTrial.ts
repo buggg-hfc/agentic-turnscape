@@ -1,5 +1,5 @@
 import type { Attributes, CharacterState, FactionState, LocationState, PlayerAction, QuestState, RelationshipState, WorldState } from "@agentic-turnscape/shared";
-import type { ScenarioDayPlan, ScenarioPackage } from "./scenarioRegistry.js";
+import type { ScenarioCampaignArc, ScenarioDayPlan, ScenarioPackage } from "./scenarioRegistry.js";
 
 const attributes: Attributes = {
   physique: 2,
@@ -57,6 +57,31 @@ export const frostLanternTrialDays: ScenarioDayPlan[] = [
     clockPressure: ["inner_fire", "shadow_debt"]
   }
 ];
+
+const frostLanternCampaignArc: ScenarioCampaignArc = {
+  chapters: [
+    {
+      id: "frost-lantern-trial_outer_trial",
+      title: "Outer Trial",
+      focus: "Survive the three-day vow test and decide whether the inner gate opens cleanly.",
+      unlocks: ["lantern_oath", "lantern_courtyard", "mist_gate"]
+    },
+    {
+      id: "frost-lantern-trial_sect_seat",
+      title: "Sect Seat",
+      focus: "Use the trial result to build a cultivation base, repair the lantern, or hide ash debt.",
+      unlocks: ["training_hall", "archive", "infirmary"]
+    },
+    {
+      id: "frost-lantern-trial_ash_front",
+      title: "Ash Front",
+      focus: "Carry the vow, cabal pressure, and elder politics into a broader sect campaign.",
+      unlocks: ["frost_lantern_sect", "gray_ash_cabal"]
+    }
+  ],
+  baseFacilities: ["training_hall", "archive", "infirmary"],
+  factionFronts: ["frost_lantern_sect", "gray_ash_cabal"]
+};
 
 const locations: Record<string, LocationState> = {
   lantern_courtyard: {
@@ -287,6 +312,7 @@ export const frostLanternTrialPackage: ScenarioPackage = {
   id: "frost-lantern-trial",
   title: "Frost Lantern Trial",
   counts: { combat: 1, social: 1, endings: 2 },
+  campaignArc: frostLanternCampaignArc,
   createWorld: createFrostLanternTrialWorld,
   getActions: getFrostLanternTrialActions,
   getDayPlan: getFrostLanternTrialDayPlan,

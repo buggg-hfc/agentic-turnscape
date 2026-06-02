@@ -77,6 +77,32 @@ describe("scenario package registry", () => {
     }
   });
 
+  it("exposes long campaign arc metadata for built-in MVP and expansion scenarios", () => {
+    const builtInScenarioIds = [
+      "border-seven-days",
+      "frost-lantern-trial",
+      "orbital-quarantine",
+      "salt-harbor-accord",
+      "rain-alley-haunting",
+      "emergency-ward-night"
+    ];
+
+    for (const scenarioId of builtInScenarioIds) {
+      const scenario = requireScenarioPackage(scenarioId);
+      expect(scenario.campaignArc?.chapters.length, scenarioId).toBeGreaterThanOrEqual(3);
+      expect(scenario.campaignArc?.baseFacilities.length, scenarioId).toBeGreaterThanOrEqual(2);
+      expect(scenario.campaignArc?.factionFronts.length, scenarioId).toBeGreaterThanOrEqual(2);
+      expect(scenario.campaignArc?.chapters[0]).toEqual(
+        expect.objectContaining({
+          id: expect.any(String),
+          title: expect.any(String),
+          focus: expect.any(String),
+          unlocks: expect.any(Array)
+        })
+      );
+    }
+  });
+
   it("rejects duplicate scenario ids in custom registries", () => {
     const scenario = requireScenarioPackage("border-seven-days");
     expect(() => createScenarioRegistry([scenario, scenario])).toThrow("Duplicate scenario package");

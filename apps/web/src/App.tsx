@@ -681,6 +681,7 @@ const ScenarioPicker = ({
       >
         <span>{option.title}</span>
         <small>{option.summary}</small>
+        {option.arcSummary ? <small className="scenario-arc">{option.arcSummary}</small> : null}
       </button>
     ))}
   </div>

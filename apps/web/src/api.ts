@@ -50,6 +50,11 @@ export type ScenarioSummary = {
     social: number;
     endings: number;
   };
+  campaignArc?: {
+    chapterCount: number;
+    baseFacilities: string[];
+    factionFronts: string[];
+  };
 };
 
 export type ScenarioCatalogPayload = {

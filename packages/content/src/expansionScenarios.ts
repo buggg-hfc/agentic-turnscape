@@ -9,7 +9,7 @@ import type {
   RelationshipState,
   WorldState
 } from "@agentic-turnscape/shared";
-import type { ScenarioDayPlan, ScenarioPackage } from "./scenarioRegistry.js";
+import type { ScenarioCampaignArc, ScenarioDayPlan, ScenarioPackage } from "./scenarioRegistry.js";
 
 const attributes: Attributes = {
   physique: 2,
@@ -62,6 +62,45 @@ type ExpansionScenarioDefinition = {
 };
 
 const clone = <T>(value: T): T => structuredClone(value);
+
+const campaignArcFacilities: Record<string, string[]> = {
+  science_fiction: ["medbay", "engineering_bay", "evidence_archive"],
+  historical: ["ledger_room", "harbor_office", "training_yard"],
+  urban_supernatural: ["tenant_office", "ritual_room", "case_archive"],
+  realistic_profession: ["triage_station", "maintenance_bay", "review_room"]
+};
+
+const createCampaignArc = (
+  definition: ExpansionScenarioDefinition,
+  allyFactionId: string,
+  pressureFactionId: string
+): ScenarioCampaignArc => {
+  const baseFacilities = campaignArcFacilities[definition.themeTag] ?? ["field_office", "archive", "workshop"];
+  return {
+    chapters: [
+      {
+        id: `${definition.id}_opening_arc`,
+        title: `${definition.title}: Opening Crisis`,
+        focus: definition.quest.surfaceGoal,
+        unlocks: [definition.quest.id, definition.startLocation.id]
+      },
+      {
+        id: `${definition.id}_base_arc`,
+        title: `${definition.title}: Campaign Base`,
+        focus: definition.quest.longTermImpact,
+        unlocks: baseFacilities
+      },
+      {
+        id: `${definition.id}_front_arc`,
+        title: `${definition.title}: Faction Front`,
+        focus: definition.quest.failureConsequence,
+        unlocks: [allyFactionId, pressureFactionId]
+      }
+    ],
+    baseFacilities,
+    factionFronts: [allyFactionId, pressureFactionId]
+  };
+};
 
 const character = (
   id: "npc_zhou_jin" | "npc_adele" | "npc_manlo",
@@ -208,6 +247,7 @@ const createExpansionScenarioPackage = (definition: ExpansionScenarioDefinition)
     id: definition.id,
     title: definition.title,
     counts: { combat: 1, social: 1, endings: 2 },
+    campaignArc: createCampaignArc(definition, allyFactionId, pressureFactionId),
     createWorld,
     getActions: (state) => [
       {

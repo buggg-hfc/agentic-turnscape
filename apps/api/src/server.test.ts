@@ -257,6 +257,17 @@ describe("campaign turn API", () => {
           id: "orbital-quarantine",
           title: "Orbital Quarantine",
           counts: { combat: 1, social: 1, endings: 2 },
+          campaignArc: {
+            chapterCount: 3,
+            baseFacilities: expect.arrayContaining([
+              "medbay",
+              "engineering_bay",
+            ]),
+            factionFronts: expect.arrayContaining([
+              "orbital-quarantine_allies",
+              "orbital-quarantine_pressure",
+            ]),
+          },
         }),
         expect.objectContaining({
           id: "salt-harbor-accord",

@@ -9,6 +9,7 @@ import {
   getScenarioPackage,
   importCreatorScenarioPackage,
   listScenarioPackages,
+  summarizeCampaignArc,
   type ScenarioPackage,
 } from "@agentic-turnscape/content";
 import {
@@ -166,11 +167,20 @@ export const buildServer = (options: ServerOptions = {}) => {
   const turnQueue = options.turnQueue ?? createTurnQueue();
   const runtimeScenarios = new Map<string, RuntimeScenarioRecord>();
   let runtimeScenariosLoaded = false;
-  const scenarioSummary = ({ id, title, counts }: ScenarioPackage) => ({
+  const scenarioSummary = ({
     id,
     title,
     counts,
-  });
+    campaignArc,
+  }: ScenarioPackage) => {
+    const arcSummary = summarizeCampaignArc(campaignArc);
+    return {
+      id,
+      title,
+      counts,
+      ...(arcSummary ? { campaignArc: arcSummary } : {}),
+    };
+  };
   const loadRuntimeScenarios = async () => {
     if (runtimeScenariosLoaded) return;
     for (const stored of await store.listRuntimeScenarios()) {

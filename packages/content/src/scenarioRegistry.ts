@@ -23,17 +23,48 @@ export type ScenarioDayPlan = {
   clockPressure: string[];
 };
 
+export type ScenarioCampaignArcChapter = {
+  id: string;
+  title: string;
+  focus: string;
+  unlocks: string[];
+};
+
+export type ScenarioCampaignArc = {
+  chapters: ScenarioCampaignArcChapter[];
+  baseFacilities: string[];
+  factionFronts: string[];
+};
+
+export type ScenarioCampaignArcSummary = {
+  chapterCount: number;
+  baseFacilities: string[];
+  factionFronts: string[];
+};
+
 export type ScenarioPackage = {
   id: string;
   title: string;
   counts: ScenarioCounts;
+  campaignArc?: ScenarioCampaignArc;
   createWorld: () => WorldState;
   getActions: (state: WorldState) => PlayerAction[];
   getDayPlan: (day: number) => ScenarioDayPlan | undefined;
   evaluateEnding: (state: WorldState) => EndingSummary | undefined;
 };
 
-export type ScenarioSummary = Pick<ScenarioPackage, "id" | "title" | "counts">;
+export type ScenarioSummary = Pick<ScenarioPackage, "id" | "title" | "counts"> & {
+  campaignArc?: ScenarioCampaignArcSummary;
+};
+
+export const summarizeCampaignArc = (campaignArc: ScenarioCampaignArc | undefined): ScenarioCampaignArcSummary | undefined =>
+  campaignArc
+    ? {
+        chapterCount: campaignArc.chapters.length,
+        baseFacilities: [...campaignArc.baseFacilities],
+        factionFronts: [...campaignArc.factionFronts]
+      }
+    : undefined;
 
 export const borderSevenDaysPackage: ScenarioPackage = {
   id: borderSevenDaysScenario.id,
@@ -42,6 +73,30 @@ export const borderSevenDaysPackage: ScenarioPackage = {
     combat: borderSevenDaysScenario.scenes.filter((scene) => scene.kind === "combat").length,
     social: borderSevenDaysScenario.scenes.filter((scene) => scene.kind === "social").length,
     endings: borderSevenDaysScenario.endings.length
+  },
+  campaignArc: {
+    chapters: [
+      {
+        id: "border-seven-days_crisis",
+        title: "Border Crisis",
+        focus: "Resolve the seven-day town crisis and decide which faction story becomes history.",
+        unlocks: ["missing_caravan", "clinic_conflict", "old_outpost"]
+      },
+      {
+        id: "border-seven-days_aftermath",
+        title: "Border Aftermath",
+        focus: "Turn the ending into a playable base, faction front, and legacy record.",
+        unlocks: ["infirmary", "workshop", "archive"]
+      },
+      {
+        id: "border-seven-days_rift_war",
+        title: "Rift War Front",
+        focus: "Carry surviving NPCs and crisis clocks into a wider regional campaign.",
+        unlocks: ["frontier_guild", "blackstone_consortium", "rift_cult"]
+      }
+    ],
+    baseFacilities: ["infirmary", "workshop", "archive"],
+    factionFronts: ["frontier_guild", "blackstone_consortium", "rift_cult"]
   },
   createWorld: createBorderSevenDaysWorld,
   getActions: getBorderSevenDaysActions,
@@ -59,7 +114,16 @@ export const createScenarioRegistry = (packages: ScenarioPackage[]) => {
   }
 
   return {
-    list: (): ScenarioSummary[] => Array.from(scenarios.values()).map(({ id, title, counts }) => ({ id, title, counts })),
+    list: (): ScenarioSummary[] =>
+      Array.from(scenarios.values()).map(({ id, title, counts, campaignArc }) => {
+        const arcSummary = summarizeCampaignArc(campaignArc);
+        return {
+          id,
+          title,
+          counts,
+          ...(arcSummary ? { campaignArc: arcSummary } : {})
+        };
+      }),
     get: (id: string): ScenarioPackage | undefined => scenarios.get(id),
     require: (id: string): ScenarioPackage => {
       const scenario = scenarios.get(id);
