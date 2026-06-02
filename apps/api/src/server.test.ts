@@ -145,7 +145,7 @@ describe("campaign turn API", () => {
     });
     expect(scenariosResponse.statusCode).toBe(200);
     expect(scenariosResponse.json()).toEqual({
-      scenarios: [
+      scenarios: expect.arrayContaining([
         expect.objectContaining({
           id: "border-seven-days",
           title: "边境七日",
@@ -156,7 +156,27 @@ describe("campaign turn API", () => {
           title: "Frost Lantern Trial",
           counts: { combat: 1, social: 1, endings: 2 },
         }),
-      ],
+        expect.objectContaining({
+          id: "orbital-quarantine",
+          title: "Orbital Quarantine",
+          counts: { combat: 1, social: 1, endings: 2 },
+        }),
+        expect.objectContaining({
+          id: "salt-harbor-accord",
+          title: "Salt Harbor Accord",
+          counts: { combat: 1, social: 1, endings: 2 },
+        }),
+        expect.objectContaining({
+          id: "rain-alley-haunting",
+          title: "Rain Alley Haunting",
+          counts: { combat: 1, social: 1, endings: 2 },
+        }),
+        expect.objectContaining({
+          id: "emergency-ward-night",
+          title: "Emergency Ward Night",
+          counts: { combat: 1, social: 1, endings: 2 },
+        }),
+      ]),
     });
 
     const campaignResponse = await app.inject({
@@ -186,6 +206,22 @@ describe("campaign turn API", () => {
       title: "Frost Lantern Trial",
       scenarioStatus: {
         dayPlan: { day: 1 },
+        sceneCounts: { combat: 1, social: 1, endings: 2 },
+      },
+    });
+
+    const scienceFictionResponse = await app.inject({
+      method: "POST",
+      url: "/campaigns",
+      headers: { "content-type": "application/json" },
+      payload: { scenarioId: "orbital-quarantine" },
+    });
+    expect(scienceFictionResponse.statusCode).toBe(200);
+    expect(scienceFictionResponse.json()).toMatchObject({
+      scenario: "orbital-quarantine",
+      title: "Orbital Quarantine",
+      scenarioStatus: {
+        dayPlan: { day: 1, defaultLocationId: "orbital_medbay" },
         sceneCounts: { combat: 1, social: 1, endings: 2 },
       },
     });

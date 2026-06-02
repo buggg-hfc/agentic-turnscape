@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { WorldStateSchema } from "@agentic-turnscape/shared";
 import { createScenarioRegistry, getScenarioPackage, listScenarioPackages, requireScenarioPackage } from "./scenarioRegistry.js";
 
 describe("scenario package registry", () => {
@@ -44,6 +45,36 @@ describe("scenario package registry", () => {
     world.time = { day: 3, phase: "night" };
     world.player.momentum = 3;
     expect(scenario.evaluateEnding(world)?.id).toBe("inner_gate_opened");
+  });
+
+  it("exposes the full first wave of genre expansion packs through the same tested contract", () => {
+    const expectedPacks = [
+      { id: "frost-lantern-trial", title: "Frost Lantern Trial" },
+      { id: "orbital-quarantine", title: "Orbital Quarantine" },
+      { id: "salt-harbor-accord", title: "Salt Harbor Accord" },
+      { id: "rain-alley-haunting", title: "Rain Alley Haunting" },
+      { id: "emergency-ward-night", title: "Emergency Ward Night" }
+    ];
+
+    expect(listScenarioPackages()).toEqual(
+      expect.arrayContaining(expectedPacks.map((pack) => expect.objectContaining(pack)))
+    );
+
+    for (const pack of expectedPacks) {
+      const scenario = requireScenarioPackage(pack.id);
+      const world = scenario.createWorld();
+      WorldStateSchema.parse(world);
+
+      expect(scenario.title).toBe(pack.title);
+      expect(scenario.counts.endings).toBeGreaterThanOrEqual(2);
+      expect(scenario.getDayPlan(world.time.day)?.defaultLocationId).toBe(world.currentLocationId);
+      expect(scenario.getActions(world).length).toBeGreaterThanOrEqual(2);
+      expect(scenario.evaluateEnding(world)).toBeUndefined();
+
+      world.time = { day: 3, phase: "night" };
+      world.player.momentum = 3;
+      expect(scenario.evaluateEnding(world)?.id).toMatch(/victory|opened|stabilized|accord|saved/);
+    }
   });
 
   it("rejects duplicate scenario ids in custom registries", () => {

@@ -6,6 +6,7 @@ import {
   getBorderSevenDaysActions,
   getBorderSevenDaysDayPlan
 } from "./borderSevenDays.js";
+import { firstWaveExpansionPackages } from "./expansionScenarios.js";
 import { frostLanternTrialPackage } from "./frostLanternTrial.js";
 
 export type ScenarioCounts = {
@@ -68,7 +69,11 @@ export const createScenarioRegistry = (packages: ScenarioPackage[]) => {
   };
 };
 
-const defaultScenarioRegistry = createScenarioRegistry([borderSevenDaysPackage, frostLanternTrialPackage]);
+const defaultScenarioRegistry = createScenarioRegistry([
+  borderSevenDaysPackage,
+  frostLanternTrialPackage,
+  ...firstWaveExpansionPackages
+]);
 
 export const listScenarioPackages = () => defaultScenarioRegistry.list();
 export const getScenarioPackage = (id: string) => defaultScenarioRegistry.get(id);
