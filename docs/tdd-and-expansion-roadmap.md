@@ -1,0 +1,63 @@
+# TDD and Full Game Expansion Roadmap
+
+This project is developed test-first. A feature is not considered ready because it looks playable; it is ready when the behavior is captured by tests, the implementation passes those tests, and the acceptance gate matches the intended game scope.
+
+## TDD Workflow
+
+1. Write or update the smallest meaningful failing test before changing production code.
+2. Implement only enough production code to make that behavior pass.
+3. Refactor while keeping the test suite green.
+4. Run the full gate before handing off work:
+
+```bash
+npm run typecheck
+npm test
+npm run build
+```
+
+5. Update the relevant docs in the same slice. At minimum, update this roadmap or `docs/development-log.md` when a tested behavior changes the MVP contract, persistence model, LLM behavior, UX surface, or expansion plan.
+6. After the gate passes, commit and push the verified slice to GitHub. Open a draft PR when the GitHub CLI or connector flow is available.
+
+For gameplay work, tests should prove the rule invariant rather than a single lucky text output. LLM prose may vary, but rule results, state patches, clocks, and visibility boundaries must be deterministic under a fixed seed.
+
+## Required Test Layers
+
+- Shared schemas: public API shapes, saved settings, Agent proposals, player actions, and state patches.
+- Core rules: dice, success levels, AP, pressure, relationships, clocks, legal/illegal patches, death and failure states.
+- Agent orchestration: limited observations, structured JSON validation, fallback behavior, no direct state mutation, no hidden-info leakage.
+- API flows: create campaign, submit action, run turn, SSE replay, chronicle, request-level LLM config, persistence once database storage is enabled.
+- Web flows: local settings persistence, action submission payloads, visible state rendering, crisis feedback, transparency modes.
+- Content acceptance: each scenario day, crisis line, major NPC, major quest, combat scene, social scene, and ending must have a test proving it can be reached or resolved.
+
+## Verified Slices
+
+- Runtime creator scenarios can be imported, exported, protected from deletion while campaigns reference them, saved locally in the browser, and restored by the API store after server rebuilds.
+- LLM settings can be configured in the web UI, saved locally, sent with a turn request, and kept out of world state.
+- Agent transparency has three tested modes: immersive hides proposals, inference shows public reasons only, and debug exposes full proposal details. Public API state, SSE replay, and chronicle replay redact hidden summaries, hidden reasons, and hidden state patch entries unless debug transparency is explicitly requested.
+
+## MVP Completion Gate
+
+The "Border Seven Days" MVP is complete only when tests and smoke checks prove all of these:
+
+- 7-day campaign progression can complete from start to ending.
+- 3 factions each have at least one plan that can advance, be blocked, or change direction.
+- 10 key NPCs can produce legal proposals from limited observations.
+- 6 locations expose public information while preserving hidden information.
+- 3 crisis clocks can progress, cap at max, and trigger consequences.
+- 5 combat scenes and 8 social scenes can resolve through the referee.
+- At least 6 endings are reachable under deterministic seeds.
+- Deterministic full-campaign playthrough tests must run from day 1 morning to day 7 night and prove each MVP ending is reachable.
+- Player failure creates a new branch instead of immediate game over.
+- LLM settings can be configured in-game, saved locally, sent per turn, and kept out of world state.
+
+## Expansion Gate After MVP
+
+After MVP completion, expand toward the full game in tested slices:
+
+1. Persistence slice: replace in-memory campaigns with PostgreSQL while keeping current API contract tests green.
+2. Long campaign slice: add memory compression, multi-chapter progression, base building, character growth, and faction wars.
+3. Scenario pack slice: add cultivation, science fiction, historical, urban supernatural, and realistic profession packs behind shared schema tests.
+4. Creator tooling slice: add editors for worlds, factions, NPCs, abilities, quests, locations, and clocks with import/export validation tests.
+5. Production hardening slice: cost monitoring, LLM retry budgets, model compatibility tests, save migration tests, and playthrough regression seeds.
+
+Each slice must start with acceptance tests that fail against the current build.

@@ -1,0 +1,33 @@
+{
+  "name": "agentic-turnscape",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A multi-agent turn-based narrative simulation game.",
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -n api,web -c green,cyan \"npm run dev -w apps/api\" \"npm run dev -w apps/web\"",
+    "build": "npm run build -w packages/shared && npm run build -w packages/content && npm run build -w packages/core && npm run build -w packages/agents && npm run build -w apps/api && npm run build -w apps/web",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "format": "prettier --check .",
+    "predev": "npm run prisma:generate",
+    "pretest": "npm run prisma:generate",
+    "pretypecheck": "npm run prisma:generate",
+    "prebuild": "npm run prisma:generate",
+    "prisma:generate": "prisma generate --schema packages/core/prisma/schema.prisma"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.29",
+    "concurrently": "^9.1.2",
+    "prettier": "^3.5.3",
+    "prisma": "^6.8.2",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.4"
+  }
+}

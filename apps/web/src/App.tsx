@@ -1,0 +1,1041 @@
+import type {
+  CharacterState,
+  ClockState,
+  LlmConfig,
+  PlayerAction,
+  TransparencyMode,
+  TurnResolution,
+  WorldState,
+} from "@agentic-turnscape/shared";
+import {
+  AlertTriangle,
+  Activity,
+  BookOpen,
+  Brain,
+  Clock3,
+  Download,
+  HeartPulse,
+  History,
+  KeyRound,
+  MessageSquare,
+  Play,
+  RefreshCcw,
+  Save,
+  ScrollText,
+  Settings,
+  Shield,
+  Sparkles,
+  Trash2,
+  Upload,
+  Users,
+} from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { api } from "./api.js";
+import { buildAgentTransparencyRows } from "./agentTransparency.js";
+import { formatCampaignProgress } from "./campaignResume.js";
+import {
+  buildChronicleTimeline,
+  type ChronicleTimelineItem,
+} from "./chronicle.js";
+import {
+  clearLlmSettings,
+  loadLlmSettings,
+  saveLlmSettings,
+} from "./llmSettings.js";
+import {
+  formatCreatorScenarioDefinition,
+  getSavedCreatorScenarioDefinition,
+  listSavedCreatorScenarioSummaries,
+  parseCreatorScenarioJson,
+  removeCreatorScenarioPackage,
+  restoreSavedCreatorScenarioDefinitions,
+  saveCreatorScenarioDefinition,
+  type SavedCreatorScenarioSummary,
+} from "./scenarioImport.js";
+import {
+  buildScenarioSelection,
+  type ScenarioOption,
+} from "./scenarioSelection.js";
+import type {
+  CampaignPayload,
+  CampaignSummary,
+  TurnProgressEvent,
+} from "./api.js";
+
+type LoadState = "booting" | "selecting" | "ready" | "running" | "error";
+type ScenarioImportStatus = { kind: "success" | "error"; message: string };
+
+type RelationshipEntry = {
+  id: string;
+  character: CharacterState;
+  score: number;
+};
+
+const phaseLabel: Record<WorldState["time"]["phase"], string> = {
+  morning: "清晨",
+  afternoon: "午后",
+  evening: "傍晚",
+  night: "夜晚",
+};
+
+const transparencyLabels: Record<TransparencyMode, string> = {
+  immersive: "沉浸",
+  inference: "推理",
+  debug: "调试",
+};
+
+const clockTone = (clock: ClockState) => {
+  const ratio = clock.progress / clock.max;
+  if (ratio >= 0.75) return "danger";
+  if (ratio >= 0.45) return "warning";
+  return "steady";
+};
+
+export const App = () => {
+  const [campaignId, setCampaignId] = useState<string>();
+  const [campaignTitle, setCampaignTitle] = useState("多 Agent 回合制模拟");
+  const [state, setState] = useState<WorldState>();
+  const [scenarioStatus, setScenarioStatus] =
+    useState<CampaignPayload["scenarioStatus"]>();
+  const [scenarioOptions, setScenarioOptions] = useState<ScenarioOption[]>([]);
+  const [campaignSummaries, setCampaignSummaries] = useState<CampaignSummary[]>(
+    [],
+  );
+  const [selectedScenarioId, setSelectedScenarioId] =
+    useState("border-seven-days");
+  const [scenarioImportText, setScenarioImportText] = useState("");
+  const [scenarioImportStatus, setScenarioImportStatus] =
+    useState<ScenarioImportStatus>();
+  const [savedCreatorScenarios, setSavedCreatorScenarios] = useState<
+    SavedCreatorScenarioSummary[]
+  >([]);
+  const [actions, setActions] = useState<PlayerAction[]>([]);
+  const [lastResolution, setLastResolution] = useState<TurnResolution>();
+  const [loadState, setLoadState] = useState<LoadState>("booting");
+  const [error, setError] = useState<string>();
+  const [transparency, setTransparency] =
+    useState<TransparencyMode>("inference");
+  const [selectedAction, setSelectedAction] = useState<PlayerAction>();
+  const [llmSettings, setLlmSettings] = useState<LlmConfig>(() =>
+    loadLlmSettings(),
+  );
+  const [llmSettingsSaved, setLlmSettingsSaved] = useState(true);
+  const [turnProgress, setTurnProgress] = useState<TurnProgressEvent[]>([]);
+  const [chronicleTimeline, setChronicleTimeline] = useState<
+    ChronicleTimelineItem[]
+  >([]);
+
+  const loadScenarios = async () => {
+    setLoadState("booting");
+    setError(undefined);
+    try {
+      const restore = await restoreSavedCreatorScenarioDefinitions(
+        (definition) => api.importScenario(definition),
+      );
+      setSavedCreatorScenarios(listSavedCreatorScenarioSummaries());
+      const [catalog, campaigns] = await Promise.all([
+        api.scenarios(),
+        api.campaigns(6),
+      ]);
+      const selection = buildScenarioSelection(catalog, selectedScenarioId);
+      setScenarioOptions(selection.options);
+      setCampaignSummaries(campaigns.campaigns);
+      setSelectedScenarioId(selection.selectedId);
+      if (restore.failed.length > 0) {
+        setScenarioImportStatus({
+          kind: "error",
+          message: `${restore.failed.length} 个本地剧本恢复失败`,
+        });
+      } else if (restore.restored.length > 0) {
+        setScenarioImportStatus({
+          kind: "success",
+          message: `已恢复 ${restore.restored.length} 个本地剧本`,
+        });
+      }
+      setLoadState("selecting");
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "剧本列表加载失败");
+      setLoadState("error");
+    }
+  };
+
+  const hydrateCampaign = async (payload: CampaignPayload) => {
+    setCampaignId(payload.campaignId);
+    setCampaignTitle(payload.title ?? "多 Agent 回合制模拟");
+    setSelectedScenarioId(payload.scenario ?? selectedScenarioId);
+    setState(payload.state);
+    setScenarioStatus(payload.scenarioStatus);
+    setActions(payload.availableActions);
+    setSelectedAction(payload.availableActions[0]);
+    setLastResolution(payload.lastTurn?.resolution);
+    setTurnProgress([]);
+    setChronicleTimeline(
+      buildChronicleTimeline(await api.chronicle(payload.campaignId)),
+    );
+    setLoadState("ready");
+  };
+
+  const boot = async (scenarioId = selectedScenarioId) => {
+    setLoadState("booting");
+    setError(undefined);
+    try {
+      const payload = await api.createCampaign(scenarioId);
+      const fallbackTitle = scenarioOptions.find(
+        (option) => option.id === scenarioId,
+      )?.title;
+      const title = payload.title ?? fallbackTitle;
+      const campaignPayload: CampaignPayload = title
+        ? { ...payload, title, scenario: payload.scenario ?? scenarioId }
+        : { ...payload, scenario: payload.scenario ?? scenarioId };
+      await hydrateCampaign(campaignPayload);
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "启动失败");
+      setLoadState("error");
+    }
+  };
+
+  const resumeCampaign = async (id: string) => {
+    setLoadState("booting");
+    setError(undefined);
+    try {
+      await hydrateCampaign(await api.getState(id, transparency));
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "继续战役失败");
+      setLoadState("error");
+    }
+  };
+
+  const importCreatorScenario = async () => {
+    const parsed = parseCreatorScenarioJson(scenarioImportText);
+    if (!parsed.ok) {
+      setScenarioImportStatus({ kind: "error", message: parsed.error });
+      return;
+    }
+
+    setLoadState("booting");
+    setError(undefined);
+    setScenarioImportStatus(undefined);
+    try {
+      const imported = await api.importScenario(parsed.definition);
+      saveCreatorScenarioDefinition(imported.scenario.id, parsed.definition);
+      setSavedCreatorScenarios(listSavedCreatorScenarioSummaries());
+      const [catalog, campaigns] = await Promise.all([
+        api.scenarios(),
+        api.campaigns(6),
+      ]);
+      const selection = buildScenarioSelection(catalog, imported.scenario.id);
+      setScenarioOptions(selection.options);
+      setCampaignSummaries(campaigns.campaigns);
+      setSelectedScenarioId(selection.selectedId);
+      setScenarioImportText("");
+      setScenarioImportStatus({
+        kind: "success",
+        message: `已导入 ${imported.scenario.title}`,
+      });
+      setLoadState("selecting");
+    } catch (caught) {
+      setScenarioImportStatus({
+        kind: "error",
+        message: caught instanceof Error ? caught.message : "导入剧本失败",
+      });
+      setLoadState("selecting");
+    }
+  };
+
+  const deleteCreatorScenario = async (scenarioId: string) => {
+    setLoadState("booting");
+    setError(undefined);
+    setScenarioImportStatus(undefined);
+    try {
+      const removal = await removeCreatorScenarioPackage(scenarioId, (id) =>
+        api.deleteScenario(id),
+      );
+      if (!removal.ok) {
+        setScenarioImportStatus({ kind: "error", message: removal.error });
+        setLoadState("selecting");
+        return;
+      }
+      setSavedCreatorScenarios(listSavedCreatorScenarioSummaries());
+      const [catalog, campaigns] = await Promise.all([
+        api.scenarios(),
+        api.campaigns(6),
+      ]);
+      const selection = buildScenarioSelection(catalog, selectedScenarioId);
+      setScenarioOptions(selection.options);
+      setCampaignSummaries(campaigns.campaigns);
+      setSelectedScenarioId(selection.selectedId);
+      setScenarioImportStatus({
+        kind: "success",
+        message: removal.runtimeAlreadyMissing
+          ? "已移除本地保存的剧本"
+          : "已删除创作者剧本",
+      });
+      setLoadState("selecting");
+    } catch (caught) {
+      setScenarioImportStatus({
+        kind: "error",
+        message: caught instanceof Error ? caught.message : "删除剧本失败",
+      });
+      setLoadState("selecting");
+    }
+  };
+
+  const exportCreatorScenario = async (scenarioId: string) => {
+    setScenarioImportStatus(undefined);
+    try {
+      let definition: Record<string, unknown> | undefined;
+      try {
+        definition = (await api.exportScenario(scenarioId)).definition;
+      } catch (caught) {
+        definition = getSavedCreatorScenarioDefinition(scenarioId);
+        if (!definition) throw caught;
+      }
+      setScenarioImportText(formatCreatorScenarioDefinition(definition));
+      setScenarioImportStatus({
+        kind: "success",
+        message: "已导出创作者剧本 JSON",
+      });
+    } catch (caught) {
+      setScenarioImportStatus({
+        kind: "error",
+        message: caught instanceof Error ? caught.message : "导出剧本失败",
+      });
+    }
+  };
+
+  useEffect(() => {
+    void loadScenarios();
+  }, []);
+
+  const location = state ? state.locations[state.currentLocationId] : undefined;
+  const visibleClocks = useMemo(
+    () =>
+      state ? Object.values(state.clocks).filter((clock) => clock.visible) : [],
+    [state],
+  );
+  const topRelationships = useMemo(() => {
+    if (!state) return [];
+    return Object.entries(state.relationships)
+      .flatMap(([id, relationship]): RelationshipEntry[] => {
+        const npcId = id.split(":")[1] ?? "";
+        const character = state.characters[npcId];
+        if (!character) return [];
+        return [
+          {
+            id,
+            character,
+            score:
+              relationship.trust +
+              relationship.affinity +
+              relationship.respect -
+              relationship.suspicion,
+          },
+        ];
+      })
+      .sort((a, b) => Math.abs(b.score) - Math.abs(a.score))
+      .slice(0, 5);
+  }, [state]);
+
+  const submitTurn = async (action: PlayerAction) => {
+    if (!campaignId) return;
+    setLoadState("running");
+    setError(undefined);
+    setTurnProgress([]);
+    try {
+      const queued = await api.runTurn(
+        campaignId,
+        action,
+        transparency,
+        llmSettings,
+        { queued: true },
+      );
+      setTurnProgress([
+        { event: "pending", data: { message: "turn_waiting_for_worker" } },
+      ]);
+      for (let attempt = 0; attempt < 30; attempt += 1) {
+        const events = await api.turnEvents(
+          campaignId,
+          queued.turnId,
+          transparency,
+        );
+        if (events.length > 0) setTurnProgress(events);
+        const payload = await api.getState(campaignId, transparency);
+        if (
+          payload.lastTurn?.id === queued.turnId &&
+          payload.lastTurn.status === "complete" &&
+          payload.lastTurn.resolution
+        ) {
+          setState(payload.state);
+          setScenarioStatus(payload.scenarioStatus);
+          setActions(payload.availableActions);
+          setSelectedAction(payload.availableActions[0]);
+          setLastResolution(payload.lastTurn.resolution);
+          setChronicleTimeline(
+            buildChronicleTimeline(await api.chronicle(campaignId)),
+          );
+          setLoadState("ready");
+          return;
+        }
+        if (
+          payload.lastTurn?.id === queued.turnId &&
+          payload.lastTurn.status === "failed"
+        ) {
+          throw new Error("回合队列结算失败，请检查 API 日志。");
+        }
+        await new Promise((resolve) => window.setTimeout(resolve, 300));
+      }
+      throw new Error("回合仍在队列中，请稍后刷新状态。");
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "回合执行失败");
+      setLoadState("error");
+    }
+  };
+
+  if (!state || !location) {
+    return (
+      <main className="boot-shell">
+        <section className="boot-panel">
+          <Sparkles size={28} />
+          <h1>多 Agent 回合制模拟</h1>
+          <p>
+            {loadState === "booting"
+              ? "正在加载剧本..."
+              : "选择一个剧本开始战役。"}
+          </p>
+          {campaignSummaries.length > 0 ? (
+            <ResumeCampaigns
+              campaigns={campaignSummaries}
+              disabled={loadState === "booting"}
+              onResume={resumeCampaign}
+            />
+          ) : null}
+          {scenarioOptions.length > 0 ? (
+            <ScenarioPicker
+              options={scenarioOptions}
+              selectedId={selectedScenarioId}
+              disabled={loadState === "booting"}
+              onSelect={setSelectedScenarioId}
+            />
+          ) : null}
+          <CreatorScenarioImportPanel
+            value={scenarioImportText}
+            status={scenarioImportStatus}
+            savedScenarios={savedCreatorScenarios}
+            disabled={loadState === "booting"}
+            onChange={setScenarioImportText}
+            onImport={() => void importCreatorScenario()}
+            onExport={(scenarioId) => void exportCreatorScenario(scenarioId)}
+            onDelete={(scenarioId) => void deleteCreatorScenario(scenarioId)}
+          />
+          {error ? <pre>{error}</pre> : null}
+          <div className="boot-actions">
+            <button
+              className="primary-button"
+              disabled={loadState === "booting" || scenarioOptions.length === 0}
+              onClick={() => void boot(selectedScenarioId)}
+            >
+              <Play size={18} />
+              开始战役
+            </button>
+            <button
+              className="icon-button"
+              title="重新加载剧本"
+              onClick={() => void loadScenarios()}
+            >
+              <RefreshCcw size={18} />
+            </button>
+          </div>
+        </section>
+      </main>
+    );
+  }
+
+  return (
+    <main className="app-shell">
+      <header className="topbar">
+        <div>
+          <h1>{campaignTitle}</h1>
+          <p>
+            第 {state.time.day} 天 · {phaseLabel[state.time.phase]} ·{" "}
+            {location.name}
+          </p>
+        </div>
+        <div className="topbar-actions">
+          <SegmentedControl value={transparency} onChange={setTransparency} />
+          <button
+            className="icon-button"
+            title="重开战役"
+            onClick={() => void boot(selectedScenarioId)}
+          >
+            <RefreshCcw size={18} />
+          </button>
+        </div>
+      </header>
+
+      {error ? (
+        <aside className="error-banner">
+          <AlertTriangle size={18} />
+          {error}
+        </aside>
+      ) : null}
+
+      <section className="dashboard">
+        <article className="scene-panel">
+          <div className="panel-heading">
+            <ScrollText size={19} />
+            <h2>当前场景</h2>
+          </div>
+          <p className="scene-text">{location.description}</p>
+          <div className="fact-list">
+            {location.publicInfo.map((fact) => (
+              <span key={fact}>{fact}</span>
+            ))}
+          </div>
+          {scenarioStatus ? (
+            <ScenarioStatusPanel status={scenarioStatus} />
+          ) : null}
+          <Narration resolution={lastResolution} state={state} />
+        </article>
+
+        <aside className="action-panel">
+          <div className="panel-heading">
+            <Play size={19} />
+            <h2>行动</h2>
+          </div>
+          <div className="action-list">
+            {actions.map((action) => (
+              <button
+                key={`${action.actionType}-${action.label}`}
+                className={
+                  selectedAction?.label === action.label
+                    ? "action-choice selected"
+                    : "action-choice"
+                }
+                onClick={() => setSelectedAction(action)}
+              >
+                <span>{action.label}</span>
+                <small>{action.description}</small>
+              </button>
+            ))}
+          </div>
+          <button
+            className="primary-button full"
+            disabled={!selectedAction || loadState === "running"}
+            onClick={() => selectedAction && void submitTurn(selectedAction)}
+          >
+            <Play size={18} />
+            {loadState === "running" ? "结算中..." : "执行回合"}
+          </button>
+          <TurnProgressPanel
+            events={turnProgress}
+            running={loadState === "running"}
+          />
+        </aside>
+
+        <aside className="side-panel">
+          <StatusPanel state={state} />
+          <ClockPanel clocks={visibleClocks} />
+          <ChroniclePanel items={chronicleTimeline} />
+        </aside>
+
+        <aside className="side-panel">
+          <RelationshipPanel entries={topRelationships} />
+          <LlmSettingsPanel
+            settings={llmSettings}
+            saved={llmSettingsSaved}
+            onChange={(settings) => {
+              setLlmSettings(settings);
+              setLlmSettingsSaved(false);
+            }}
+            onSave={() => {
+              setLlmSettings(saveLlmSettings(llmSettings));
+              setLlmSettingsSaved(true);
+            }}
+            onClear={() => {
+              setLlmSettings(clearLlmSettings());
+              setLlmSettingsSaved(true);
+            }}
+          />
+          <AgentPanel resolution={lastResolution} transparency={transparency} />
+        </aside>
+      </section>
+    </main>
+  );
+};
+
+const progressTitle: Record<string, string> = {
+  turn: "回合任务",
+  pending: "队列等待",
+  agent_proposals: "Agent 提案",
+  referee: "规则裁判",
+  narration: "叙事输出",
+  done: "完成",
+  error: "错误",
+};
+
+const progressDetail = (event: TurnProgressEvent) => {
+  const data = event.data as Record<string, unknown> | null;
+  if (!data) return "";
+  if (typeof data.message === "string") return data.message;
+  if (typeof data.status === "string") return data.status;
+  if (typeof data.publicSummary === "string") return data.publicSummary;
+  if (typeof data.text === "string") return data.text;
+  if (Array.isArray(data)) return `${data.length} 条提案`;
+  return "";
+};
+
+const TurnProgressPanel = ({
+  events,
+  running,
+}: {
+  events: TurnProgressEvent[];
+  running: boolean;
+}) => {
+  if (!running && events.length === 0) return null;
+  return (
+    <section className="turn-progress">
+      <div className="panel-heading compact">
+        <Activity size={17} />
+        <h3>回合进度</h3>
+      </div>
+      <div className="progress-list">
+        {(events.length > 0
+          ? events
+          : [{ event: "pending", data: { message: "turn_waiting_for_worker" } }]
+        ).map((event, index) => (
+          <div key={`${event.event}-${index}`} className="progress-row">
+            <strong>{progressTitle[event.event] ?? event.event}</strong>
+            <span>{progressDetail(event)}</span>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+};
+
+const ResumeCampaigns = ({
+  campaigns,
+  disabled,
+  onResume,
+}: {
+  campaigns: CampaignSummary[];
+  disabled: boolean;
+  onResume: (campaignId: string) => void;
+}) => (
+  <section className="resume-panel">
+    <div className="panel-heading compact">
+      <History size={17} />
+      <h3>继续战役</h3>
+    </div>
+    <div className="resume-list">
+      {campaigns.map((campaign) => (
+        <button
+          key={campaign.id}
+          className="resume-choice"
+          disabled={disabled}
+          onClick={() => onResume(campaign.id)}
+        >
+          <span>{campaign.title}</span>
+          <small>{formatCampaignProgress(campaign)}</small>
+        </button>
+      ))}
+    </div>
+  </section>
+);
+
+const ScenarioPicker = ({
+  options,
+  selectedId,
+  disabled,
+  onSelect,
+}: {
+  options: ScenarioOption[];
+  selectedId: string;
+  disabled: boolean;
+  onSelect: (scenarioId: string) => void;
+}) => (
+  <div className="scenario-picker" role="listbox" aria-label="剧本选择">
+    {options.map((option) => (
+      <button
+        key={option.id}
+        className={
+          selectedId === option.id
+            ? "scenario-option selected"
+            : "scenario-option"
+        }
+        disabled={disabled}
+        onClick={() => onSelect(option.id)}
+        role="option"
+        aria-selected={selectedId === option.id}
+      >
+        <span>{option.title}</span>
+        <small>{option.summary}</small>
+      </button>
+    ))}
+  </div>
+);
+
+const CreatorScenarioImportPanel = ({
+  value,
+  status,
+  savedScenarios,
+  disabled,
+  onChange,
+  onImport,
+  onExport,
+  onDelete,
+}: {
+  value: string;
+  status: ScenarioImportStatus | undefined;
+  savedScenarios: SavedCreatorScenarioSummary[];
+  disabled: boolean;
+  onChange: (value: string) => void;
+  onImport: () => void;
+  onExport: (scenarioId: string) => void;
+  onDelete: (scenarioId: string) => void;
+}) => (
+  <section className="creator-import-panel">
+    <div className="panel-heading compact">
+      <Upload size={17} />
+      <h3>导入创作者剧本</h3>
+    </div>
+    <textarea
+      aria-label="创作者剧本 JSON"
+      placeholder='{ "id": "my-scenario", "title": "My Scenario", ... }'
+      value={value}
+      disabled={disabled}
+      onChange={(event) => onChange(event.target.value)}
+    />
+    <div className="creator-import-actions">
+      <button
+        className="secondary-button"
+        disabled={disabled || value.trim().length === 0}
+        onClick={onImport}
+      >
+        <Upload size={15} />
+        导入
+      </button>
+      {status ? (
+        <span className={`import-status ${status.kind}`}>{status.message}</span>
+      ) : null}
+    </div>
+    {savedScenarios.length > 0 ? (
+      <div className="creator-saved-list">
+        {savedScenarios.map((scenario) => (
+          <div key={scenario.id} className="creator-saved-row">
+            <div>
+              <strong>{scenario.title}</strong>
+              <span>{scenario.id}</span>
+            </div>
+            <button
+              className="icon-button"
+              title="导出创作者剧本"
+              disabled={disabled}
+              onClick={() => onExport(scenario.id)}
+            >
+              <Download size={15} />
+            </button>
+            <button
+              className="icon-button"
+              title="删除创作者剧本"
+              disabled={disabled}
+              onClick={() => onDelete(scenario.id)}
+            >
+              <Trash2 size={15} />
+            </button>
+          </div>
+        ))}
+      </div>
+    ) : null}
+  </section>
+);
+
+const SegmentedControl = ({
+  value,
+  onChange,
+}: {
+  value: TransparencyMode;
+  onChange: (value: TransparencyMode) => void;
+}) => (
+  <div className="segmented" role="tablist" aria-label="Agent 透明度">
+    {(Object.keys(transparencyLabels) as TransparencyMode[]).map((mode) => (
+      <button
+        key={mode}
+        className={value === mode ? "active" : ""}
+        onClick={() => onChange(mode)}
+      >
+        {transparencyLabels[mode]}
+      </button>
+    ))}
+  </div>
+);
+
+const ScenarioStatusPanel = ({
+  status,
+}: {
+  status: CampaignPayload["scenarioStatus"];
+}) => (
+  <section className="scenario-status">
+    <div>
+      <strong>今日主事件</strong>
+      <span>{status.dayPlan?.mainEvent ?? "战役日程之外的自由行动。"}</span>
+    </div>
+    <div className="scenario-counts">
+      <span>战斗 {status.sceneCounts.combat}</span>
+      <span>社交 {status.sceneCounts.social}</span>
+      <span>结局 {status.sceneCounts.endings}</span>
+    </div>
+    {status.ending ? (
+      <div className="ending-callout">
+        <strong>{status.ending.title}</strong>
+        <span>{status.ending.summary}</span>
+      </div>
+    ) : null}
+  </section>
+);
+
+const Narration = ({
+  resolution,
+  state,
+}: {
+  resolution: TurnResolution | undefined;
+  state: WorldState;
+}) => (
+  <section className="narration">
+    <div className="panel-heading compact">
+      <BookOpen size={17} />
+      <h3>叙事记录</h3>
+    </div>
+    <p>{resolution?.narration ?? state.publicEvents.at(-1)?.body}</p>
+    {resolution ? (
+      <div className="resolution-strip">
+        <span>{resolution.publicSummary}</span>
+      </div>
+    ) : null}
+  </section>
+);
+
+const StatusPanel = ({ state }: { state: WorldState }) => (
+  <section className="module">
+    <div className="panel-heading compact">
+      <HeartPulse size={17} />
+      <h3>队伍状态</h3>
+    </div>
+    <div className="stat-grid">
+      <Metric label="生命" value={state.player.resources.health ?? 0} max={5} />
+      <Metric
+        label="压力"
+        value={state.player.resources.pressure ?? 0}
+        max={9}
+      />
+      <Metric
+        label="体力"
+        value={state.player.resources.stamina ?? 0}
+        max={5}
+      />
+      <Metric label="声势" value={state.player.momentum} max={5} />
+    </div>
+    <div className="tag-row">
+      {state.player.reputationTags.map((tag) => (
+        <span key={tag}>{tag}</span>
+      ))}
+    </div>
+  </section>
+);
+
+const ClockPanel = ({ clocks }: { clocks: ClockState[] }) => (
+  <section className="module">
+    <div className="panel-heading compact">
+      <Clock3 size={17} />
+      <h3>危机时钟</h3>
+    </div>
+    <div className="clock-list">
+      {clocks.map((clock) => (
+        <div className="clock-row" key={clock.id}>
+          <div>
+            <strong>{clock.name}</strong>
+            <span>
+              {clock.progress}/{clock.max}
+            </span>
+          </div>
+          <div className={`bar ${clockTone(clock)}`}>
+            <i style={{ width: `${(clock.progress / clock.max) * 100}%` }} />
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+);
+
+const ChroniclePanel = ({ items }: { items: ChronicleTimelineItem[] }) => (
+  <section className="module">
+    <div className="panel-heading compact">
+      <History size={17} />
+      <h3>回放记录</h3>
+    </div>
+    <div className="chronicle-list">
+      {items.slice(-4).map((item) => (
+        <div key={item.id} className="chronicle-row">
+          <strong>{item.title}</strong>
+          <span>{item.meta}</span>
+          <p>{item.body}</p>
+          <small>
+            {item.patchSummary}
+            {item.endingTitle ? ` · ${item.endingTitle}` : ""}
+          </small>
+        </div>
+      ))}
+      {items.length === 0 ? <p className="muted">等待第一轮结算。</p> : null}
+    </div>
+  </section>
+);
+
+const RelationshipPanel = ({ entries }: { entries: RelationshipEntry[] }) => (
+  <section className="module">
+    <div className="panel-heading compact">
+      <Users size={17} />
+      <h3>关系图谱</h3>
+    </div>
+    <div className="relation-list">
+      {entries.map((entry) => (
+        <div key={entry.id} className="relation-row">
+          <div>
+            <strong>{entry.character.name}</strong>
+            <span>{entry.character.role}</span>
+          </div>
+          <meter min={-10} max={10} value={entry.score} />
+        </div>
+      ))}
+    </div>
+  </section>
+);
+
+const LlmSettingsPanel = ({
+  settings,
+  saved,
+  onChange,
+  onSave,
+  onClear,
+}: {
+  settings: LlmConfig;
+  saved: boolean;
+  onChange: (settings: LlmConfig) => void;
+  onSave: () => void;
+  onClear: () => void;
+}) => (
+  <section className="module">
+    <div className="panel-heading compact">
+      <Settings size={17} />
+      <h3>LLM 接口</h3>
+    </div>
+    <div className="settings-grid">
+      <label>
+        <span>Base URL</span>
+        <input
+          value={settings.baseUrl}
+          onChange={(event) =>
+            onChange({ ...settings, baseUrl: event.target.value })
+          }
+        />
+      </label>
+      <label>
+        <span>Model</span>
+        <input
+          value={settings.model}
+          onChange={(event) =>
+            onChange({ ...settings, model: event.target.value })
+          }
+        />
+      </label>
+      <label>
+        <span>API Key</span>
+        <div className="secret-input">
+          <KeyRound size={15} />
+          <input
+            type="password"
+            value={settings.apiKey}
+            autoComplete="off"
+            onChange={(event) =>
+              onChange({ ...settings, apiKey: event.target.value })
+            }
+          />
+        </div>
+      </label>
+      <label>
+        <span>Timeout</span>
+        <input
+          type="number"
+          min={1000}
+          max={120000}
+          step={1000}
+          value={settings.timeoutMs}
+          onChange={(event) =>
+            onChange({ ...settings, timeoutMs: Number(event.target.value) })
+          }
+        />
+      </label>
+    </div>
+    <div className="settings-actions">
+      <button className="secondary-button" onClick={onSave}>
+        <Save size={15} />
+        {saved ? "已保存" : "保存"}
+      </button>
+      <button className="icon-button" title="清除 LLM 设置" onClick={onClear}>
+        <Trash2 size={16} />
+      </button>
+    </div>
+  </section>
+);
+
+const AgentPanel = ({
+  resolution,
+  transparency,
+}: {
+  resolution: TurnResolution | undefined;
+  transparency: TransparencyMode;
+}) => {
+  const rows = buildAgentTransparencyRows(resolution, transparency);
+  return (
+    <section className="module">
+      <div className="panel-heading compact">
+        <Brain size={17} />
+        <h3>Agent</h3>
+      </div>
+      {transparency === "immersive" ? (
+        <p className="muted">角色的动机隐藏在行为里。</p>
+      ) : (
+        <div className="agent-list">
+          {rows.map((row) => (
+            <div key={row.id} className="agent-row">
+              <MessageSquare size={15} />
+              <span>{row.headline}</span>
+              {row.detail ? <small>{row.detail}</small> : null}
+              {row.hiddenDetail ? (
+                <small className="debug-detail">{row.hiddenDetail}</small>
+              ) : null}
+            </div>
+          ))}
+          {!resolution ? <p className="muted">等待第一轮行动。</p> : null}
+        </div>
+      )}
+    </section>
+  );
+};
+
+const Metric = ({
+  label,
+  value,
+  max,
+}: {
+  label: string;
+  value: number;
+  max: number;
+}) => (
+  <div className="metric">
+    <Shield size={15} />
+    <span>{label}</span>
+    <strong>
+      {value}/{max}
+    </strong>
+  </div>
+);

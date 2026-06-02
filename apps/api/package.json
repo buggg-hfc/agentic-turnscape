@@ -1,0 +1,22 @@
+{
+  "name": "@agentic-turnscape/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx --conditions development watch src/server.ts",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "start": "node dist/server.js"
+  },
+  "dependencies": {
+    "@agentic-turnscape/agents": "0.1.0",
+    "@agentic-turnscape/content": "0.1.0",
+    "@agentic-turnscape/core": "0.1.0",
+    "@agentic-turnscape/shared": "0.1.0",
+    "@fastify/cors": "^11.0.1",
+    "bullmq": "^5.53.2",
+    "fastify": "^5.3.3",
+    "zod": "^3.25.30"
+  }
+}

@@ -1,0 +1,103 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Campaign {
+  id            String      @id @default(cuid())
+  title         String
+  scenario      String
+  state         Json
+  pendingAction Json?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  turns         Turn[]
+  snapshots     Snapshot[]
+  events        Event[]
+  agentRuns     AgentRun[]
+  memoryLog     MemoryLog[]
+}
+
+model RuntimeScenario {
+  id         String   @id
+  title      String
+  definition Json
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Turn {
+  id           String    @id @default(cuid())
+  campaignId   String
+  index        Int
+  playerAction Json?
+  resolution   Json?
+  status       String
+  createdAt    DateTime  @default(now())
+  completedAt  DateTime?
+  campaign     Campaign  @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@index([campaignId, index])
+}
+
+model Snapshot {
+  id         String   @id @default(cuid())
+  campaignId String
+  turnId     String?
+  state      Json
+  createdAt  DateTime @default(now())
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@index([campaignId, createdAt])
+}
+
+model Event {
+  id         String   @id @default(cuid())
+  campaignId String
+  turnId     String?
+  kind       String
+  payload    Json
+  visible    Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@index([campaignId, createdAt])
+}
+
+model AgentRun {
+  id         String   @id @default(cuid())
+  campaignId String
+  turnId     String?
+  agentType  String
+  actorId    String?
+  prompt     String
+  output     Json?
+  status     String
+  error      String?
+  latencyMs  Int?
+  tokenUsage Json?
+  createdAt  DateTime @default(now())
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@index([campaignId, turnId])
+}
+
+model MemoryLog {
+  id         String   @id @default(cuid())
+  campaignId String
+  turnId     String?
+  scope      String
+  subjectId  String?
+  summary    String
+  hidden     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@index([campaignId, scope, subjectId])
+  @@index([campaignId, turnId])
+}
