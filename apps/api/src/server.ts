@@ -55,11 +55,38 @@ type RuntimeScenarioRecord = {
   definition: unknown;
 };
 
-const getScenarioStatus = (state: WorldState, scenario: ScenarioPackage) => ({
-  dayPlan: scenario.getDayPlan(state.time.day),
-  ending: scenario.evaluateEnding(state),
-  sceneCounts: scenario.counts,
-});
+const getCampaignArcStatus = (state: WorldState, scenario: ScenarioPackage) => {
+  const campaignArc = scenario.campaignArc;
+  if (!campaignArc || campaignArc.chapters.length === 0) return undefined;
+
+  const chapterNumber = Math.min(
+    Math.max(state.campaign?.chapter ?? 1, 1),
+    campaignArc.chapters.length,
+  );
+  const currentChapter = campaignArc.chapters[chapterNumber - 1];
+  if (!currentChapter) return undefined;
+
+  return {
+    chapterCount: campaignArc.chapters.length,
+    chapterNumber,
+    currentChapter: {
+      ...currentChapter,
+      unlocks: [...currentChapter.unlocks],
+    },
+    baseFacilities: [...campaignArc.baseFacilities],
+    factionFronts: [...campaignArc.factionFronts],
+  };
+};
+
+const getScenarioStatus = (state: WorldState, scenario: ScenarioPackage) => {
+  const campaignArc = getCampaignArcStatus(state, scenario);
+  return {
+    dayPlan: scenario.getDayPlan(state.time.day),
+    ending: scenario.evaluateEnding(state),
+    sceneCounts: scenario.counts,
+    ...(campaignArc ? { campaignArc } : {}),
+  };
+};
 
 const cloneJson = (value: unknown): unknown =>
   JSON.parse(JSON.stringify(value));

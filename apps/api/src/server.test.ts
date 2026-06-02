@@ -94,6 +94,19 @@ describe("campaign turn API", () => {
     expect(progressResponse.statusCode).toBe(200);
     expect(progressResponse.json()).toMatchObject({
       campaignId: campaign.campaignId,
+      scenarioStatus: {
+        campaignArc: {
+          chapterCount: 3,
+          chapterNumber: 2,
+          currentChapter: {
+            id: "border-seven-days_aftermath",
+            title: "Border Aftermath",
+            unlocks: expect.arrayContaining(["infirmary", "archive"]),
+          },
+          baseFacilities: expect.arrayContaining(["infirmary", "archive"]),
+          factionFronts: expect.arrayContaining(["blackstone_consortium"]),
+        },
+      },
       state: {
         time: { day: 1, phase: "morning" },
         campaign: {
@@ -331,6 +344,23 @@ describe("campaign turn API", () => {
       scenarioStatus: {
         dayPlan: { day: 1, defaultLocationId: "orbital_medbay" },
         sceneCounts: { combat: 1, social: 1, endings: 2 },
+        campaignArc: {
+          chapterCount: 3,
+          chapterNumber: 1,
+          currentChapter: {
+            id: "orbital-quarantine_opening_arc",
+            title: "Orbital Quarantine: Opening Crisis",
+            unlocks: expect.arrayContaining([
+              "station_quarantine",
+              "orbital_medbay",
+            ]),
+          },
+          baseFacilities: expect.arrayContaining(["medbay"]),
+          factionFronts: expect.arrayContaining([
+            "orbital-quarantine_allies",
+            "orbital-quarantine_pressure",
+          ]),
+        },
       },
     });
 

@@ -14,6 +14,7 @@ import {
   Brain,
   Clock3,
   Download,
+  GitBranch,
   HeartPulse,
   History,
   KeyRound,
@@ -32,6 +33,10 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { api } from "./api.js";
 import { buildAgentTransparencyRows } from "./agentTransparency.js";
+import {
+  buildCampaignArcStatusSummary,
+  type CampaignArcStatusSummary,
+} from "./campaignArcStatus.js";
 import {
   buildCampaignProgressionSummary,
   type CampaignProgressionSummary,
@@ -343,6 +348,10 @@ export const App = () => {
     () => (state ? buildCampaignProgressionSummary(state) : undefined),
     [state],
   );
+  const campaignArcStatus = useMemo(
+    () => buildCampaignArcStatusSummary(scenarioStatus),
+    [scenarioStatus],
+  );
 
   const submitTurn = async (action: PlayerAction) => {
     if (!campaignId) return;
@@ -542,6 +551,9 @@ export const App = () => {
 
         <aside className="side-panel">
           <StatusPanel state={state} />
+          {campaignArcStatus.available ? (
+            <CampaignArcPanel summary={campaignArcStatus} />
+          ) : null}
           {campaignProgression?.available ? (
             <CampaignProgressionPanel summary={campaignProgression} />
           ) : null}
@@ -851,6 +863,35 @@ const StatusPanel = ({ state }: { state: WorldState }) => (
       {state.player.reputationTags.map((tag) => (
         <span key={tag}>{tag}</span>
       ))}
+    </div>
+  </section>
+);
+
+const CampaignArcPanel = ({
+  summary,
+}: {
+  summary: CampaignArcStatusSummary;
+}) => (
+  <section className="module campaign-arc-status">
+    <div className="panel-heading compact">
+      <GitBranch size={17} />
+      <h3>Campaign Arc</h3>
+    </div>
+    <div className="arc-current">
+      <strong>{summary.chapterLabel}</strong>
+      <span>{summary.focus}</span>
+    </div>
+    <div className="arc-section">
+      <small>Unlocks</small>
+      <div className="tag-row compact">
+        {summary.unlocks.slice(0, 4).map((unlock) => (
+          <span key={unlock}>{unlock}</span>
+        ))}
+      </div>
+    </div>
+    <div className="arc-meta-grid">
+      <Metric label="Base" valueLabel={String(summary.baseFacilities.length)} />
+      <Metric label="Fronts" valueLabel={String(summary.factionFronts.length)} />
     </div>
   </section>
 );

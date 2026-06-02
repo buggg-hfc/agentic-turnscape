@@ -537,6 +537,47 @@ button {
   margin-top: 12px;
 }
 
+.campaign-arc-status .arc-current {
+  border-left: 3px solid rgba(227, 193, 111, 0.78);
+  border-radius: 0 8px 8px 0;
+  padding: 8px 10px;
+  background: rgba(227, 193, 111, 0.1);
+}
+
+.campaign-arc-status .arc-current strong,
+.campaign-arc-status .arc-current span {
+  display: block;
+}
+
+.campaign-arc-status .arc-current strong {
+  color: #fff1c5;
+  line-height: 1.35;
+}
+
+.campaign-arc-status .arc-current span {
+  margin-top: 5px;
+  color: #c8d6ce;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.arc-section {
+  margin-top: 12px;
+}
+
+.arc-section > small {
+  display: block;
+  color: #aebbb4;
+  font-size: 12px;
+}
+
+.arc-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
 .campaign-base strong {
   display: block;
   color: #fff1c5;

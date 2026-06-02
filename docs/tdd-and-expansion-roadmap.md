@@ -40,6 +40,7 @@ For gameplay work, tests should prove the rule invariant rather than a single lu
 - The long campaign foundation now has tested referee-owned progression patches for optional `campaign` state: chapter transitions, base facility upgrades, character skill growth, and faction-war front status changes.
 - Long campaign progression now has a tested API and UI path: `/campaigns/:id/campaign/progress` stores replayable progression turns, while the web dashboard shows chapter, XP, base facilities, and faction-war fronts.
 - Built-in MVP and first-wave expansion scenarios now expose tested long campaign arc metadata: chapter beats, base facility hooks, and faction front hooks appear in the scenario catalog and web scenario picker.
+- Active campaign payloads now expose tested current arc status, including `chapterNumber`, `currentChapter`, unlocks, base facility hooks, and faction fronts; the web dashboard summarizes it in a Campaign Arc panel.
 
 ## MVP Completion Gate
 

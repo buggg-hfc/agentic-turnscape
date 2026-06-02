@@ -4,6 +4,9 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-02
 
+- Exposed active long campaign arc status in campaign payloads. `scenarioStatus.campaignArc` now includes the current chapter number, current chapter details, base facility hooks, and faction fronts.
+- Added a tested web Campaign Arc view model and dashboard panel so players can see the current chapter focus and upcoming unlock hooks after entering a campaign.
+- Updated the implementation report to keep runtime screenshots visible in the report as requested.
 - Added long campaign arc metadata for Border Seven Days and all first-wave expansion packs. Built-in scenarios now declare chapter beats, base facility hooks, and faction front hooks for post-MVP expansion.
 - Exposed arc summaries through the scenario catalog and web scenario picker so players can see which scenario packs have long campaign structure.
 - Added the long campaign progression API slice: `/campaigns/:id/campaign/progress` now resolves chapter/base/growth/front changes through the rules engine, stores the resulting snapshot, and records replayable referee patches.
@@ -16,6 +19,7 @@ This log records tested implementation slices as the project moves from the Bord
 - Added server-side Agent transparency redaction: immersive hides proposals, inference exposes only public reasoning, and debug exposes hidden summaries, hidden reasons, and hidden patch entries.
 - Connected web state polling and SSE replay requests to the selected transparency mode, and added a tested Agent transparency view model for the panel.
 - Verification used for the latest slice:
+  - `npm test -- apps/api/src/server.test.ts apps/web/src/campaignArcStatus.test.ts --reporter=dot`
   - `npm run typecheck`
   - `npm test -- --reporter=dot`
   - `npm run build`

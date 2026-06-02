@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-02 - Active Campaign Arc Status
+
+### Scope
+
+- Added active campaign arc status to campaign payloads: current chapter number, current chapter details, unlocks, base facilities, and faction fronts.
+- Added a web Campaign Arc panel that summarizes the active chapter focus after the player enters a campaign.
+- Kept the existing invariant intact: this is derived scenario/package status and does not mutate world state outside referee-owned patches.
+
+### Runtime Screenshot
+
+![Long campaign progression panel](screenshots/long-campaign-progress-panel-2026-06-02.png)
+
+The report keeps a runtime screenshot inline as requested. This stored capture remains the current verified runtime image for the long-campaign dashboard surface; the active Campaign Arc slice is covered by API and web view-model tests plus the build gate below.
+
+### Verification
+
+```bash
+npm test -- apps/api/src/server.test.ts apps/web/src/campaignArcStatus.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-02 - Long Campaign API and UI
 
 ### Scope

@@ -30,6 +30,18 @@ export type CampaignPayload = {
       social: number;
       endings: number;
     };
+    campaignArc?: {
+      chapterCount: number;
+      chapterNumber: number;
+      currentChapter: {
+        id: string;
+        title: string;
+        focus: string;
+        unlocks: string[];
+      };
+      baseFacilities: string[];
+      factionFronts: string[];
+    };
   };
   state: WorldState;
   availableActions: PlayerAction[];
