@@ -95,6 +95,24 @@ export type RunTurnPayload = CampaignPayload & {
   queued?: boolean;
 };
 
+export type LongCampaignProgressionRequest = {
+  completedQuestIds?: string[];
+  baseInvestments?: Array<{
+    facilityId: string;
+    supplies?: number;
+    money?: number;
+  }>;
+  training?: {
+    skill: string;
+    experience: number;
+  };
+  factionFronts?: Array<{
+    factionId: string;
+    influenceDelta?: number;
+    pressureDelta?: number;
+  }>;
+};
+
 export type ChroniclePayload = {
   publicEvents: WorldState["publicEvents"];
   revealedHiddenEvents: WorldState["hiddenEvents"];
@@ -223,6 +241,17 @@ export const api = {
         queued: options.queued ?? false,
       }),
     }),
+  progressCampaign: (
+    campaignId: string,
+    request: LongCampaignProgressionRequest,
+  ) =>
+    json<RunTurnPayload>(
+      `/campaigns/${campaignId}/campaign/progress`,
+      {
+        method: "POST",
+        body: JSON.stringify(request),
+      },
+    ),
   turnEvents: async (
     campaignId: string,
     turnId: string,

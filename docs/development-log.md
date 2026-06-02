@@ -4,6 +4,12 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-02
 
+- Added the long campaign progression API slice: `/campaigns/:id/campaign/progress` now resolves chapter/base/growth/front changes through the rules engine, stores the resulting snapshot, and records replayable referee patches.
+- Added the web long campaign summary panel for chapter, campaign XP, base facilities, faction front pressure, and replay visibility.
+- Captured a runtime screenshot for the implementation report:
+
+![Long campaign progression panel](screenshots/long-campaign-progress-panel-2026-06-02.png)
+
 - Added runtime creator scenario management: import, export, protected deletion, browser-local restore, and API-side persistence for creator definitions.
 - Added server-side Agent transparency redaction: immersive hides proposals, inference exposes only public reasoning, and debug exposes hidden summaries, hidden reasons, and hidden patch entries.
 - Connected web state polling and SSE replay requests to the selected transparency mode, and added a tested Agent transparency view model for the panel.
@@ -50,3 +56,10 @@ This log records tested implementation slices as the project moves from the Bord
 - Added referee-owned long campaign progression patches for chapter transitions, base facility upgrades, character skill growth, and faction-war front status changes.
 - State patches can initialize the optional `campaign` root while still rejecting unknown nested fields elsewhere.
 - Verification used: `npm test -- packages/core/src/campaignProgression.test.ts --reporter=dot`.
+
+## 2026-06-02 - Long campaign API and dashboard
+
+- Exposed tested long campaign progression through `POST /campaigns/:id/campaign/progress`.
+- Added in-memory and Prisma store support for synthetic progression turns so state snapshots, replay records, public chronicle, hidden logs, and compressed memories remain complete.
+- Added a tested web view model and dashboard module for long campaign chapter, XP, base facilities, and faction fronts.
+- Verification used: `npm test -- apps/api/src/server.test.ts apps/web/src/api.test.ts apps/web/src/campaignProgression.test.ts --reporter=dot`, `npm run typecheck`, `npm test -- --reporter=dot`, and `npm run build`.

@@ -67,6 +67,103 @@ const creatorScenarioDefinition = () => {
 };
 
 describe("campaign turn API", () => {
+  it("applies long campaign progression through the rules engine and persists the snapshot", async () => {
+    const store = new InMemoryCampaignStore();
+    const app = buildServer({ store });
+
+    const campaignResponse = await app.inject({
+      method: "POST",
+      url: "/campaigns",
+      headers: { "content-type": "application/json" },
+      payload: {},
+    });
+    const campaign = campaignResponse.json<{ campaignId: string }>();
+    const record = store.get(campaign.campaignId);
+    if (!record) throw new Error("test campaign was not created");
+    record.state.time = { day: 7, phase: "night" };
+
+    const progressResponse = await app.inject({
+      method: "POST",
+      url: `/campaigns/${campaign.campaignId}/campaign/progress`,
+      headers: { "content-type": "application/json" },
+      payload: {
+        completedQuestIds: ["missing_caravan"],
+      },
+    });
+
+    expect(progressResponse.statusCode).toBe(200);
+    expect(progressResponse.json()).toMatchObject({
+      campaignId: campaign.campaignId,
+      state: {
+        time: { day: 1, phase: "morning" },
+        campaign: {
+          chapter: 2,
+          experience: 2,
+          legacyFlags: ["quest:missing_caravan:resolved"],
+        },
+      },
+    });
+
+    const upgradeResponse = await app.inject({
+      method: "POST",
+      url: `/campaigns/${campaign.campaignId}/campaign/progress`,
+      headers: { "content-type": "application/json" },
+      payload: {
+        baseInvestments: [{ facilityId: "infirmary", supplies: 2, money: 1 }],
+        factionFronts: [
+          {
+            factionId: "blackstone_consortium",
+            influenceDelta: -6,
+            pressureDelta: 4,
+          },
+        ],
+      },
+    });
+
+    expect(upgradeResponse.statusCode).toBe(200);
+    expect(upgradeResponse.json()).toMatchObject({
+      state: {
+        player: { resources: { supplies: 2, money: 4 } },
+        campaign: {
+          base: { level: 1, facilities: { infirmary: 1 } },
+          fronts: {
+            blackstone_consortium: {
+              influence: 0,
+              pressure: 4,
+              status: "broken",
+            },
+          },
+        },
+      },
+    });
+
+    const chronicleResponse = await app.inject({
+      method: "GET",
+      url: `/campaigns/${campaign.campaignId}/chronicle`,
+    });
+    const chronicle = chronicleResponse.json();
+    expect(chronicle.snapshots).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ day: 1, phase: "morning" }),
+      ]),
+    );
+    expect(chronicle.replay).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          publicSummary: "Long campaign progression updated.",
+        }),
+      ]),
+    );
+    expect(
+      chronicle.replay.some(
+        (entry: { statePatch?: { source?: string } }) =>
+          entry.statePatch?.source === "referee",
+      ),
+    ).toBe(true);
+
+    await app.close();
+  });
+
   it("lists resumable campaigns with current progress summaries", async () => {
     const fakeClient: LLMClient = {
       completeJson: async ({ fallback }) => fallback(),

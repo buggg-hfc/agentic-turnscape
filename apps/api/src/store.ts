@@ -131,6 +131,11 @@ export type CampaignStore = {
     nextState: WorldState,
     resolution: TurnResolution,
   ): MaybePromise<StoredTurn>;
+  recordCampaignProgress(
+    campaignId: string,
+    nextState: WorldState,
+    resolution: TurnResolution,
+  ): MaybePromise<StoredTurn>;
   failTurn(
     campaignId: string,
     turnId: string,
@@ -378,6 +383,76 @@ export class InMemoryCampaignStore implements CampaignStore {
         createdAt: completedAt,
       },
     );
+    this.compressMemory(campaign);
+    campaign.updatedAt = completedAt;
+    return turn;
+  }
+
+  recordCampaignProgress(
+    campaignId: string,
+    nextState: WorldState,
+    resolution: TurnResolution,
+  ): StoredTurn {
+    const campaign = this.require(campaignId);
+    const previousPublicEventCount = campaign.state.publicEvents.length;
+    const previousHiddenEventCount = campaign.state.hiddenEvents.length;
+    const completedAt = new Date().toISOString();
+    const turn: StoredTurn = {
+      id: resolution.turnId,
+      index: campaign.turns.length + 1,
+      status: "complete",
+      resolution,
+      createdAt: completedAt,
+      completedAt,
+    };
+    campaign.turns.push(turn);
+    campaign.state = cloneState(nextState);
+    campaign.snapshots.push({
+      id: crypto.randomUUID(),
+      turnId: turn.id,
+      state: cloneState(nextState),
+      createdAt: completedAt,
+    });
+    campaign.events.push({
+      id: crypto.randomUUID(),
+      turnId: turn.id,
+      kind: "state_patch",
+      payload: resolution.statePatch,
+      visible: false,
+      createdAt: completedAt,
+    });
+    for (const publicEvent of nextState.publicEvents.slice(
+      previousPublicEventCount,
+    )) {
+      campaign.events.push({
+        id: crypto.randomUUID(),
+        turnId: turn.id,
+        kind: "public_chronicle",
+        payload: publicEvent,
+        visible: true,
+        createdAt: completedAt,
+      });
+    }
+    for (const hiddenEvent of nextState.hiddenEvents.slice(
+      previousHiddenEventCount,
+    )) {
+      campaign.events.push({
+        id: crypto.randomUUID(),
+        turnId: turn.id,
+        kind: "hidden_chronicle",
+        payload: hiddenEvent,
+        visible: false,
+        createdAt: completedAt,
+      });
+    }
+    campaign.memoryLog.push({
+      id: crypto.randomUUID(),
+      turnId: turn.id,
+      scope: "turn",
+      summary: resolution.publicSummary,
+      hidden: false,
+      createdAt: completedAt,
+    });
     this.compressMemory(campaign);
     campaign.updatedAt = completedAt;
     return turn;

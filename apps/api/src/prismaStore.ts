@@ -403,6 +403,106 @@ export class PrismaCampaignStore implements CampaignStore {
     return toStoredTurn(completedTurn);
   }
 
+  async recordCampaignProgress(
+    campaignId: string,
+    nextState: WorldState,
+    resolution: TurnResolution,
+  ): Promise<StoredTurn> {
+    const completedTurn = await this.prisma.$transaction(async (tx) => {
+      const campaign = await tx.campaign.findUnique({
+        where: { id: campaignId },
+        select: { id: true, state: true },
+      });
+      if (!campaign) throw new Error(`Campaign not found: ${campaignId}`);
+
+      const previousState = WorldStateSchema.parse(campaign.state);
+      const completedAt = new Date();
+      const index = (await tx.turn.count({ where: { campaignId } })) + 1;
+      const createdTurn = await tx.turn.create({
+        data: {
+          id: resolution.turnId,
+          campaignId,
+          index,
+          status: "complete",
+          resolution: toJson(resolution),
+          completedAt,
+          createdAt: completedAt,
+        },
+      });
+      await tx.campaign.update({
+        where: { id: campaignId },
+        data: { state: toJson(nextState) },
+      });
+      await tx.snapshot.create({
+        data: {
+          id: crypto.randomUUID(),
+          campaignId,
+          turnId: createdTurn.id,
+          state: toJson(nextState),
+          createdAt: completedAt,
+        },
+      });
+      await tx.event.create({
+        data: {
+          id: crypto.randomUUID(),
+          campaignId,
+          turnId: createdTurn.id,
+          kind: "state_patch",
+          payload: toJson(resolution.statePatch),
+          visible: false,
+          createdAt: completedAt,
+        },
+      });
+
+      const publicEvents = nextState.publicEvents.slice(
+        previousState.publicEvents.length,
+      );
+      const hiddenEvents = nextState.hiddenEvents.slice(
+        previousState.hiddenEvents.length,
+      );
+      if (publicEvents.length > 0) {
+        await tx.event.createMany({
+          data: publicEvents.map((event) => ({
+            id: crypto.randomUUID(),
+            campaignId,
+            turnId: createdTurn.id,
+            kind: "public_chronicle",
+            payload: toJson(event),
+            visible: true,
+            createdAt: completedAt,
+          })),
+        });
+      }
+      if (hiddenEvents.length > 0) {
+        await tx.event.createMany({
+          data: hiddenEvents.map((event) => ({
+            id: crypto.randomUUID(),
+            campaignId,
+            turnId: createdTurn.id,
+            kind: "hidden_chronicle",
+            payload: toJson(event),
+            visible: false,
+            createdAt: completedAt,
+          })),
+        });
+      }
+      await tx.memoryLog.create({
+        data: {
+          id: crypto.randomUUID(),
+          campaignId,
+          turnId: createdTurn.id,
+          scope: "turn",
+          summary: resolution.publicSummary,
+          hidden: false,
+          createdAt: completedAt,
+        },
+      });
+      await this.compressMemory(tx, campaignId);
+      return createdTurn;
+    });
+    return toStoredTurn(completedTurn);
+  }
+
   async failTurn(
     campaignId: string,
     turnId: string,

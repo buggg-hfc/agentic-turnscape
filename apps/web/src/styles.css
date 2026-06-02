@@ -517,6 +517,76 @@ button {
   gap: 8px;
 }
 
+.campaign-progress-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.campaign-progress-grid .metric {
+  grid-template-columns: 16px minmax(2em, 1fr) auto;
+  gap: 6px;
+}
+
+.campaign-base {
+  margin-top: 12px;
+}
+
+.campaign-base strong {
+  display: block;
+  color: #fff1c5;
+}
+
+.tag-row.compact {
+  margin: 8px 0 0;
+}
+
+.front-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.front-row {
+  display: grid;
+  gap: 5px;
+  border-left: 3px solid rgba(103, 160, 143, 0.75);
+  border-radius: 0 8px 8px 0;
+  padding: 8px 9px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.front-row.dominant {
+  border-left-color: #e36a5a;
+}
+
+.front-row.broken {
+  border-left-color: #66c6a3;
+}
+
+.front-row.contained {
+  border-left-color: #e3c16f;
+}
+
+.front-row > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.front-row span,
+.front-row small,
+.legacy-flags {
+  color: #aebbb4;
+  font-size: 12px;
+}
+
+.legacy-flags {
+  display: block;
+  margin-top: 10px;
+}
+
 .metric {
   display: grid;
   grid-template-columns: 18px 1fr auto;
@@ -530,6 +600,11 @@ button {
 
 .metric span {
   color: #b8c6bd;
+  white-space: nowrap;
+}
+
+.metric strong {
+  white-space: nowrap;
 }
 
 .clock-list,

@@ -11,7 +11,11 @@ import {
   listScenarioPackages,
   type ScenarioPackage,
 } from "@agentic-turnscape/content";
-import { toPlayerVisibleState } from "@agentic-turnscape/core";
+import {
+  applyStatePatch,
+  resolveLongCampaignStep,
+  toPlayerVisibleState,
+} from "@agentic-turnscape/core";
 import {
   LlmConfigSchema,
   PlayerActionSchema,
@@ -121,6 +125,34 @@ const parseTransparencyQuery = (query: unknown): TransparencyMode =>
   z
     .object({ transparency: TransparencyModeSchema.default("inference") })
     .parse(query ?? {}).transparency;
+
+const LongCampaignProgressBodySchema = z.object({
+  completedQuestIds: z.array(z.string()).default([]),
+  baseInvestments: z
+    .array(
+      z.object({
+        facilityId: z.string(),
+        supplies: z.number().int().min(0).default(0),
+        money: z.number().int().min(0).default(0),
+      }),
+    )
+    .default([]),
+  training: z
+    .object({
+      skill: z.string(),
+      experience: z.number().int().min(1),
+    })
+    .optional(),
+  factionFronts: z
+    .array(
+      z.object({
+        factionId: z.string(),
+        influenceDelta: z.number().int().optional(),
+        pressureDelta: z.number().int().optional(),
+      }),
+    )
+    .default([]),
+});
 
 export const buildServer = (options: ServerOptions = {}) => {
   const app = Fastify({ logger: true });
@@ -359,6 +391,58 @@ export const buildServer = (options: ServerOptions = {}) => {
     } catch {
       return reply.code(404).send({ error: "campaign_not_found" });
     }
+  });
+
+  app.post("/campaigns/:id/campaign/progress", async (request, reply) => {
+    const params = z.object({ id: z.string() }).parse(request.params);
+    const body = LongCampaignProgressBodySchema.parse(request.body ?? {});
+    const campaign = await store.get(params.id);
+    if (!campaign) return reply.code(404).send({ error: "campaign_not_found" });
+    const scenario = await requireAvailableScenario(campaign.scenario);
+    const turnId = crypto.randomUUID();
+    const patch = resolveLongCampaignStep({
+      state: campaign.state,
+      turnId,
+      completedQuestIds: body.completedQuestIds,
+      baseInvestments: body.baseInvestments,
+      ...(body.training ? { training: body.training } : {}),
+      factionFronts: body.factionFronts.map((front) => ({
+        factionId: front.factionId,
+        ...(front.influenceDelta !== undefined
+          ? { influenceDelta: front.influenceDelta }
+          : {}),
+        ...(front.pressureDelta !== undefined
+          ? { pressureDelta: front.pressureDelta }
+          : {}),
+      })),
+    });
+    const nextState = applyStatePatch(campaign.state, patch);
+    const resolution: TurnResolution = {
+      turnId,
+      proposals: [],
+      statePatch: patch,
+      publicSummary: "Long campaign progression updated.",
+      hiddenSummary: "No hidden long campaign updates.",
+      narration:
+        "The campaign ledger updates, carrying the group's choices into the next layer of play.",
+      ending: scenario.evaluateEnding(nextState),
+      availableActions: scenario.getActions(nextState),
+    };
+    const completed = await store.recordCampaignProgress(
+      campaign.id,
+      nextState,
+      resolution,
+    );
+
+    return {
+      campaignId: campaign.id,
+      turnId: completed.id,
+      status: completed.status,
+      resolution: resolutionForTransparency(resolution, "inference"),
+      scenarioStatus: getScenarioStatus(nextState, scenario),
+      state: toPlayerVisibleState(nextState),
+      availableActions: scenario.getActions(nextState),
+    };
   });
 
   app.post("/campaigns/:id/turns/run", async (request, reply) => {

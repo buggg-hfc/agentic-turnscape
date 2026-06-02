@@ -38,6 +38,7 @@ For gameplay work, tests should prove the rule invariant rather than a single lu
 - The first wave of genre expansion packs is registered and tested through the same `ScenarioPackage` contract: cultivation (`Frost Lantern Trial`), science fiction (`Orbital Quarantine`), historical (`Salt Harbor Accord`), urban supernatural (`Rain Alley Haunting`), and realistic profession (`Emergency Ward Night`). Each pack creates a schema-valid world, exposes playable actions, and has deterministic endings.
 - First-wave expansion packs can now run deterministic three-day playthroughs through the same Agent/referee/state-patch pipeline. Successful runs advance scenario stability clocks and reach success endings; pressure runs advance pressure lines, reach failure/pressure endings, and both routes can be replayed from their emitted `state_patch` records.
 - The long campaign foundation now has tested referee-owned progression patches for optional `campaign` state: chapter transitions, base facility upgrades, character skill growth, and faction-war front status changes.
+- Long campaign progression now has a tested API and UI path: `/campaigns/:id/campaign/progress` stores replayable progression turns, while the web dashboard shows chapter, XP, base facilities, and faction-war fronts.
 
 ## MVP Completion Gate
 
@@ -59,7 +60,7 @@ The "Border Seven Days" MVP is complete only when tests and smoke checks prove a
 After MVP completion, expand toward the full game in tested slices:
 
 1. Persistence slice: replace in-memory campaigns with PostgreSQL while keeping current API contract tests green.
-2. Long campaign slice: deepen the tested campaign progression foundation with memory compression, multi-session chapter arcs, base-building choices, character growth UI, and faction-war scenario consequences.
+2. Long campaign slice: deepen the tested campaign progression foundation with multi-session chapter arcs, richer base-building choices, character growth UI, and faction-war scenario consequences. The first API/UI bridge is already in place and must remain replayable through stored referee patches.
 3. Scenario pack slice: deepen cultivation, science fiction, historical, urban supernatural, and realistic profession packs from tested three-day playthroughs into multi-session arcs with dedicated scenes, richer rules hooks, and broader playthrough regression seeds.
 4. Creator tooling slice: add editors for worlds, factions, NPCs, abilities, quests, locations, and clocks with import/export validation tests.
 5. Production hardening slice: cost monitoring, LLM retry budgets, model compatibility tests, save migration tests, and playthrough regression seeds.

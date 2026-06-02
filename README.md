@@ -18,6 +18,7 @@ A multi-agent turn-based narrative simulation game. The current implementation i
 - First-wave expansion scenario packs for cultivation, science fiction, historical, urban supernatural, and realistic profession play, all using the same tested `ScenarioPackage` contract.
 - Deterministic expansion playthrough tests for all first-wave packs, covering both success and pressure endings with generic scenario clock progression and replayable state patches.
 - Long campaign progression rules for post-MVP expansion: chapter transitions, base facilities, character growth, and faction-war fronts all enter world state through referee-owned patches.
+- Long campaign progression is now available through `POST /campaigns/:id/campaign/progress`, persisted in snapshots/replay records, and surfaced in the web dashboard.
 - Built-in scenario registry plus runtime creator scenario import, export, protected deletion, local restore, and API-side persistence.
 - Chronicle replay records, state snapshots, Agent run records, and hidden memory logs.
 - PostgreSQL/Redis Docker Compose, Prisma schema, optional `STORAGE_DRIVER=prisma` persistence, and optional `TURN_QUEUE_DRIVER=bullmq` turn workers.
@@ -50,3 +51,5 @@ npm run build
 This project is TDD-first. New gameplay, API, Agent, content, and UI behavior should start with a failing test or acceptance fixture before production code changes. The working roadmap and gates live in [docs/tdd-and-expansion-roadmap.md](docs/tdd-and-expansion-roadmap.md).
 
 Documentation should be updated with each meaningful gameplay, API, Agent, persistence, or UX slice. Recent implementation notes are tracked in [docs/development-log.md](docs/development-log.md).
+
+Runtime reports and screenshots are collected in [docs/implementation-report.md](docs/implementation-report.md).

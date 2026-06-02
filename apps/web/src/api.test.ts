@@ -61,6 +61,48 @@ describe("web API client", () => {
     });
   });
 
+  it("posts long campaign progression requests to the campaign endpoint", async () => {
+    const fetchMock = vi.fn(async () => ({
+      ok: true,
+      json: async () => ({
+        campaignId: "campaign-1",
+        state: {
+          campaign: {
+            chapter: 2,
+            base: { level: 1, facilities: { infirmary: 1 } },
+          },
+        },
+        availableActions: [],
+      }),
+    }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(
+      api.progressCampaign("campaign-1", {
+        baseInvestments: [{ facilityId: "infirmary", supplies: 2, money: 1 }],
+        training: { skill: "medical", experience: 3 },
+      }),
+    ).resolves.toMatchObject({
+      campaignId: "campaign-1",
+      state: {
+        campaign: {
+          chapter: 2,
+          base: { level: 1, facilities: { infirmary: 1 } },
+        },
+      },
+    });
+
+    const [url, init] = fetchMock.mock.calls[0] as unknown as [
+      string,
+      RequestInit,
+    ];
+    expect(url).toBe("/api/campaigns/campaign-1/campaign/progress");
+    expect(JSON.parse(String(init.body))).toEqual({
+      baseInvestments: [{ facilityId: "infirmary", supplies: 2, money: 1 }],
+      training: { skill: "medical", experience: 3 },
+    });
+  });
+
   it("lists scenarios and posts an explicit campaign creation body", async () => {
     const fetchMock = vi
       .fn()

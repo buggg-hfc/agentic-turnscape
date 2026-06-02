@@ -32,6 +32,10 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { api } from "./api.js";
 import { buildAgentTransparencyRows } from "./agentTransparency.js";
+import {
+  buildCampaignProgressionSummary,
+  type CampaignProgressionSummary,
+} from "./campaignProgression.js";
 import { formatCampaignProgress } from "./campaignResume.js";
 import {
   buildChronicleTimeline,
@@ -335,6 +339,10 @@ export const App = () => {
       .sort((a, b) => Math.abs(b.score) - Math.abs(a.score))
       .slice(0, 5);
   }, [state]);
+  const campaignProgression = useMemo(
+    () => (state ? buildCampaignProgressionSummary(state) : undefined),
+    [state],
+  );
 
   const submitTurn = async (action: PlayerAction) => {
     if (!campaignId) return;
@@ -534,6 +542,9 @@ export const App = () => {
 
         <aside className="side-panel">
           <StatusPanel state={state} />
+          {campaignProgression?.available ? (
+            <CampaignProgressionPanel summary={campaignProgression} />
+          ) : null}
           <ClockPanel clocks={visibleClocks} />
           <ChroniclePanel items={chronicleTimeline} />
         </aside>
@@ -843,6 +854,49 @@ const StatusPanel = ({ state }: { state: WorldState }) => (
   </section>
 );
 
+const CampaignProgressionPanel = ({
+  summary,
+}: {
+  summary: CampaignProgressionSummary;
+}) => (
+  <section className="module campaign-progression">
+    <div className="panel-heading compact">
+      <Activity size={17} />
+      <h3>长期战役</h3>
+    </div>
+    <div className="campaign-progress-grid">
+      <Metric label="章节" valueLabel={summary.chapterLabel} />
+      <Metric label="成长" valueLabel={summary.experienceLabel} />
+    </div>
+    <div className="campaign-base">
+      <strong>{summary.baseLabel}</strong>
+      <div className="tag-row compact">
+        {summary.facilities.length > 0 ? (
+          summary.facilities.map((facility) => <span key={facility}>{facility}</span>)
+        ) : (
+          <span>暂无设施</span>
+        )}
+      </div>
+    </div>
+    <div className="front-list">
+      {summary.fronts.slice(0, 3).map((front) => (
+        <div key={front.id} className={`front-row ${front.status}`}>
+          <div>
+            <strong>{front.name}</strong>
+            <span>{front.statusLabel}</span>
+          </div>
+          <small>
+            影响 {front.influence} · 压力 {front.pressure}
+          </small>
+        </div>
+      ))}
+    </div>
+    {summary.legacyFlags.length > 0 ? (
+      <small className="legacy-flags">{summary.legacyFlags.length} 条传承记录</small>
+    ) : null}
+  </section>
+);
+
 const ClockPanel = ({ clocks }: { clocks: ClockState[] }) => (
   <section className="module">
     <div className="panel-heading compact">
@@ -1026,16 +1080,16 @@ const Metric = ({
   label,
   value,
   max,
+  valueLabel,
 }: {
   label: string;
-  value: number;
-  max: number;
+  value?: number;
+  max?: number;
+  valueLabel?: string;
 }) => (
   <div className="metric">
     <Shield size={15} />
     <span>{label}</span>
-    <strong>
-      {value}/{max}
-    </strong>
+    <strong>{valueLabel ?? `${value}/${max}`}</strong>
   </div>
 );
