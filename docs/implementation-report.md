@@ -2,6 +2,31 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-03 - OpenAI-compatible LLM Token Budget
+
+### Scope
+
+- Added a validated `maxTokens` field to the shared LLM configuration contract, with browser-local persistence and API per-turn override support.
+- Passed the token budget into the OpenAI-compatible chat completion request as `max_tokens`, covering DeepSeek-compatible base URLs and models without provider-specific code.
+- Added an opt-in real-provider smoke test that reads credentials only from environment variables.
+- Kept API keys out of world state, replay payloads, queue persistence, and documentation.
+
+### Runtime Screenshot
+
+![Long campaign progression panel](screenshots/long-campaign-progress-panel-2026-06-02.png)
+
+The report continues to include a verified runtime screenshot inline. This LLM configuration slice is validated by focused tests and the full gate; the screenshot remains the current captured runtime surface for the web dashboard.
+
+### Verification
+
+```bash
+npm test -- packages/agents/src/llm.test.ts apps/web/src/llmSettings.test.ts apps/web/src/api.test.ts apps/api/src/server.test.ts --reporter=dot
+npm run test:llm:smoke
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-02 - Active Campaign Arc Status
 
 ### Scope

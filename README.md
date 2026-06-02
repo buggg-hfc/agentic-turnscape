@@ -12,7 +12,7 @@ A multi-agent turn-based narrative simulation game. The current implementation i
 - Crisis recovery branches for plague, mine control, and cult ritual clocks so near-collapse failures open new playable choices instead of an early game over.
 - Agent orchestration where NPCs only propose actions and the referee is the only code path that mutates state.
 - OpenAI-compatible LLM client with structured JSON parsing and deterministic scripted fallback for local development.
-- In-game LLM configuration for base URL, model, API key, and timeout, with browser-local saved settings.
+- In-game LLM configuration for base URL, model, API key, timeout, and max token budget, with browser-local saved settings.
 - Three Agent transparency modes with server-side redaction so hidden reasons, hidden summaries, and hidden patches only appear in debug views.
 - Seed content for 3 factions, 10 NPCs, 6 locations, 3 visible crisis clocks, quests, and starting chronicle.
 - First-wave expansion scenario packs for cultivation, science fiction, historical, urban supernatural, and realistic profession play, all using the same tested `ScenarioPackage` contract.
@@ -34,7 +34,13 @@ npm run dev
 
 Open the web app at `http://localhost:5173`. The API runs at `http://localhost:8787`.
 
-To use a real LLM, copy `.env.example` to `.env` and set `LLM_API_KEY`, `LLM_BASE_URL`, and `LLM_MODEL`. Without a key, the game uses scripted Agent fallbacks so the vertical slice remains playable.
+To use a real LLM, copy `.env.example` to `.env` and set `LLM_API_KEY`, `LLM_BASE_URL`, `LLM_MODEL`, and optionally `LLM_TIMEOUT_MS`/`LLM_MAX_TOKENS`. OpenAI-compatible providers such as DeepSeek can also be configured in the in-game LLM panel and saved locally in the browser. Without a key, the game uses scripted Agent fallbacks so the vertical slice remains playable.
+
+To run an opt-in provider smoke test, set `RUN_REAL_LLM_SMOKE=1` plus the same `LLM_*` environment variables and run:
+
+```bash
+npm run test:llm:smoke
+```
 
 The default store is in-memory for fast local iteration. Set `STORAGE_DRIVER=prisma` with `DATABASE_URL` pointed at PostgreSQL to use the Prisma-backed campaign store.
 

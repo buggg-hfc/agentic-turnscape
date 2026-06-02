@@ -1070,6 +1070,19 @@ const LlmSettingsPanel = ({
           }
         />
       </label>
+      <label>
+        <span>Max tokens</span>
+        <input
+          type="number"
+          min={1}
+          max={128000}
+          step={256}
+          value={settings.maxTokens}
+          onChange={(event) =>
+            onChange({ ...settings, maxTokens: Number(event.target.value) })
+          }
+        />
+      </label>
     </div>
     <div className="settings-actions">
       <button className="secondary-button" onClick={onSave}>

@@ -12,7 +12,11 @@ export type LLMClient = {
     temperature?: number;
     fallback: () => T;
   }): Promise<T>;
-  completeText(input: { messages: LLMMessage[]; temperature?: number; fallback: () => string }): Promise<string>;
+  completeText(input: {
+    messages: LLMMessage[];
+    temperature?: number;
+    fallback: () => string;
+  }): Promise<string>;
 };
 
 export type OpenAICompatibleOptions = {
@@ -20,10 +24,14 @@ export type OpenAICompatibleOptions = {
   apiKey?: string | undefined;
   model?: string | undefined;
   timeoutMs?: number | undefined;
+  maxTokens?: number | undefined;
   jsonRetries?: number | undefined;
 };
 
-const withTimeout = async <T>(task: (signal: AbortSignal) => Promise<T>, timeoutMs: number): Promise<T> => {
+const withTimeout = async <T>(
+  task: (signal: AbortSignal) => Promise<T>,
+  timeoutMs: number,
+): Promise<T> => {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
   try {
@@ -38,9 +46,14 @@ export const createOpenAICompatibleClient = ({
   apiKey,
   model = "gpt-4.1-mini",
   timeoutMs = 15000,
-  jsonRetries = 1
+  maxTokens = 1024,
+  jsonRetries = 1,
 }: OpenAICompatibleOptions): LLMClient => {
-  const request = async (messages: LLMMessage[], temperature = 0.3, jsonMode = true): Promise<string | undefined> => {
+  const request = async (
+    messages: LLMMessage[],
+    temperature = 0.3,
+    jsonMode = true,
+  ): Promise<string | undefined> => {
     if (!apiKey) return undefined;
     const response = await withTimeout(
       (signal) =>
@@ -49,26 +62,41 @@ export const createOpenAICompatibleClient = ({
           signal,
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${apiKey}`
+            Authorization: `Bearer ${apiKey}`,
           },
           body: JSON.stringify({
             model,
             temperature,
+            max_tokens: maxTokens,
             messages,
-            ...(jsonMode ? { response_format: { type: "json_object" } } : {})
-          })
+            ...(jsonMode ? { response_format: { type: "json_object" } } : {}),
+          }),
         }),
-      timeoutMs
+      timeoutMs,
     );
     if (!response.ok) {
-      throw new Error(`LLM request failed with ${response.status}: ${await response.text()}`);
+      throw new Error(
+        `LLM request failed with ${response.status}: ${await response.text()}`,
+      );
     }
-    const body = (await response.json()) as { choices?: Array<{ message?: { content?: string } }> };
+    const body = (await response.json()) as {
+      choices?: Array<{ message?: { content?: string } }>;
+    };
     return body.choices?.[0]?.message?.content;
   };
 
   return {
-    async completeJson<T>({ messages, schema, temperature, fallback }: { messages: LLMMessage[]; schema: z.ZodType<T>; temperature?: number; fallback: () => T }) {
+    async completeJson<T>({
+      messages,
+      schema,
+      temperature,
+      fallback,
+    }: {
+      messages: LLMMessage[];
+      schema: z.ZodType<T>;
+      temperature?: number;
+      fallback: () => T;
+    }) {
       let retryMessages = messages;
       for (let attempt = 0; attempt <= jsonRetries; attempt += 1) {
         try {
@@ -82,17 +110,21 @@ export const createOpenAICompatibleClient = ({
             {
               role: "user",
               content: `The previous JSON failed schema validation: ${parsed.error.issues
-                .map((issue) => `${issue.path.join(".") || "root"} ${issue.message}`)
-                .join("; ")}. Return only valid JSON with all required fields.`
-            }
+                .map(
+                  (issue) =>
+                    `${issue.path.join(".") || "root"} ${issue.message}`,
+                )
+                .join("; ")}. Return only valid JSON with all required fields.`,
+            },
           ];
         } catch {
           retryMessages = [
             ...messages,
             {
               role: "user",
-              content: "The previous response was not valid JSON. Return only valid JSON with all required fields."
-            }
+              content:
+                "The previous response was not valid JSON. Return only valid JSON with all required fields.",
+            },
           ];
         }
       }
@@ -108,22 +140,25 @@ export const createOpenAICompatibleClient = ({
               signal,
               headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${apiKey}`
+                Authorization: `Bearer ${apiKey}`,
               },
               body: JSON.stringify({
                 model,
                 temperature,
-                messages
-              })
+                max_tokens: maxTokens,
+                messages,
+              }),
             }),
-          timeoutMs
+          timeoutMs,
         );
         if (!response.ok) return fallback();
-        const body = (await response.json()) as { choices?: Array<{ message?: { content?: string } }> };
+        const body = (await response.json()) as {
+          choices?: Array<{ message?: { content?: string } }>;
+        };
         return body.choices?.[0]?.message?.content?.trim() || fallback();
       } catch {
         return fallback();
       }
-    }
+    },
   };
 };

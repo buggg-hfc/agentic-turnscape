@@ -666,6 +666,7 @@ describe("campaign turn API", () => {
           model: "local-story-model",
           apiKey: "local-secret",
           timeoutMs: 5000,
+          maxTokens: 2048,
         },
       },
     });
@@ -677,6 +678,7 @@ describe("campaign turn API", () => {
       model: "local-story-model",
       apiKey: "local-secret",
       timeoutMs: 5000,
+      maxTokens: 2048,
     });
     expect(JSON.stringify(body.state)).not.toContain("local-secret");
     expect(body.resolution.proposals.length).toBeGreaterThan(0);

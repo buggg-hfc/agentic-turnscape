@@ -13,7 +13,8 @@ export const DEFAULT_LLM_CONFIG = {
   baseUrl: "https://api.openai.com/v1",
   model: "gpt-4.1-mini",
   apiKey: "",
-  timeoutMs: 15000
+  timeoutMs: 15000,
+  maxTokens: 1024
 } as const;
 
 export const LlmConfigSchema = z.object({
@@ -25,7 +26,8 @@ export const LlmConfigSchema = z.object({
     .default(DEFAULT_LLM_CONFIG.baseUrl),
   model: z.string().trim().min(1).default(DEFAULT_LLM_CONFIG.model),
   apiKey: z.string().trim().default(DEFAULT_LLM_CONFIG.apiKey),
-  timeoutMs: z.coerce.number().int().min(1000).max(120000).default(DEFAULT_LLM_CONFIG.timeoutMs)
+  timeoutMs: z.coerce.number().int().min(1000).max(120000).default(DEFAULT_LLM_CONFIG.timeoutMs),
+  maxTokens: z.coerce.number().int().min(1).max(128000).default(DEFAULT_LLM_CONFIG.maxTokens)
 });
 export type LlmConfig = z.infer<typeof LlmConfigSchema>;
 

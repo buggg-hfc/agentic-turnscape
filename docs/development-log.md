@@ -2,6 +2,19 @@
 
 This log records tested implementation slices as the project moves from the Border Seven Days MVP toward the full game. Each entry should name the behavior that changed and the verification gate used before publishing.
 
+## 2026-06-03
+
+- Added a tested max-token budget to the shared LLM configuration contract, browser-local saved settings, API per-turn overrides, and OpenAI-compatible request payloads.
+- Added an opt-in real-provider LLM smoke test that reads credentials only from environment variables.
+- Documented the optional `LLM_TIMEOUT_MS` and `LLM_MAX_TOKENS` environment variables and kept real provider credentials out of committed files.
+- Kept the implementation report screenshot visible while recording the LLM configuration verification gate.
+- Verification used for this slice:
+  - `npm test -- packages/agents/src/llm.test.ts apps/web/src/llmSettings.test.ts apps/web/src/api.test.ts apps/api/src/server.test.ts --reporter=dot`
+  - `npm run test:llm:smoke`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 ## 2026-06-02
 
 - Exposed active long campaign arc status in campaign payloads. `scenarioStatus.campaignArc` now includes the current chapter number, current chapter details, base facility hooks, and faction fronts.

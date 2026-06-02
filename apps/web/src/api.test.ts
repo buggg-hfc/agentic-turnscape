@@ -37,6 +37,7 @@ describe("web API client", () => {
         model: "local-model",
         apiKey: "secret",
         timeoutMs: 5000,
+        maxTokens: 2048,
       },
       { queued: true },
     );
@@ -57,6 +58,7 @@ describe("web API client", () => {
         model: "local-model",
         apiKey: "secret",
         timeoutMs: 5000,
+        maxTokens: 2048,
       },
     });
   });

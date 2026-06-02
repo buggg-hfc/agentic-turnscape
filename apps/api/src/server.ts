@@ -250,6 +250,12 @@ export const buildServer = (options: ServerOptions = {}) => {
     baseUrl: process.env.LLM_BASE_URL,
     apiKey: process.env.LLM_API_KEY,
     model: process.env.LLM_MODEL,
+    timeoutMs: process.env.LLM_TIMEOUT_MS
+      ? Number(process.env.LLM_TIMEOUT_MS)
+      : undefined,
+    maxTokens: process.env.LLM_MAX_TOKENS
+      ? Number(process.env.LLM_MAX_TOKENS)
+      : undefined,
   };
   const envLlm = createLlmClient(envLlmConfig);
   const llmForConfig = (config: TurnJobPayload["llmConfig"]): LLMClient =>
@@ -259,6 +265,7 @@ export const buildServer = (options: ServerOptions = {}) => {
           model: config.model,
           apiKey: config.apiKey || undefined,
           timeoutMs: config.timeoutMs,
+          maxTokens: config.maxTokens,
         })
       : envLlm;
 
