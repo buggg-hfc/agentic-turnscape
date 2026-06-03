@@ -2,6 +2,30 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-03 - Faction Plan Visibility
+
+### Scope
+
+- Added a tested web view model for visible faction plans, leaders, public clock pressure, and strongest resources.
+- Added a dashboard Faction Plans panel so players can see what the Frontier Guild, Blackstone Consortium, and Rift Cult are currently trying to do.
+- Kept the rule invariant intact: the UI only summarizes world state already produced by referee-owned patches.
+
+### Runtime Screenshot
+
+![Faction plan dashboard panel](screenshots/faction-plans-runtime-2026-06-03.png)
+
+The screenshot was captured from a local runtime session after creating a fresh `border-seven-days` campaign. It shows the new Faction Plans panel alongside crisis clocks, relationships, LLM settings, and Agent transparency.
+
+### Verification
+
+```bash
+npm test -- apps/web/src/factionPlans.test.ts --reporter=dot
+npm test -- apps/web/src/factionPlans.test.ts apps/web/src/campaignProgression.test.ts apps/web/src/api.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-03 - Long Campaign Progress Legality
 
 ### Scope

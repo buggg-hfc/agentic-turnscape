@@ -49,6 +49,10 @@ import {
   type ChronicleTimelineItem,
 } from "./chronicle.js";
 import {
+  buildFactionPlanSummaries,
+  type FactionPlanSummary,
+} from "./factionPlans.js";
+import {
   clearLlmSettings,
   loadLlmSettings,
   saveLlmSettings,
@@ -346,6 +350,10 @@ export const App = () => {
       .sort((a, b) => Math.abs(b.score) - Math.abs(a.score))
       .slice(0, 5);
   }, [state]);
+  const factionPlanSummaries = useMemo(
+    () => (state ? buildFactionPlanSummaries(state) : []),
+    [state],
+  );
   const campaignProgression = useMemo(
     () => (state ? buildCampaignProgressionSummary(state) : undefined),
     [state],
@@ -617,6 +625,7 @@ export const App = () => {
 
         <aside className="side-panel">
           <RelationshipPanel entries={topRelationships} />
+          <FactionPlanPanel summaries={factionPlanSummaries} />
           <LlmSettingsPanel
             settings={llmSettings}
             saved={llmSettingsSaved}
@@ -1085,6 +1094,38 @@ const RelationshipPanel = ({ entries }: { entries: RelationshipEntry[] }) => (
             <span>{entry.character.role}</span>
           </div>
           <meter min={-10} max={10} value={entry.score} />
+        </div>
+      ))}
+    </div>
+  </section>
+);
+
+const FactionPlanPanel = ({
+  summaries,
+}: {
+  summaries: FactionPlanSummary[];
+}) => (
+  <section className="module faction-plans">
+    <div className="panel-heading compact">
+      <Shield size={17} />
+      <h3>阵营计划</h3>
+    </div>
+    <div className="faction-plan-list">
+      {summaries.map((summary) => (
+        <div key={summary.id} className="faction-plan-row">
+          <div className="faction-plan-head">
+            <div>
+              <strong>{summary.name}</strong>
+              <span>{summary.leaderName}</span>
+            </div>
+            <small>{summary.clockLabel}</small>
+          </div>
+          <p>{summary.plan}</p>
+          <div className="tag-row compact">
+            {summary.resourceBadges.map((badge) => (
+              <span key={`${summary.id}-${badge}`}>{badge}</span>
+            ))}
+          </div>
         </div>
       ))}
     </div>

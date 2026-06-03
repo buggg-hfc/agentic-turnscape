@@ -4,6 +4,18 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-03
 
+- Added a tested faction-plan dashboard panel. The web UI now summarizes each visible faction plan, leader, public clock pressure, and strongest resources so players can see faction strategy shifting after referee-owned turn results.
+- Captured a runtime screenshot for the implementation report:
+
+![Faction plan dashboard panel](screenshots/faction-plans-runtime-2026-06-03.png)
+
+- Verification used for this slice:
+  - `npm test -- apps/web/src/factionPlans.test.ts --reporter=dot`
+  - `npm test -- apps/web/src/factionPlans.test.ts apps/web/src/campaignProgression.test.ts apps/web/src/api.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added API-side legality checks for long-campaign progression requests. Unknown completed quests, unavailable base facilities, unknown training skills, and unavailable faction fronts now return `invalid_campaign_progression` before any referee patch or snapshot is created.
 - Verification used for this slice:
   - `npm test -- apps/api/src/server.test.ts --reporter=dot`

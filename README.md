@@ -15,6 +15,7 @@ A multi-agent turn-based narrative simulation game. The current implementation i
 - In-game LLM configuration for base URL, model, API key, timeout, and max token budget, with browser-local saved settings.
 - Three Agent transparency modes with server-side redaction so hidden reasons, hidden summaries, and hidden patches only appear in debug views.
 - Seed content for 3 factions, 10 NPCs, 6 locations, 3 visible crisis clocks, quests, and starting chronicle.
+- Web dashboard faction-plan panel showing each visible faction's leader, current plan, public clock pressure, and strongest resources.
 - First-wave expansion scenario packs for cultivation, science fiction, historical, urban supernatural, and realistic profession play, all using the same tested `ScenarioPackage` contract.
 - Deterministic expansion playthrough tests for all first-wave packs, covering both success and pressure endings with generic scenario clock progression and replayable state patches.
 - Long campaign progression rules for post-MVP expansion: chapter transitions, base facilities, character growth, and faction-war fronts all enter world state through referee-owned patches.
