@@ -1,4 +1,9 @@
-import type { AgentActionProposal, CharacterState, PlayerAction, WorldState } from "@agentic-turnscape/shared";
+import type { AgentActionProposal, CharacterState, FactionState, PlayerAction, WorldState } from "@agentic-turnscape/shared";
+
+type VisibleFactionContext = Pick<
+  FactionState,
+  "id" | "name" | "publicGoal" | "leader" | "resources" | "baseId" | "allies" | "enemies" | "style" | "currentPlan" | "clockIds"
+>;
 
 export type LimitedObservation = {
   actor: Pick<
@@ -29,9 +34,30 @@ export type LimitedObservation = {
     dangerLevel: number;
   };
   visibleClocks: Array<{ id: string; name: string; progress: number; max: number; consequence: string }>;
+  actorFaction?: VisibleFactionContext;
   recentPublicEvents: Array<{ title: string; body: string; tags: string[] }>;
   relationshipToPlayer?: unknown;
   playerAction: PlayerAction;
+};
+
+const visibleFactionContext = (actor: CharacterState, state: WorldState): VisibleFactionContext | undefined => {
+  if (!actor.factionId) return undefined;
+  const faction = state.factions[actor.factionId];
+  if (!faction) return undefined;
+
+  return {
+    id: faction.id,
+    name: faction.name,
+    publicGoal: faction.publicGoal,
+    leader: faction.leader,
+    resources: faction.resources,
+    baseId: faction.baseId,
+    allies: faction.allies,
+    enemies: faction.enemies,
+    style: faction.style,
+    currentPlan: faction.currentPlan,
+    clockIds: faction.clockIds
+  };
 };
 
 export const buildLimitedObservation = (
@@ -44,6 +70,7 @@ export const buildLimitedObservation = (
   if (!actor || !location) return undefined;
 
   const relationshipToPlayer = state.relationships[`player:${actorId}`];
+  const actorFaction = visibleFactionContext(actor, state);
   return {
     actor: {
       id: actor.id,
@@ -74,6 +101,7 @@ export const buildLimitedObservation = (
     visibleClocks: Object.values(state.clocks)
       .filter((clock) => clock.visible)
       .map((clock) => ({ id: clock.id, name: clock.name, progress: clock.progress, max: clock.max, consequence: clock.consequence })),
+    ...(actorFaction ? { actorFaction } : {}),
     recentPublicEvents: state.publicEvents.slice(-5).map((event) => ({ title: event.title, body: event.body, tags: event.tags })),
     relationshipToPlayer,
     playerAction

@@ -11,6 +11,7 @@ A multi-agent turn-based narrative simulation game. The current implementation i
 - Core rules for 2d6 checks, success levels, time progression, state patches, crisis clocks, relationships, pressure, momentum, and first-scene consequences.
 - Crisis recovery branches for plague, mine control, and cult ritual clocks so near-collapse failures open new playable choices instead of an early game over.
 - Agent orchestration where NPCs only propose actions and the referee is the only code path that mutates state.
+- NPC LLM observations are built from a strict public-context whitelist: current public location facts, visible clocks, recent public events, player relationship, and the actor faction's public plan without hidden goals.
 - OpenAI-compatible LLM client with structured JSON parsing and deterministic scripted fallback for local development.
 - In-game LLM configuration for base URL, model, API key, timeout, and max token budget, with browser-local saved settings.
 - Three Agent transparency modes with server-side redaction so hidden reasons, hidden summaries, and hidden patches only appear in debug views.

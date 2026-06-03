@@ -4,6 +4,11 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-03
 
+- Added a tested Agent observation boundary. NPC LLM prompts now expose the actor faction's public plan context without sending faction `hiddenGoal`, location `hiddenInfo`, or character `secret` strings into the model input.
+- Kept the implementation report screenshot visible while recording this backend Agent safety slice.
+- Verification used for this slice:
+  - `npm test -- packages/agents/src/orchestrator.test.ts --reporter=dot`
+
 - Added a tested faction-plan dashboard panel. The web UI now summarizes each visible faction plan, leader, public clock pressure, and strongest resources so players can see faction strategy shifting after referee-owned turn results.
 - Captured a runtime screenshot for the implementation report:
 

@@ -35,6 +35,57 @@ describe("turn orchestrator", () => {
     expect(resolution.availableActions.length).toBeGreaterThan(0);
   });
 
+  it("keeps hidden world facts out of NPC LLM observations while exposing public faction context", async () => {
+    const scenario = requireScenarioPackage("border-seven-days");
+    const state = scenario.createWorld();
+    const observations: Array<Record<string, unknown>> = [];
+    const observingLlm: LLMClient = {
+      completeJson: async ({ messages, fallback }) => {
+        observations.push(JSON.parse(messages[1]?.content ?? "{}"));
+        return fallback();
+      },
+      completeText: async ({ fallback }) => fallback()
+    };
+
+    await runTurn({
+      state,
+      llm: observingLlm,
+      turnId: "turn-limited-observation",
+      seed: "turn-limited-observation",
+      playerAction: {
+        actionType: "protect",
+        label: "保护诊所",
+        description: "在诊所门口保护病人和医生。",
+        targetId: "npc_adele",
+        leverage: ["public_rumor"],
+        riskLevel: "medium"
+      },
+      getAvailableActions: scenario.getActions,
+      evaluateEnding: scenario.evaluateEnding
+    });
+
+    const serializedObservations = JSON.stringify(observations);
+    expect(serializedObservations).not.toContain("商会雇员正在观察谁会接近失踪商队的家属");
+    expect(serializedObservations).not.toContain("矿区污染正在加速瘟疫扩散");
+    expect(serializedObservations).not.toContain("寻找可控裂隙技术");
+    expect(serializedObservations).not.toContain("垄断裂隙矿石");
+    expect(serializedObservations).not.toContain("召唤裂隙中的高等存在");
+    expect(serializedObservations).not.toContain("她怀疑旧井水样被裂隙矿污染");
+    expect(serializedObservations).not.toContain("他知道走私派雇佣了密探煽动诊所冲突");
+
+    const manloObservation = observations.find((observation) => {
+      const actor = observation.actor as { id?: string } | undefined;
+      return actor?.id === "npc_manlo";
+    });
+    expect(manloObservation).toBeDefined();
+    expect(manloObservation?.actorFaction).toMatchObject({
+      id: "blackstone_consortium",
+      publicGoal: "控制边境贸易",
+      currentPlan: "完成矿区收购并转移瘟疫责任"
+    });
+    expect(manloObservation?.actorFaction).not.toHaveProperty("hiddenGoal");
+  });
+
   it("retries and rejects proposals that impersonate another actor or invent resources", async () => {
     const scenario = requireScenarioPackage("border-seven-days");
     const state = scenario.createWorld();

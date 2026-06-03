@@ -44,6 +44,7 @@ For gameplay work, tests should prove the rule invariant rather than a single lu
 - The web dashboard now derives actionable long-campaign moves from current state: base-building can initialize campaign progression, earned XP can become training, and the highest-pressure faction front can be stabilized through the existing referee-owned progress API.
 - Long campaign progression requests now have tested API legality guards: unknown completed quests, unavailable base facilities, unknown training skills, and unavailable faction fronts are rejected before any referee patch or snapshot is created.
 - The web dashboard now exposes tested visible faction-plan summaries, including each faction's leader, current plan, public clock pressure, and strongest resources, so faction consequences can be read after referee-owned turn patches.
+- NPC LLM observations now have a tested public-context whitelist: actor faction public plans can enter the prompt, while location hidden info, faction hidden goals, and character secrets stay out of model input.
 
 ## MVP Completion Gate
 

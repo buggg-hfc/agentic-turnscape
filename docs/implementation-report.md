@@ -2,6 +2,26 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-03 - Agent Observation Boundary
+
+### Scope
+
+- Added a regression test around NPC LLM prompt construction.
+- NPC observations now include the actor faction's public strategy context so proposals can respond to faction pressure.
+- The prompt whitelist excludes location `hiddenInfo`, faction `hiddenGoal`, and character `secret` strings, preserving the rule that Agents act only on what they can know.
+
+### Runtime Screenshot
+
+![Faction plan dashboard panel](screenshots/faction-plans-runtime-2026-06-03.png)
+
+The report keeps a verified runtime screenshot inline as requested. This backend Agent safety slice protects the same dashboard surface: public faction plans may be shown to players and NPCs, while hidden faction goals remain available only to referee/debug paths.
+
+### Verification
+
+```bash
+npm test -- packages/agents/src/orchestrator.test.ts --reporter=dot
+```
+
 ## 2026-06-03 - Faction Plan Visibility
 
 ### Scope
