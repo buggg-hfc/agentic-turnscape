@@ -20,6 +20,7 @@ A multi-agent turn-based narrative simulation game. The current implementation i
 - Player-visible world state redacts location hidden info, character secrets, faction hidden goals, quest true backgrounds, unrevealed hidden events, and quest hidden goals.
 - Seed content for 3 factions, 10 NPCs, 6 locations, 3 visible crisis clocks, quests, and starting chronicle.
 - Web dashboard faction-plan panel showing each visible faction's leader, current plan, public clock pressure, and strongest resources.
+- Faction-plan rules now cover advance, blocked, and redirected outcomes for all 3 Border Seven Days factions through referee-owned state patches.
 - First-wave expansion scenario packs for cultivation, science fiction, historical, urban supernatural, and realistic profession play, all using the same tested `ScenarioPackage` contract.
 - Deterministic expansion playthrough tests for all first-wave packs, covering both success and pressure endings with generic scenario clock progression and replayable state patches.
 - Long campaign progression rules for post-MVP expansion: chapter transitions, base facilities, character growth, and faction-war fronts all enter world state through referee-owned patches.

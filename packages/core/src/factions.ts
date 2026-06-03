@@ -42,7 +42,14 @@ export const resolveFactionPlans = (state: WorldState, input: FactionPlanInput):
         }
       }
     } else if (hasFaction(state, "frontier_guild")) {
-      changes.push(setPlan("frontier_guild", "扩大街区封锁，把诊所纳入城防接管。", "谈判失败推动边境公会转向强硬封锁"));
+      changes.push(setPlan("frontier_guild", "转向强硬封锁，扩大街区封锁并把诊所纳入城防接管。", "谈判失败推动边境公会转向强硬封锁"));
+    }
+  }
+
+  if (input.actionType === "investigate" && input.targetId === "npc_kyle" && input.success && hasFaction(state, "frontier_guild")) {
+    changes.push(setPlan("frontier_guild", "旧哨站证据公开后，暂停街区接管并转向内部审查。", "旧哨站调查阻断边境公会强硬接管计划"));
+    if (hasResource(state, "frontier_guild", "legitimacy")) {
+      changes.push(incResource("frontier_guild", "legitimacy", -1, "旧哨站证据削弱边境公会合法性"));
     }
   }
 
@@ -61,10 +68,21 @@ export const resolveFactionPlans = (state: WorldState, input: FactionPlanInput):
     }
   }
 
+  if (input.actionType === "trade" && input.targetId === "npc_crow_nine" && input.success && hasFaction(state, "blackstone_consortium")) {
+    changes.push(setPlan("blackstone_consortium", "黑市账线暴露后，商会转向切割中间人与洗白物资流。", "黑市交易成功迫使商会调整矿区资金路线"));
+  }
+
   if (input.actionType === "protect" && input.targetId === "npc_mina" && input.success && hasFaction(state, "rift_cult")) {
     changes.push(setPlan("rift_cult", "争取米娜与温和派，把保护者塑造成裂隙启示的见证人。", "玩家保护病人迫使教团调整招募策略"));
     if (hasResource(state, "rift_cult", "shelter")) {
       changes.push(incResource("rift_cult", "shelter", 1, "教团扩大病人庇护容量"));
+    }
+  }
+
+  if (input.actionType === "fight" && input.targetId === "npc_eve" && input.success && hasFaction(state, "rift_cult")) {
+    changes.push(setPlan("rift_cult", "仪式入口被迫转移，狂信派暂时放弃公开收容点。", "玩家击退伊芙阻断教团公开仪式路线"));
+    if (hasResource(state, "rift_cult", "relics")) {
+      changes.push(incResource("rift_cult", "relics", -1, "仪式物被迫转移造成损耗"));
     }
   }
 

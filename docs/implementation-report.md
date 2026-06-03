@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-03 - Faction Outcome Matrix
+
+### Scope
+
+- Added a focused TDD matrix proving all 3 Border Seven Days factions have advance, blocked, and redirected plan outcomes.
+- Added referee-owned branches for old outpost evidence blocking the Frontier Guild, black-market ledger exposure redirecting Blackstone Consortium, and defeating Eve disrupting the Rift Cult ritual route.
+- Kept the invariant intact: faction plans and resources still change only through `StatePatch` records produced by the referee.
+
+### Runtime Screenshot
+
+![Faction plan dashboard panel](screenshots/faction-plans-runtime-2026-06-03.png)
+
+The report keeps a verified runtime screenshot inline as requested. This rules slice powers the same faction-plan dashboard surface by ensuring each visible faction plan can meaningfully change direction after player choices.
+
+### Verification
+
+```bash
+npm test -- packages/core/src/factions.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-03 - Player Visible State Redaction
 
 ### Scope

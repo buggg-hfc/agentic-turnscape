@@ -48,6 +48,7 @@ For gameplay work, tests should prove the rule invariant rather than a single lu
 - Border Seven Days now has tested proposal coverage for all 10 key NPCs across representative town square, clinic, black market, old outpost, mine, and chapel routes.
 - Border Seven Days now has executable scene-action coverage for all MVP combat/social scenes: 5 combat and 8 social scenes run through Agent proposals, referee patches, and public results.
 - Player-visible state now has tested redaction for all 6 Border Seven Days locations plus character secrets, faction hidden goals, quest true backgrounds, quest hidden goals, and unrevealed hidden events.
+- Border Seven Days faction plans now have tested outcome coverage for all 3 MVP factions: each faction can advance, be blocked, or redirect through referee-owned `StatePatch` results.
 
 ## MVP Completion Gate
 

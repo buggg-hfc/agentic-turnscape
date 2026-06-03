@@ -4,6 +4,14 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-03
 
+- Added a tested faction-plan outcome matrix for the Border Seven Days MVP. Frontier Guild, Blackstone Consortium, and Rift Cult now each have at least one referee-owned plan result that can advance, be blocked, or redirect based on player action.
+- Added missing rule branches for old outpost evidence blocking the Frontier Guild, black-market ledger exposure redirecting the consortium, and defeating Eve disrupting the cult ritual route.
+- Verification used for this slice:
+  - `npm test -- packages/core/src/factions.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added tested player-visible state redaction for the Border Seven Days MVP. The visibility layer now proves all 6 locations keep public information while stripping hidden info, and it also redacts character secrets, faction hidden goals, quest true backgrounds, quest hidden goals, and unrevealed hidden events.
 - Verification used for this slice:
   - `npm test -- packages/core/src/visibility.test.ts --reporter=dot`
