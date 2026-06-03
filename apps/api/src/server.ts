@@ -498,9 +498,13 @@ export const buildServer = (options: ServerOptions = {}) => {
       });
     }
     const turnId = crypto.randomUUID();
+    const inheritedEnding = scenario.evaluateEnding(campaign.state);
     const patch = resolveLongCampaignStep({
       state: campaign.state,
       turnId,
+      ...(inheritedEnding
+        ? { endingId: inheritedEnding.id, endingTitle: inheritedEnding.title }
+        : {}),
       completedQuestIds: body.completedQuestIds,
       baseInvestments: body.baseInvestments,
       ...(body.training ? { training: body.training } : {}),

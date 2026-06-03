@@ -26,6 +26,7 @@ A multi-agent turn-based narrative simulation game. The current implementation i
 - Deterministic expansion playthrough tests for all first-wave packs, covering both success and pressure endings with generic scenario clock progression and replayable state patches.
 - Long campaign progression rules for post-MVP expansion: chapter transitions, base facilities, character growth, and faction-war fronts all enter world state through referee-owned patches.
 - Long campaign progression is now available through `POST /campaigns/:id/campaign/progress`, persisted in snapshots/replay records, and surfaced in the web dashboard.
+- Terminal MVP endings can now be inherited into the long campaign aftermath as ending legacy flags, chapter transition history, and campaign XP.
 - Built-in MVP and first-wave expansion scenarios declare long campaign arc metadata for chapters, base facilities, and faction fronts; the API catalog and web scenario picker expose the summary.
 - Active campaign state now exposes the current long campaign arc chapter, and the web dashboard shows a Campaign Arc panel with chapter focus, unlocks, base hooks, and faction fronts.
 - Built-in scenario registry plus runtime creator scenario import, export, protected deletion, local restore, and API-side persistence.

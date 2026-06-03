@@ -20,6 +20,8 @@ export type FactionFrontDelta = {
 export type LongCampaignStepInput = {
   state: WorldState;
   turnId: string;
+  endingId?: string;
+  endingTitle?: string;
   completedQuestIds?: string[];
   baseInvestments?: BaseInvestment[];
   training?: SkillTraining;
@@ -81,12 +83,16 @@ const defaultCampaignProgression = (state: WorldState): CampaignProgressionState
   legacyFlags: []
 });
 
-const shouldAdvanceChapter = (state: WorldState, completedQuestIds: string[]): boolean =>
-  completedQuestIds.length > 0 && state.time.day === 7 && state.time.phase === "night";
+const isTerminalNight = (state: WorldState): boolean => state.time.day === 7 && state.time.phase === "night";
+
+const shouldAdvanceChapter = (state: WorldState, completedQuestIds: string[], endingId?: string): boolean =>
+  (completedQuestIds.length > 0 || Boolean(endingId)) && isTerminalNight(state);
 
 export const resolveLongCampaignStep = ({
   state,
   turnId,
+  endingId,
+  endingTitle,
   completedQuestIds = [],
   baseInvestments = [],
   training,
@@ -94,6 +100,7 @@ export const resolveLongCampaignStep = ({
 }: LongCampaignStepInput): StatePatch => {
   const startingCampaign = state.campaign ?? defaultCampaignProgression(state);
   const changes: StatePatch["changes"] = [];
+  const terminalEndingId = endingId && isTerminalNight(state) ? endingId : undefined;
 
   if (!state.campaign) {
     changes.push({
@@ -135,7 +142,26 @@ export const resolveLongCampaignStep = ({
     );
   }
 
-  if (shouldAdvanceChapter(state, completedExistingQuests)) {
+  if (terminalEndingId) {
+    changes.push(
+      { op: "tag", path: "campaign.legacyFlags", value: `ending:${terminalEndingId}`, reason: "Record terminal ending legacy flag" },
+      { op: "inc", path: "campaign.experience", delta: 3, reason: "Terminal ending adds long campaign experience" },
+      {
+        op: "append",
+        path: "publicEvents",
+        value: event(
+          state,
+          turnId,
+          "Ending carried forward",
+          `${endingTitle ?? terminalEndingId} becomes the starting history for the next playable chapter.`,
+          ["campaign", "ending"]
+        ),
+        reason: "Record terminal ending legacy"
+      }
+    );
+  }
+
+  if (shouldAdvanceChapter(state, completedExistingQuests, terminalEndingId)) {
     changes.push(
       { op: "set", path: "campaign.chapter", value: clamp(startingCampaign.chapter + 1, 1, 12), reason: "Advance long campaign chapter" },
       { op: "set", path: "time.day", value: 1, reason: "Start the next campaign chapter" },

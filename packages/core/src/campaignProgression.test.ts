@@ -25,6 +25,37 @@ describe("long campaign progression", () => {
     expect(() => WorldStateSchema.parse(next)).not.toThrow();
   });
 
+  it("turns a terminal ending into long-campaign legacy for the next chapter", () => {
+    const state = createBorderSevenDaysWorld();
+    state.time = { day: 7, phase: "night" };
+
+    const patch = resolveLongCampaignStep({
+      state,
+      turnId: "ending-aftermath",
+      endingId: "guild_reform",
+      endingTitle: "Guild Reform"
+    });
+    const next = applyStatePatch(state, patch);
+
+    expect(next.campaign?.chapter).toBe(2);
+    expect(next.time).toEqual({ day: 1, phase: "morning" });
+    expect(next.campaign?.experience).toBe(3);
+    expect(next.campaign?.legacyFlags).toContain("ending:guild_reform");
+    expect(next.publicEvents).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          title: "Ending carried forward",
+          tags: expect.arrayContaining(["campaign", "ending"])
+        }),
+        expect.objectContaining({
+          title: "Next chapter begins",
+          tags: expect.arrayContaining(["chapter", "campaign"])
+        })
+      ])
+    );
+    expect(() => WorldStateSchema.parse(next)).not.toThrow();
+  });
+
   it("upgrades base facilities through referee patches while spending player resources", () => {
     const state = createBorderSevenDaysWorld();
 

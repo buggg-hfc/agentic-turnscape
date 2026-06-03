@@ -4,6 +4,14 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-03
 
+- Added a tested post-MVP continuation bridge from terminal endings into long campaign play. A day 7 night ending can now become an `ending:<id>` legacy flag, add campaign XP, record a public ending memory, and transition into the next chapter through referee-owned patches.
+- Connected API campaign progression to the current scenario ending, so `/campaigns/:id/campaign/progress` can inherit the finished MVP result without the client inventing an ending id.
+- Verification used for this slice:
+  - `npm test -- packages/core/src/campaignProgression.test.ts apps/api/src/server.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added API-level full-campaign acceptance coverage for the Border Seven Days MVP. All 6 deterministic ending routes now run from campaign creation through repeated public `/turns/run` calls to day 7 night, while proving replay entries, turn records, snapshots, and final referee patches are persisted.
 - Verification used for this slice:
   - `npm test -- apps/api/src/server.test.ts --reporter=dot`

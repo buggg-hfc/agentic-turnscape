@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-03 - Ending Legacy Continuation
+
+### Scope
+
+- Added a tested bridge from terminal MVP endings into post-MVP long campaign play.
+- Long campaign referee patches can now record `ending:<id>` legacy flags, grant campaign XP, append a public ending memory, and advance from the finished crisis into the next chapter.
+- The API now derives the current scenario ending server-side before `/campaigns/:id/campaign/progress`, so clients do not need to invent or submit ending identities.
+
+### Runtime Screenshot
+
+![Faction plan dashboard panel](screenshots/faction-plans-runtime-2026-06-03.png)
+
+The report keeps a verified runtime screenshot inline as requested. This continuation slice extends the same campaign dashboard path by turning a finished MVP ending into persistent chapter history for the long game.
+
+### Verification
+
+```bash
+npm test -- packages/core/src/campaignProgression.test.ts apps/api/src/server.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-03 - API Full Campaign Endings
 
 ### Scope

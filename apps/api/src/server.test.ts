@@ -174,8 +174,11 @@ describe("campaign turn API", () => {
         time: { day: 1, phase: "morning" },
         campaign: {
           chapter: 2,
-          experience: 2,
-          legacyFlags: ["quest:missing_caravan:resolved"],
+          experience: 5,
+          legacyFlags: [
+            "quest:missing_caravan:resolved",
+            "ending:ritual_stopped",
+          ],
         },
       },
     });
@@ -292,6 +295,84 @@ describe("campaign turn API", () => {
 
     expect(store.get(campaign.campaignId)?.turns).toHaveLength(0);
     expect(store.get(campaign.campaignId)?.state.campaign).toBeUndefined();
+    await app.close();
+  });
+
+  it("inherits a terminal MVP ending into the long campaign aftermath", async () => {
+    const store = new InMemoryCampaignStore();
+    const app = buildServer({ store });
+
+    const campaignResponse = await app.inject({
+      method: "POST",
+      url: "/campaigns",
+      headers: { "content-type": "application/json" },
+      payload: { scenarioId: "border-seven-days" },
+    });
+    const campaign = campaignResponse.json<{ campaignId: string }>();
+    const record = store.get(campaign.campaignId);
+    if (!record) throw new Error("test campaign was not created");
+    record.state.time = { day: 7, phase: "night" };
+    record.state.player.resources.intel = 7;
+    const rowan = record.state.relationships["player:npc_rowan"];
+    if (!rowan) throw new Error("test fixture missing Rowan relationship");
+    rowan.respect = 3;
+
+    const progressResponse = await app.inject({
+      method: "POST",
+      url: `/campaigns/${campaign.campaignId}/campaign/progress`,
+      headers: { "content-type": "application/json" },
+      payload: {},
+    });
+
+    expect(progressResponse.statusCode).toBe(200);
+    const progressed = progressResponse.json<{
+      scenarioStatus: { ending?: { id: string } };
+      state: {
+        time: { day: number; phase: string };
+        campaign?: {
+          chapter: number;
+          experience: number;
+          legacyFlags: string[];
+        };
+      };
+      resolution: {
+        ending?: { id: string };
+        statePatch: {
+          changes: Array<{ op: string; path: string; value?: unknown }>;
+        };
+      };
+    }>();
+
+    expect(progressed.state.time).toEqual({ day: 1, phase: "morning" });
+    expect(progressed.state.campaign?.chapter).toBe(2);
+    expect(progressed.state.campaign?.experience).toBe(3);
+    expect(progressed.state.campaign?.legacyFlags).toContain(
+      "ending:guild_reform",
+    );
+    expect(progressed.scenarioStatus.ending).toBeUndefined();
+    expect(progressed.resolution.ending).toBeUndefined();
+    expect(progressed.resolution.statePatch.changes).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          op: "tag",
+          path: "campaign.legacyFlags",
+          value: "ending:guild_reform",
+        }),
+      ]),
+    );
+
+    const chronicleResponse = await app.inject({
+      method: "GET",
+      url: `/campaigns/${campaign.campaignId}/chronicle`,
+    });
+    expect(chronicleResponse.json().replay).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          statePatch: expect.objectContaining({ source: "referee" }),
+        }),
+      ]),
+    );
+
     await app.close();
   });
 
