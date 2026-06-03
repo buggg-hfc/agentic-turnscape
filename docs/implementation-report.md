@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-03 - Key NPC Proposal Coverage
+
+### Scope
+
+- Added a regression test proving the normal orchestrator can activate every Border Seven Days key NPC across representative MVP routes.
+- Expanded active Agent selection for clinic, black market, old outpost, mine, and chapel scenes so Mina and White Crow participate in LLM proposal generation instead of staying content-only records.
+- Filtered active Agent ids against the current world's character table so expansion packs do not receive unrelated Border Seven Days actors.
+
+### Runtime Screenshot
+
+![Faction plan dashboard panel](screenshots/faction-plans-runtime-2026-06-03.png)
+
+The report keeps a verified runtime screenshot inline as requested. This backend Agent slice supports the same playable dashboard: the visible scenes and faction surfaces now have proposal coverage from all 10 important NPCs behind the turn-resolution flow.
+
+### Verification
+
+```bash
+npm test -- packages/agents/src/orchestrator.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-03 - Agent Observation Boundary
 
 ### Scope

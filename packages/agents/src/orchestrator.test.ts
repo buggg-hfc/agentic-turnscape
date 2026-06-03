@@ -86,6 +86,62 @@ describe("turn orchestrator", () => {
     expect(manloObservation?.actorFaction).not.toHaveProperty("hiddenGoal");
   });
 
+  it("activates every key Border Seven Days NPC through legal limited-observation proposals", async () => {
+    const scenario = requireScenarioPackage("border-seven-days");
+    const expectedNpcIds = Object.keys(scenario.createWorld().characters);
+    const proposalActorIds = new Set<string>();
+    const observedActorIds = new Set<string>();
+    const observationLlm: LLMClient = {
+      completeJson: async ({ messages, fallback }) => {
+        const observation = JSON.parse(messages[1]?.content ?? "{}") as { actor?: { id?: string } };
+        if (observation.actor?.id) observedActorIds.add(observation.actor.id);
+        return fallback();
+      },
+      completeText: async ({ fallback }) => fallback()
+    };
+    const routeCases = [
+      { locationId: "town_square", actionType: "negotiate", targetId: "npc_rowan" },
+      { locationId: "clinic", actionType: "protect", targetId: "npc_mina" },
+      { locationId: "black_market", actionType: "trade", targetId: "npc_crow_nine" },
+      { locationId: "old_outpost", actionType: "investigate", targetId: "npc_kyle" },
+      { locationId: "mine", actionType: "fight", targetId: "npc_hagen" },
+      { locationId: "chapel", actionType: "investigate", targetId: "npc_white_crow" }
+    ] as const;
+
+    for (const routeCase of routeCases) {
+      const state = scenario.createWorld();
+      state.currentLocationId = routeCase.locationId;
+      const { resolution } = await runTurn({
+        state,
+        llm: observationLlm,
+        turnId: `turn-${routeCase.locationId}`,
+        seed: `turn-${routeCase.locationId}`,
+        playerAction: {
+          actionType: routeCase.actionType,
+          label: `Resolve ${routeCase.locationId}`,
+          description: `Exercise active NPC coverage for ${routeCase.locationId}.`,
+          targetId: routeCase.targetId,
+          leverage: routeCase.actionType === "fight" ? ["ap:guard", "ap:maneuver"] : ["public_rumor"],
+          riskLevel: "medium"
+        },
+        getAvailableActions: scenario.getActions,
+        evaluateEnding: scenario.evaluateEnding
+      });
+
+      for (const proposal of resolution.proposals) {
+        proposalActorIds.add(proposal.actorId);
+        expect(state.characters[proposal.actorId], `${routeCase.locationId} ${proposal.actorId}`).toBeDefined();
+        const availableResources = Object.keys(state.characters[proposal.actorId]!.resources);
+        expect(proposal.usedResources.every((resource) => availableResources.includes(resource)), `${proposal.actorId} legal resources`).toBe(
+          true
+        );
+      }
+    }
+
+    expect([...proposalActorIds].sort()).toEqual(expectedNpcIds.sort());
+    expect([...observedActorIds].sort()).toEqual(expectedNpcIds.sort());
+  });
+
   it("retries and rejects proposals that impersonate another actor or invent resources", async () => {
     const scenario = requireScenarioPackage("border-seven-days");
     const state = scenario.createWorld();

@@ -22,18 +22,30 @@ export type RunTurnOptions = {
   evaluateEnding?: ((state: WorldState) => EndingSummary | undefined) | undefined;
 };
 
+const uniqueExistingAgentIds = (state: WorldState, ids: string[]): string[] =>
+  Array.from(new Set(ids)).filter((id) => Boolean(state.characters[id]));
+
 const activeAgentIds = (state: WorldState, playerAction: PlayerAction): string[] => {
   const base = ["npc_zhou_jin"];
-  if (state.currentLocationId === "clinic" || playerAction.targetId === "npc_rowan" || playerAction.targetId === "npc_adele") {
-    return [...base, "npc_adele", "npc_rowan", "npc_manlo", "npc_eve"];
+  const targetId = playerAction.targetId;
+  const targets = (...ids: string[]) => (targetId ? ids.includes(targetId) : false);
+
+  if (state.currentLocationId === "clinic" || targets("npc_rowan", "npc_adele", "npc_mina")) {
+    return uniqueExistingAgentIds(state, [...base, "npc_adele", "npc_rowan", "npc_mina", "npc_manlo", "npc_eve"]);
   }
-  if (state.currentLocationId === "black_market" || playerAction.targetId === "npc_crow_nine") {
-    return [...base, "npc_crow_nine", "npc_manlo"];
+  if (state.currentLocationId === "black_market" || targets("npc_crow_nine")) {
+    return uniqueExistingAgentIds(state, [...base, "npc_crow_nine", "npc_manlo", "npc_hagen"]);
   }
-  if (state.currentLocationId === "old_outpost" || playerAction.targetId === "old_outpost") {
-    return [...base, "npc_kyle", "npc_hagen", "npc_manlo"];
+  if (state.currentLocationId === "old_outpost" || targetId === "old_outpost" || targets("npc_kyle")) {
+    return uniqueExistingAgentIds(state, [...base, "npc_kyle", "npc_hagen", "npc_manlo"]);
   }
-  return [...base, "npc_adele", "npc_manlo"];
+  if (state.currentLocationId === "mine" || targets("npc_manlo", "npc_hagen")) {
+    return uniqueExistingAgentIds(state, [...base, "npc_manlo", "npc_rowan", "npc_crow_nine", "npc_hagen"]);
+  }
+  if (state.currentLocationId === "chapel" || targets("npc_eve", "npc_mina", "npc_white_crow")) {
+    return uniqueExistingAgentIds(state, [...base, "npc_eve", "npc_mina", "npc_white_crow", "npc_hagen"]);
+  }
+  return uniqueExistingAgentIds(state, [...base, "npc_adele", "npc_manlo"]);
 };
 
 const proposalValidationIssues = (proposal: AgentActionProposal, observation: LimitedObservation): string[] => {
@@ -80,8 +92,8 @@ const decide = async (actorId: string, state: WorldState, playerAction: PlayerAc
     });
     const issues = proposalValidationIssues(proposal, observation);
     if (issues.length === 0) return proposal;
-      messages = [
-        ...baseMessages,
+    messages = [
+      ...baseMessages,
       { role: "assistant", content: JSON.stringify(proposal) },
       { role: "user", content: validationRetryPrompt(issues, observation) }
     ];

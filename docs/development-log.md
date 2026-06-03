@@ -4,6 +4,14 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-03
 
+- Added tested key-NPC proposal coverage for the Border Seven Days MVP. Representative town square, clinic, black market, old outpost, mine, and chapel routes now activate all 10 important NPCs at least once through the normal orchestrator path.
+- Agent activation now filters to characters that exist in the current world, keeping first-wave expansion packages on their own scenario cast while Border Seven Days receives full NPC coverage.
+- Verification used for this slice:
+  - `npm test -- packages/agents/src/orchestrator.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added a tested Agent observation boundary. NPC LLM prompts now expose the actor faction's public plan context without sending faction `hiddenGoal`, location `hiddenInfo`, or character `secret` strings into the model input.
 - Kept the implementation report screenshot visible while recording this backend Agent safety slice.
 - Verification used for this slice:
