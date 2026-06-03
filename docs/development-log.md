@@ -4,6 +4,13 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-03
 
+- Added API-level full-campaign acceptance coverage for the Border Seven Days MVP. All 6 deterministic ending routes now run from campaign creation through repeated public `/turns/run` calls to day 7 night, while proving replay entries, turn records, snapshots, and final referee patches are persisted.
+- Verification used for this slice:
+  - `npm test -- apps/api/src/server.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added a tested faction-plan outcome matrix for the Border Seven Days MVP. Frontier Guild, Blackstone Consortium, and Rift Cult now each have at least one referee-owned plan result that can advance, be blocked, or redirect based on player action.
 - Added missing rule branches for old outpost evidence blocking the Frontier Guild, black-market ledger exposure redirecting the consortium, and defeating Eve disrupting the cult ritual route.
 - Verification used for this slice:

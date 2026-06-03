@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-03 - API Full Campaign Endings
+
+### Scope
+
+- Added a public API acceptance test for all 6 Border Seven Days deterministic MVP ending routes.
+- Each route creates a campaign, repeatedly calls `POST /campaigns/:id/turns/run`, reaches day 7 night, and verifies the expected ending in both `scenarioStatus` and the final turn resolution.
+- The same test proves API persistence records stay replayable: chronicle replay length matches completed turns, snapshots include the initial state plus every turn result, and the final replay patch remains referee-owned.
+
+### Runtime Screenshot
+
+![Faction plan dashboard panel](screenshots/faction-plans-runtime-2026-06-03.png)
+
+The report keeps a verified runtime screenshot inline as requested. This API acceptance slice proves the dashboard-backed campaign surface is supported by complete server-side playthrough and replay records for every MVP ending.
+
+### Verification
+
+```bash
+npm test -- apps/api/src/server.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-03 - Faction Outcome Matrix
 
 ### Scope

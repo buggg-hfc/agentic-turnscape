@@ -2,11 +2,74 @@ import { describe, expect, it } from "vitest";
 import type {
   LLMClient,
   OpenAICompatibleOptions,
+  BorderSevenDaysRouteId,
 } from "@agentic-turnscape/agents";
 import { createBorderSevenDaysWorld } from "@agentic-turnscape/content";
+import type { PlayerAction } from "@agentic-turnscape/shared";
 import { buildServer } from "./server.js";
 import { InMemoryCampaignStore } from "./store.js";
 import { InMemoryTurnQueue } from "./turnQueue.js";
+
+const borderRouteAction = (
+  routeId: BorderSevenDaysRouteId,
+  turnIndex: number,
+): PlayerAction => {
+  const base = {
+    id: `api_${routeId}_${turnIndex}`,
+    leverage: [`strategy:${routeId}`, `step:${turnIndex}`],
+    riskLevel: "medium" as const,
+  };
+
+  switch (routeId) {
+    case "guild_case":
+      return {
+        ...base,
+        actionType: "investigate",
+        label: "Build the public case",
+        description: "Gather evidence carefully enough that Rowan can act.",
+        targetId: "npc_rowan",
+      };
+    case "cure_alliance":
+      return {
+        ...base,
+        actionType: "protect",
+        label: "Support the clinic cure",
+        description: "Protect patients and coordinate Adele's work with Eve.",
+        targetId: "npc_adele",
+      };
+    case "neglect_plague":
+      return {
+        ...base,
+        actionType: "ignore",
+        label: "Wait out the crisis",
+        description: "Avoid direct commitments while the town's clocks advance.",
+      };
+    case "consortium_deal":
+      return {
+        ...base,
+        actionType: "trade",
+        label: "Back the consortium deal",
+        description: "Trade influence and time for Blackstone's promises.",
+        targetId: "npc_manlo",
+      };
+    case "open_rift":
+      return {
+        ...base,
+        actionType: "investigate",
+        label: "Follow the rift omens",
+        description: "Trace White Crow's signs toward the chapel anomaly.",
+        targetId: "npc_white_crow",
+      };
+    case "balanced_hero":
+      return {
+        ...base,
+        actionType: "negotiate",
+        label: "Balance the factions",
+        description: "Slow each crisis without giving any faction full control.",
+        targetId: "npc_rowan",
+      };
+  }
+};
 
 const creatorScenarioDefinition = () => {
   const world = createBorderSevenDaysWorld();
@@ -427,6 +490,121 @@ describe("campaign turn API", () => {
     });
     expect(unknownResponse.statusCode).toBe(400);
     expect(unknownResponse.json()).toEqual({ error: "unknown_scenario" });
+
+    await app.close();
+  });
+
+  it("runs every Border Seven Days MVP ending through the public turn API with replay records", async () => {
+    const fakeClient: LLMClient = {
+      completeJson: async ({ fallback }) => fallback(),
+      completeText: async ({ fallback }) => fallback(),
+    };
+    const app = buildServer({
+      createLlmClient: () => fakeClient,
+    });
+    const cases: Array<{ routeId: BorderSevenDaysRouteId; endingId: string }> =
+      [
+        { routeId: "balanced_hero", endingId: "ritual_stopped" },
+        { routeId: "guild_case", endingId: "guild_reform" },
+        { routeId: "cure_alliance", endingId: "cure_with_exiles" },
+        { routeId: "neglect_plague", endingId: "town_quarantined" },
+        { routeId: "consortium_deal", endingId: "consortium_rule" },
+        { routeId: "open_rift", endingId: "rift_opened" },
+      ];
+
+    for (const { routeId, endingId } of cases) {
+      const campaignResponse = await app.inject({
+        method: "POST",
+        url: "/campaigns",
+        headers: { "content-type": "application/json" },
+        payload: { scenarioId: "border-seven-days" },
+      });
+      expect(campaignResponse.statusCode).toBe(200);
+      const campaign = campaignResponse.json<{
+        campaignId: string;
+        scenarioStatus: { ending?: { id: string } };
+      }>();
+      expect(campaign.scenarioStatus.ending, routeId).toBeUndefined();
+
+      let latestTurn:
+        | {
+            turnId: string;
+            status: string;
+            scenarioStatus: { ending?: { id: string } };
+            state: { time: { day: number; phase: string } };
+            resolution: {
+              ending?: { id: string };
+              statePatch: { source: string };
+              availableActions: unknown[];
+            };
+          }
+        | undefined;
+
+      for (let turnIndex = 1; turnIndex <= 32; turnIndex += 1) {
+        const turnResponse = await app.inject({
+          method: "POST",
+          url: `/campaigns/${campaign.campaignId}/turns/run`,
+          headers: { "content-type": "application/json" },
+          payload: {
+            action: borderRouteAction(routeId, turnIndex),
+            seed: `${routeId}_${turnIndex}`,
+          },
+        });
+        expect(turnResponse.statusCode, `${routeId} turn ${turnIndex}`).toBe(
+          200,
+        );
+        latestTurn = turnResponse.json<typeof latestTurn>();
+        expect(latestTurn?.status, `${routeId} turn ${turnIndex}`).toBe(
+          "complete",
+        );
+        expect(latestTurn?.resolution.statePatch.source, routeId).toBe(
+          "referee",
+        );
+
+        if (
+          latestTurn?.state.time.day === 7 &&
+          latestTurn.state.time.phase === "night"
+        ) {
+          break;
+        }
+      }
+
+      expect(latestTurn?.state.time, routeId).toEqual({
+        day: 7,
+        phase: "night",
+      });
+      expect(latestTurn?.scenarioStatus.ending?.id, routeId).toBe(endingId);
+      expect(latestTurn?.resolution.ending?.id, routeId).toBe(endingId);
+      expect(latestTurn?.resolution.availableActions.length, routeId).toBeGreaterThan(
+        0,
+      );
+
+      const chronicleResponse = await app.inject({
+        method: "GET",
+        url: `/campaigns/${campaign.campaignId}/chronicle`,
+      });
+      expect(chronicleResponse.statusCode).toBe(200);
+      const chronicle = chronicleResponse.json<{
+        snapshots: unknown[];
+        replay: Array<{
+          ending?: { id: string };
+          statePatch?: { source: string };
+        }>;
+        turns: Array<{ status: string }>;
+      }>();
+      expect(chronicle.replay.length, routeId).toBeGreaterThanOrEqual(24);
+      expect(chronicle.turns, routeId).toHaveLength(chronicle.replay.length);
+      expect(chronicle.snapshots, routeId).toHaveLength(
+        chronicle.replay.length + 1,
+      );
+      expect(chronicle.turns.every((turn) => turn.status === "complete")).toBe(
+        true,
+      );
+      expect(chronicle.replay.at(-1)?.ending?.id, routeId).toBe(endingId);
+      expect(chronicle.replay.at(-1)?.statePatch?.source, routeId).toBe(
+        "referee",
+      );
+    }
 
     await app.close();
   });

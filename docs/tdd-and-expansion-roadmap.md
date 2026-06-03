@@ -49,6 +49,7 @@ For gameplay work, tests should prove the rule invariant rather than a single lu
 - Border Seven Days now has executable scene-action coverage for all MVP combat/social scenes: 5 combat and 8 social scenes run through Agent proposals, referee patches, and public results.
 - Player-visible state now has tested redaction for all 6 Border Seven Days locations plus character secrets, faction hidden goals, quest true backgrounds, quest hidden goals, and unrevealed hidden events.
 - Border Seven Days faction plans now have tested outcome coverage for all 3 MVP factions: each faction can advance, be blocked, or redirect through referee-owned `StatePatch` results.
+- Border Seven Days now has API-level full-campaign acceptance coverage for all 6 MVP endings: each deterministic route reaches day 7 night through public `/turns/run` calls and leaves matching replay, turn, snapshot, and final referee patch records.
 
 ## MVP Completion Gate
 
