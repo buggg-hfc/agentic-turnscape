@@ -30,5 +30,15 @@ export const toPlayerVisibleState = (state: WorldState): WorldState => ({
         hiddenGoal: "未知"
       }
     ])
+  ),
+  quests: Object.fromEntries(
+    Object.entries(state.quests).map(([id, quest]) => [
+      id,
+      {
+        ...quest,
+        realBackground: "未知",
+        hiddenGoal: "未知"
+      }
+    ])
   )
 });

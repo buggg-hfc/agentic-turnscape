@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-03 - Player Visible State Redaction
+
+### Scope
+
+- Added a focused visibility test for player-facing world state.
+- Proved all 6 Border Seven Days locations retain public information while hiding `hiddenInfo`.
+- Extended redaction to quest true backgrounds and hidden goals so API-visible state does not reveal referee-only truth before discovery.
+
+### Runtime Screenshot
+
+![Faction plan dashboard panel](screenshots/faction-plans-runtime-2026-06-03.png)
+
+The report keeps a verified runtime screenshot inline as requested. This backend visibility slice protects the same campaign dashboard surface by ensuring player-facing API state cannot expose hidden scenario truth.
+
+### Verification
+
+```bash
+npm test -- packages/core/src/visibility.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-03 - MVP Scene Resolution Coverage
 
 ### Scope

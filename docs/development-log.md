@@ -4,6 +4,13 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-03
 
+- Added tested player-visible state redaction for the Border Seven Days MVP. The visibility layer now proves all 6 locations keep public information while stripping hidden info, and it also redacts character secrets, faction hidden goals, quest true backgrounds, quest hidden goals, and unrevealed hidden events.
+- Verification used for this slice:
+  - `npm test -- packages/core/src/visibility.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added executable scene action fixtures for the Border Seven Days MVP's 5 combat scenes and 8 social scenes.
 - Added playthrough acceptance coverage proving every combat/social MVP scene can run through `runTurn`, produce legal Agent proposals, emit a referee-owned `state_patch`, and append a public result.
 - Verification used for this slice:
