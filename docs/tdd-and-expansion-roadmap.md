@@ -46,6 +46,7 @@ For gameplay work, tests should prove the rule invariant rather than a single lu
 - The web dashboard now exposes tested visible faction-plan summaries, including each faction's leader, current plan, public clock pressure, and strongest resources, so faction consequences can be read after referee-owned turn patches.
 - NPC LLM observations now have a tested public-context whitelist: actor faction public plans can enter the prompt, while location hidden info, faction hidden goals, and character secrets stay out of model input.
 - Border Seven Days now has tested proposal coverage for all 10 key NPCs across representative town square, clinic, black market, old outpost, mine, and chapel routes.
+- Border Seven Days now has executable scene-action coverage for all MVP combat/social scenes: 5 combat and 8 social scenes run through Agent proposals, referee patches, and public results.
 
 ## MVP Completion Gate
 

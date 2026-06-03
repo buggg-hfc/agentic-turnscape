@@ -4,6 +4,14 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-03
 
+- Added executable scene action fixtures for the Border Seven Days MVP's 5 combat scenes and 8 social scenes.
+- Added playthrough acceptance coverage proving every combat/social MVP scene can run through `runTurn`, produce legal Agent proposals, emit a referee-owned `state_patch`, and append a public result.
+- Verification used for this slice:
+  - `npm test -- packages/agents/src/playthrough.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added tested key-NPC proposal coverage for the Border Seven Days MVP. Representative town square, clinic, black market, old outpost, mine, and chapel routes now activate all 10 important NPCs at least once through the normal orchestrator path.
 - Agent activation now filters to characters that exist in the current world, keeping first-wave expansion packages on their own scenario cast while Border Seven Days receives full NPC coverage.
 - Verification used for this slice:

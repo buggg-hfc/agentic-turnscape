@@ -1,7 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { createBorderSevenDaysWorld, evaluateBorderSevenDaysEnding, requireScenarioPackage } from "@agentic-turnscape/content";
+import {
+  borderSevenDaysScenario,
+  createBorderSevenDaysWorld,
+  evaluateBorderSevenDaysEnding,
+  getBorderSevenDaysSceneAction,
+  requireScenarioPackage
+} from "@agentic-turnscape/content";
 import { applyStatePatch } from "@agentic-turnscape/core";
 import type { LLMClient } from "./llm.js";
+import { runTurn } from "./orchestrator.js";
 import { runBorderSevenDaysPlaythrough, runExpansionScenarioPlaythrough, type BorderSevenDaysRouteId } from "./playthrough.js";
 
 const fallbackLlm: LLMClient = {
@@ -44,6 +51,43 @@ describe("Border Seven Days deterministic playthroughs", () => {
         createBorderSevenDaysWorld()
       );
       expect(evaluateBorderSevenDaysEnding(replayed)?.id, `${routeId} replay`).toBe(endingId);
+    }
+  });
+
+  it("resolves every MVP combat and social scene through the referee pipeline", async () => {
+    const scenario = requireScenarioPackage("border-seven-days");
+    const sceneCases = borderSevenDaysScenario.scenes.filter((scene) => scene.kind === "combat" || scene.kind === "social");
+
+    expect(sceneCases.filter((scene) => scene.kind === "combat")).toHaveLength(5);
+    expect(sceneCases.filter((scene) => scene.kind === "social")).toHaveLength(8);
+
+    for (const scene of sceneCases) {
+      const action = getBorderSevenDaysSceneAction(scene.id);
+      expect(action, `${scene.id} action`).toBeDefined();
+
+      const state = scenario.createWorld();
+      state.time = { day: scene.day, phase: "morning" };
+      state.currentLocationId = scene.locationId;
+      const beforeEvents = state.publicEvents.length;
+      const result = await runTurn({
+        state,
+        playerAction: action!,
+        llm: fallbackLlm,
+        turnId: `scene-${scene.id}`,
+        seed: `scene-${scene.id}`,
+        getAvailableActions: scenario.getActions,
+        evaluateEnding: scenario.evaluateEnding
+      });
+
+      expect(result.resolution.statePatch.source, scene.id).toBe("referee");
+      expect(result.resolution.proposals.length, scene.id).toBeGreaterThan(0);
+      expect(result.nextState.publicEvents.length, scene.id).toBeGreaterThan(beforeEvents);
+      if (scene.kind === "combat") {
+        expect(action!.actionType, scene.id).toBe("fight");
+        expect(result.resolution.publicSummary, scene.id).toContain("3 AP");
+      } else {
+        expect(action!.actionType, scene.id).not.toBe("fight");
+      }
     }
   });
 });

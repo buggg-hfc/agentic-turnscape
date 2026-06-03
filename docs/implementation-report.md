@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-03 - MVP Scene Resolution Coverage
+
+### Scope
+
+- Added executable scene action fixtures for all Border Seven Days combat and social MVP scenes.
+- Added acceptance coverage for 5 combat scenes and 8 social scenes through the full `runTurn` pipeline.
+- Each covered scene now proves three invariants: Agent proposals exist, state changes enter through the referee `state_patch`, and a public result is appended for player feedback.
+
+### Runtime Screenshot
+
+![Faction plan dashboard panel](screenshots/faction-plans-runtime-2026-06-03.png)
+
+The report keeps a verified runtime screenshot inline as requested. This content/backend slice strengthens the playable scene coverage behind the same campaign dashboard and turn-resolution flow.
+
+### Verification
+
+```bash
+npm test -- packages/agents/src/playthrough.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-03 - Key NPC Proposal Coverage
 
 ### Scope

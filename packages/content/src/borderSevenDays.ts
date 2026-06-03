@@ -787,6 +787,140 @@ export const createBorderSevenDaysWorld = (): WorldState => ({
 export const getBorderSevenDaysDayPlan = (day: number): BorderSevenDaysDayPlan | undefined =>
   borderSevenDaysScenario.days.find((plan) => plan.day === day);
 
+const borderSevenDaysSceneActions: Record<string, PlayerAction> = {
+  caravan_rumor_square: {
+    id: "scene:caravan_rumor_square",
+    actionType: "negotiate",
+    label: "Question the caravan rumor crowd",
+    description: "Use public testimony and Rowan's authority to stabilize the square before the rumor spreads.",
+    targetId: "npc_rowan",
+    leverage: ["scene:caravan_rumor_square", "public_rumor", "resident_trust"],
+    riskLevel: "medium"
+  },
+  black_market_first_trade: {
+    id: "scene:black_market_first_trade",
+    actionType: "trade",
+    label: "Buy the first black-market lead",
+    description: "Trade coin and fresh rumor for Crow Nine's first useful lead.",
+    targetId: "npc_crow_nine",
+    leverage: ["scene:black_market_first_trade", "money", "fresh_rumor"],
+    riskLevel: "medium"
+  },
+  clinic_first_diagnosis: {
+    id: "scene:clinic_first_diagnosis",
+    actionType: "protect",
+    label: "Protect the clinic diagnosis",
+    description: "Hold space for Adele and Mina long enough for the first diagnosis to matter.",
+    targetId: "npc_mina",
+    leverage: ["scene:clinic_first_diagnosis", "clinic_protocol", "adele_trust"],
+    riskLevel: "medium"
+  },
+  clinic_door_standoff: {
+    id: "scene:clinic_door_standoff",
+    actionType: "negotiate",
+    label: "Defuse the clinic door standoff",
+    description: "Negotiate with Rowan while Adele keeps the patients stable.",
+    targetId: "npc_rowan",
+    leverage: ["scene:clinic_door_standoff", "medical_plan", "resident_trust"],
+    riskLevel: "medium"
+  },
+  street_lockdown_break: {
+    id: "scene:street_lockdown_break",
+    actionType: "fight",
+    label: "Break the street lockdown",
+    description: "Use a controlled three-action combat exchange to open an escape route.",
+    targetId: "npc_rowan",
+    leverage: ["scene:street_lockdown_break", "ap:strike", "ap:guard"],
+    riskLevel: "high"
+  },
+  mine_contract_hearing: {
+    id: "scene:mine_contract_hearing",
+    actionType: "investigate",
+    label: "Challenge the mine contract",
+    description: "Expose contract gaps before Manlo can turn the hearing into a done deal.",
+    targetId: "npc_manlo",
+    leverage: ["scene:mine_contract_hearing", "contract_gap", "public_record"],
+    riskLevel: "medium"
+  },
+  chapel_shelter_offer: {
+    id: "scene:chapel_shelter_offer",
+    actionType: "protect",
+    label: "Vet the chapel shelter offer",
+    description: "Protect Mina while testing whether Eve's shelter offer is safe.",
+    targetId: "npc_mina",
+    leverage: ["scene:chapel_shelter_offer", "eve_shelter", "patient_list"],
+    riskLevel: "medium"
+  },
+  old_outpost_ambush: {
+    id: "scene:old_outpost_ambush",
+    actionType: "fight",
+    label: "Survive the old outpost ambush",
+    description: "Hold off Hagen's mercenaries while Kyle gets a chance to move.",
+    targetId: "npc_hagen",
+    leverage: ["scene:old_outpost_ambush", "ap:strike", "ap:guard"],
+    riskLevel: "high"
+  },
+  signal_tower_chase: {
+    id: "scene:signal_tower_chase",
+    actionType: "fight",
+    label: "Win the signal tower chase",
+    description: "Spend three combat actions to pin Hagen's route and keep the ledger moving.",
+    targetId: "npc_hagen",
+    leverage: ["scene:signal_tower_chase", "ap:maneuver", "ap:press", "ap:guard"],
+    riskLevel: "high"
+  },
+  mercenary_bargain: {
+    id: "scene:mercenary_bargain",
+    actionType: "trade",
+    label: "Bargain with the mercenaries",
+    description: "Trade value and leverage through Crow Nine before Hagen chooses a side.",
+    targetId: "npc_crow_nine",
+    leverage: ["scene:mercenary_bargain", "money", "mercenary_terms"],
+    riskLevel: "medium"
+  },
+  eve_confession: {
+    id: "scene:eve_confession",
+    actionType: "investigate",
+    label: "Listen to Eve's confession",
+    description: "Follow Eve's confession carefully enough to separate warning from cult doctrine.",
+    targetId: "npc_eve",
+    leverage: ["scene:eve_confession", "eve_confession", "patient_list"],
+    riskLevel: "medium"
+  },
+  hagen_showdown: {
+    id: "scene:hagen_showdown",
+    actionType: "fight",
+    label: "Force Hagen's showdown",
+    description: "Resolve the mine showdown through a full three-action combat exchange.",
+    targetId: "npc_hagen",
+    leverage: ["scene:hagen_showdown", "ap:strike", "ap:guard"],
+    riskLevel: "high"
+  },
+  ritual_gate_battle: {
+    id: "scene:ritual_gate_battle",
+    actionType: "fight",
+    label: "Fight at the ritual gate",
+    description: "Hold the ritual gate while Mina and White Crow's clues reshape the choice.",
+    targetId: "npc_hagen",
+    leverage: ["scene:ritual_gate_battle", "ap:maneuver", "ap:press", "ap:guard"],
+    riskLevel: "high"
+  },
+  public_trial_square: {
+    id: "scene:public_trial_square",
+    actionType: "negotiate",
+    label: "Argue the public trial",
+    description: "Use Rowan's public authority and the mine evidence to force a visible ruling.",
+    targetId: "npc_rowan",
+    leverage: ["scene:public_trial_square", "public_record", "rowan_authority"],
+    riskLevel: "medium"
+  }
+};
+
+export const getBorderSevenDaysSceneAction = (sceneId: string): PlayerAction | undefined => {
+  const action = borderSevenDaysSceneActions[sceneId];
+  return action ? { ...action, leverage: [...action.leverage] } : undefined;
+};
+
 const requiredClock = (state: WorldState, clockId: string) => {
   const clock = state.clocks[clockId];
   if (!clock) throw new Error(`Missing required Border Seven Days clock: ${clockId}`);
