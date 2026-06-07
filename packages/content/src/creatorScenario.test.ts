@@ -137,6 +137,7 @@ describe("creator scenario import", () => {
         mainQuestGoal: "在哨卡封闭前建立公开分诊线并争取放行窗口。",
         mainQuestRealBackground:
           "巡逻队曾把第一批伤员转移到哨卡后仓，公开分诊会暴露延误。",
+        mainQuestHiddenGoal: "查清谁命令志愿护理队延后公开伤员名单。",
         mainQuestFailureConsequence:
           "巡逻队会宣布分诊失败，哨卡进入长期封闭。",
         primaryActionLabel: "稳定分诊",
@@ -162,6 +163,9 @@ describe("creator scenario import", () => {
     ]);
     expect(Object.values(world.quests).map((quest) => quest.realBackground)).toEqual([
       "巡逻队曾把第一批伤员转移到哨卡后仓，公开分诊会暴露延误。",
+    ]);
+    expect(Object.values(world.quests).map((quest) => quest.hiddenGoal)).toEqual([
+      "查清谁命令志愿护理队延后公开伤员名单。",
     ]);
     expect(
       Object.values(world.quests).map((quest) => quest.failureConsequence),

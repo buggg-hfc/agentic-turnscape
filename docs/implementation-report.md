@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Creator Editable Quest Hidden Goals
+
+### Scope
+
+- Added TDD coverage proving creator quick drafts can author the main quest's hidden investigation goal instead of relying on a fixed template.
+- Extended `CreatorScenarioDraftInput` with `mainQuestHiddenGoal`; generated worlds and imported creator packages now preserve that authored text in `WorldState.quests[*].hiddenGoal`.
+- The creator GUI now exposes a Chinese `隐线目标` text area, and the preview task section displays `任务目标；真相：背景；隐线：目标；失败：后果` before import.
+
+### Runtime Screenshot
+
+![Creator editable quest hidden goals](screenshots/creator-quest-hidden-goal-runtime-2026-06-08.png)
+
+The screenshot was captured from a local runtime session after opening the scenario selection screen and verifying the creator panel showed the hidden-goal field and the preview task section reflected the authored hidden investigation direction.
+
+### Verification
+
+```bash
+npm test -- packages/shared/src/creatorScenarioDraft.test.ts apps/web/src/creatorScenarioPreview.test.ts packages/content/src/creatorScenario.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - Creator Editable Quest Truth
 
 ### Scope

@@ -1161,6 +1161,16 @@ const CreatorScenarioImportPanel = ({
         />
       </label>
       <label className="creator-field wide">
+        <span>隐线目标</span>
+        <textarea
+          value={draft.mainQuestHiddenGoal}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("mainQuestHiddenGoal", event.target.value)
+          }
+        />
+      </label>
+      <label className="creator-field wide">
         <span>任务失败后果</span>
         <textarea
           value={draft.mainQuestFailureConsequence}

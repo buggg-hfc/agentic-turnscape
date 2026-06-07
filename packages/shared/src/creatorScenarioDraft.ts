@@ -17,6 +17,7 @@ export type CreatorScenarioDraftInput = {
   pressureFactionName: string;
   mainQuestGoal: string;
   mainQuestRealBackground: string;
+  mainQuestHiddenGoal: string;
   mainQuestFailureConsequence: string;
   primaryActionLabel: string;
   secondaryActionLabel: string;
@@ -77,6 +78,7 @@ export const defaultCreatorScenarioDraftInput: CreatorScenarioDraftInput = {
   pressureFactionName: "施压者联盟",
   mainQuestGoal: "在三天内稳住危机并给出公开解释。",
   mainQuestRealBackground: "施压阵营正在遮掩一条能改变公众判断的关键证据。",
+  mainQuestHiddenGoal: "找出谁在推动危机失控。",
   mainQuestFailureConsequence: "施压阵营将获得危机后的解释权。",
   primaryActionLabel: "安抚现场",
   secondaryActionLabel: "追查源头",
@@ -174,6 +176,10 @@ export const buildCreatorScenarioDraft = (
   const mainQuestRealBackground = textOr(
     input.mainQuestRealBackground,
     defaultCreatorScenarioDraftInput.mainQuestRealBackground,
+  );
+  const mainQuestHiddenGoal = textOr(
+    input.mainQuestHiddenGoal,
+    defaultCreatorScenarioDraftInput.mainQuestHiddenGoal,
   );
   const mainQuestFailureConsequence = textOr(
     input.mainQuestFailureConsequence,
@@ -400,7 +406,7 @@ export const buildCreatorScenarioDraft = (
         patron: guideId,
         realBackground: mainQuestRealBackground,
         surfaceGoal: mainQuestGoal,
-        hiddenGoal: "找出谁在推动危机失控。",
+        hiddenGoal: mainQuestHiddenGoal,
         locationIds: [startLocationId, pressureLocationId],
         npcIds: [guideId, pressureNpcId],
         factionIds: [allyFactionId, pressureFactionId],

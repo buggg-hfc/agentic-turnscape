@@ -34,6 +34,7 @@ describe("creator scenario draft builder", () => {
       mainQuestGoal: "在雨夜结束前公开怨念来源并保护旧城住户。",
       mainQuestRealBackground:
         "失踪者留下的水渍指向旧仓库，拆迁队提前封存了最后一段监控。",
+      mainQuestHiddenGoal: "确认谁替拆迁队改写了雨夜巡逻记录。",
       mainQuestFailureConsequence:
         "拆迁队会把雨声解释成封街理由，旧城住户失去公开辩护机会。",
       primaryActionLabel: "安抚街坊",
@@ -81,6 +82,9 @@ describe("creator scenario draft builder", () => {
       Object.values(draft.world.quests).map((quest) => quest.realBackground),
     ).toEqual([
       "失踪者留下的水渍指向旧仓库，拆迁队提前封存了最后一段监控。",
+    ]);
+    expect(Object.values(draft.world.quests).map((quest) => quest.hiddenGoal)).toEqual([
+      "确认谁替拆迁队改写了雨夜巡逻记录。",
     ]);
     expect(
       Object.values(draft.world.quests).map(

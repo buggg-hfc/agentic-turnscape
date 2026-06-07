@@ -21,6 +21,7 @@ describe("creator scenario draft preview", () => {
       mainQuestGoal: "在下一次潮汐前修复灯塔并公开黑帆的封航证据。",
       mainQuestRealBackground:
         "停摆前夜有人把备用灯芯调包，只有潮汐记录能证明黑帆提前进场。",
+      mainQuestHiddenGoal: "找出谁把备用灯芯交给黑帆船长。",
       mainQuestFailureConsequence:
         "黑帆会把灯塔停摆解释成封航理由，码头失去谈判窗口。",
       primaryActionLabel: "安抚码头",
@@ -66,7 +67,7 @@ describe("creator scenario draft preview", () => {
         title: "任务",
         count: 1,
         items: [
-          "港口试作主线：在下一次潮汐前修复灯塔并公开黑帆的封航证据。；真相：停摆前夜有人把备用灯芯调包，只有潮汐记录能证明黑帆提前进场。；失败：黑帆会把灯塔停摆解释成封航理由，码头失去谈判窗口。",
+          "港口试作主线：在下一次潮汐前修复灯塔并公开黑帆的封航证据。；真相：停摆前夜有人把备用灯芯调包，只有潮汐记录能证明黑帆提前进场。；隐线：找出谁把备用灯芯交给黑帆船长。；失败：黑帆会把灯塔停摆解释成封航理由，码头失去谈判窗口。",
         ],
       },
       {
