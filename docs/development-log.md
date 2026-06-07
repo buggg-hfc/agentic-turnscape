@@ -4,6 +4,17 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added tested editable crisis consequence text for creator quick drafts. The GUI now shows `危机后果`, generated drafts preserve `crisisConsequence`, and imported creator packages keep that text in `WorldState.clocks[*].consequence`.
+- Captured a runtime screenshot showing the crisis consequence field and preview `当前/上限：后果` display:
+
+![Creator editable crisis consequence](screenshots/creator-crisis-consequence-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- packages/shared/src/creatorScenarioDraft.test.ts apps/web/src/creatorScenarioPreview.test.ts packages/content/src/creatorScenario.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added tested editable crisis clock values for creator quick drafts. The GUI now shows `危机初始值` and `危机上限`, generated drafts preserve `crisisInitialProgress` and `crisisMax`, and imported creator packages keep those values on the pressure crisis clock.
 - Captured a runtime screenshot showing the crisis clock number fields and preview `当前/上限` display:
 

@@ -10,6 +10,7 @@ export type CreatorScenarioDraftInput = {
   crisisName: string;
   crisisInitialProgress: number;
   crisisMax: number;
+  crisisConsequence: string;
   guideName: string;
   pressureNpcName: string;
   allyFactionName: string;
@@ -66,6 +67,7 @@ export const defaultCreatorScenarioDraftInput: CreatorScenarioDraftInput = {
   crisisName: "局势失控",
   crisisInitialProgress: 0,
   crisisMax: 4,
+  crisisConsequence: "局势失控满格时，施压阵营会夺取局势解释权。",
   guideName: "向导",
   pressureNpcName: "施压代表",
   allyFactionName: "本地互助会",
@@ -138,6 +140,10 @@ export const buildCreatorScenarioDraft = (
     defaultCreatorScenarioDraftInput.crisisInitialProgress,
     0,
     crisisMax,
+  );
+  const crisisConsequence = textOr(
+    input.crisisConsequence,
+    defaultCreatorScenarioDraftInput.crisisConsequence,
   );
   const guideName = textOr(
     input.guideName,
@@ -400,7 +406,7 @@ export const buildCreatorScenarioDraft = (
         name: crisisName,
         progress: crisisInitialProgress,
         max: crisisMax,
-        consequence: `${crisisName}满格时，施压阵营会夺取局势解释权。`,
+        consequence: crisisConsequence,
         visible: true,
       },
     },

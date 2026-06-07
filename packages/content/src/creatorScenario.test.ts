@@ -129,6 +129,7 @@ describe("creator scenario import", () => {
         crisisName: "伤员潮",
         crisisInitialProgress: 1,
         crisisMax: 5,
+        crisisConsequence: "伤员潮满格时，巡逻队会接管哨卡分诊权。",
         guideName: "米娜",
         pressureNpcName: "赫然队长",
         allyFactionName: "志愿护理队",
@@ -155,6 +156,9 @@ describe("creator scenario import", () => {
       (clock) => clock.name === "伤员潮",
     );
     expect(importedPressureClock).toMatchObject({ progress: 1, max: 5 });
+    expect(importedPressureClock?.consequence).toBe(
+      "伤员潮满格时，巡逻队会接管哨卡分诊权。",
+    );
     expect(scenario.getDayPlan(1)?.mainEvent).toContain("封锁线外");
     expect(scenario.getActions(world).map((action) => action.label)).toEqual([
       "稳定分诊",

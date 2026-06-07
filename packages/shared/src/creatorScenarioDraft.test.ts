@@ -26,6 +26,7 @@ describe("creator scenario draft builder", () => {
       crisisName: "雨声怨念",
       crisisInitialProgress: 2,
       crisisMax: 6,
+      crisisConsequence: "雨棚下的怨念满格时，拆迁队会拿到封街理由。",
       guideName: "林姐",
       pressureNpcName: "周队",
       allyFactionName: "街坊互助会",
@@ -55,7 +56,11 @@ describe("creator scenario draft builder", () => {
     const pressureClock = Object.values(draft.world.clocks).find(
       (clock) => clock.name === "雨声怨念",
     );
-    expect(pressureClock).toMatchObject({ progress: 2, max: 6 });
+    expect(pressureClock).toMatchObject({
+      progress: 2,
+      max: 6,
+      consequence: "雨棚下的怨念满格时，拆迁队会拿到封街理由。",
+    });
     expect(draft.days).toEqual(
       expect.arrayContaining([
         expect.objectContaining({

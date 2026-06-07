@@ -13,6 +13,7 @@ describe("creator scenario draft preview", () => {
       crisisName: "灯塔停摆",
       crisisInitialProgress: 2,
       crisisMax: 6,
+      crisisConsequence: "灯塔停摆满格时，黑帆将控制外海航标。",
       guideName: "林澈",
       pressureNpcName: "黑帆船长",
       allyFactionName: "码头互助会",
@@ -50,7 +51,10 @@ describe("creator scenario draft preview", () => {
       {
         title: "危机钟",
         count: 2,
-        items: ["港口试作稳定度 0/4", "灯塔停摆 2/6"],
+        items: [
+          "港口试作稳定度 0/4：稳定度满格时，玩家能把危机转化为长期优势。",
+          "灯塔停摆 2/6：灯塔停摆满格时，黑帆将控制外海航标。",
+        ],
       },
       {
         title: "行动",

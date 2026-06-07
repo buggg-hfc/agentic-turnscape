@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Creator Editable Crisis Consequences
+
+### Scope
+
+- Added TDD coverage proving creator quick drafts can author the pressure crisis clock consequence, not only the crisis name and clock values.
+- Extended `CreatorScenarioDraftInput` with `crisisConsequence`; generated worlds and imported creator packages now preserve that authored text in `WorldState.clocks[*].consequence`.
+- The creator GUI now exposes a Chinese `危机后果` text area, and the preview crisis-clock section displays `当前/上限：后果` before import.
+
+### Runtime Screenshot
+
+![Creator editable crisis consequences](screenshots/creator-crisis-consequence-runtime-2026-06-08.png)
+
+The screenshot was captured from a local runtime session after opening the scenario selection screen and verifying the creator panel showed the crisis consequence field and the preview clock list reflected the authored consequence text.
+
+### Verification
+
+```bash
+npm test -- packages/shared/src/creatorScenarioDraft.test.ts apps/web/src/creatorScenarioPreview.test.ts packages/content/src/creatorScenario.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - Creator Editable Crisis Clock Values
 
 ### Scope

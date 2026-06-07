@@ -1092,6 +1092,16 @@ const CreatorScenarioImportPanel = ({
           }
         />
       </label>
+      <label className="creator-field wide">
+        <span>危机后果</span>
+        <textarea
+          value={draft.crisisConsequence}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("crisisConsequence", event.target.value)
+          }
+        />
+      </label>
       <label className="creator-field">
         <span>关键 NPC</span>
         <input
