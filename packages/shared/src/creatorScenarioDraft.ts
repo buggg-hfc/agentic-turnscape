@@ -13,7 +13,15 @@ export type CreatorScenarioDraftInput = {
   premise: string;
   playerName: string;
   startLocationName: string;
+  startLocationDescription: string;
+  startLocationPublicInfo: string;
+  startLocationHiddenInfo: string;
+  startLocationDangerLevel: number;
   pressureLocationName: string;
+  pressureLocationDescription: string;
+  pressureLocationPublicInfo: string;
+  pressureLocationHiddenInfo: string;
+  pressureLocationDangerLevel: number;
   crisisName: string;
   crisisInitialProgress: number;
   crisisMax: number;
@@ -93,7 +101,15 @@ export const defaultCreatorScenarioDraftInput: CreatorScenarioDraftInput = {
   premise: "一个小镇在三天内必须处理突然爆发的危机。",
   playerName: "调查者",
   startLocationName: "临时指挥所",
+  startLocationDescription: "临时指挥所里挤满了等待消息的人，危机正在逼近公开爆发。",
+  startLocationPublicInfo: "居民正在等待可信消息;向导愿意协助玩家先稳住局面",
+  startLocationHiddenInfo: "施压阵营有人希望危机继续扩大",
+  startLocationDangerLevel: 1,
   pressureLocationName: "危机现场",
+  pressureLocationDescription: "危机现场聚集着事件迹象，任何迟疑都会让施压阵营取得主动。",
+  pressureLocationPublicInfo: "支援阵营需要可公开说明的证据;施压阵营正在催促人群做出仓促选择",
+  pressureLocationHiddenInfo: "真正的转折点藏在危机现场的证据链里",
+  pressureLocationDangerLevel: 3,
   crisisName: "局势失控",
   crisisInitialProgress: 0,
   crisisMax: 4,
@@ -196,6 +212,17 @@ const resourcesOr = (value: string, fallback: string): Record<string, number> =>
   return Object.keys(resources).length > 0 ? resources : parseResourceText(fallback);
 };
 
+const parseListText = (value: string): string[] =>
+  value
+    .split(/[\n;；]+/)
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+
+const listOr = (value: string, fallback: string): string[] => {
+  const values = parseListText(value);
+  return values.length > 0 ? values : parseListText(fallback);
+};
+
 export const buildCreatorScenarioDraft = (
   input: CreatorScenarioDraftInput,
 ): CreatorScenarioDraft => {
@@ -211,9 +238,45 @@ export const buildCreatorScenarioDraft = (
     input.startLocationName,
     defaultCreatorScenarioDraftInput.startLocationName,
   );
+  const startLocationDescription = textOr(
+    input.startLocationDescription ?? "",
+    defaultCreatorScenarioDraftInput.startLocationDescription,
+  );
+  const startLocationPublicInfo = listOr(
+    input.startLocationPublicInfo ?? "",
+    defaultCreatorScenarioDraftInput.startLocationPublicInfo,
+  );
+  const startLocationHiddenInfo = listOr(
+    input.startLocationHiddenInfo ?? "",
+    defaultCreatorScenarioDraftInput.startLocationHiddenInfo,
+  );
+  const startLocationDangerLevel = boundedInt(
+    input.startLocationDangerLevel ?? defaultCreatorScenarioDraftInput.startLocationDangerLevel,
+    defaultCreatorScenarioDraftInput.startLocationDangerLevel,
+    0,
+    5,
+  );
   const pressureLocationName = textOr(
     input.pressureLocationName,
     defaultCreatorScenarioDraftInput.pressureLocationName,
+  );
+  const pressureLocationDescription = textOr(
+    input.pressureLocationDescription ?? "",
+    defaultCreatorScenarioDraftInput.pressureLocationDescription,
+  );
+  const pressureLocationPublicInfo = listOr(
+    input.pressureLocationPublicInfo ?? "",
+    defaultCreatorScenarioDraftInput.pressureLocationPublicInfo,
+  );
+  const pressureLocationHiddenInfo = listOr(
+    input.pressureLocationHiddenInfo ?? "",
+    defaultCreatorScenarioDraftInput.pressureLocationHiddenInfo,
+  );
+  const pressureLocationDangerLevel = boundedInt(
+    input.pressureLocationDangerLevel ?? defaultCreatorScenarioDraftInput.pressureLocationDangerLevel,
+    defaultCreatorScenarioDraftInput.pressureLocationDangerLevel,
+    0,
+    5,
   );
   const crisisName = textOr(
     input.crisisName,
@@ -427,26 +490,20 @@ export const buildCreatorScenarioDraft = (
       [startLocationId]: {
         id: startLocationId,
         name: startLocationName,
-        description: `${startLocationName}里挤满了等待消息的人，${crisisName}正在逼近公开爆发。`,
-        publicInfo: [
-          premise,
-          `${guideName}愿意协助玩家先稳住局面。`,
-        ],
-        hiddenInfo: [`${pressureFactionName}有人希望危机继续扩大。`],
+        description: startLocationDescription,
+        publicInfo: startLocationPublicInfo,
+        hiddenInfo: startLocationHiddenInfo,
         tags: ["creator", "start"],
-        dangerLevel: 1,
+        dangerLevel: startLocationDangerLevel,
       },
       [pressureLocationId]: {
         id: pressureLocationId,
         name: pressureLocationName,
-        description: `${pressureLocationName}聚集着${crisisName}的迹象，任何迟疑都会让${pressureFactionName}取得主动。`,
-        publicInfo: [
-          `${allyFactionName}需要玩家带回可公开说明的证据。`,
-          `${pressureFactionName}正在催促人群做出仓促选择。`,
-        ],
-        hiddenInfo: [`真正的转折点藏在${pressureLocationName}的证据链里。`],
+        description: pressureLocationDescription,
+        publicInfo: pressureLocationPublicInfo,
+        hiddenInfo: pressureLocationHiddenInfo,
         tags: ["creator", "pressure"],
-        dangerLevel: 3,
+        dangerLevel: pressureLocationDangerLevel,
       },
     },
     characters: {

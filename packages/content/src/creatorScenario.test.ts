@@ -125,7 +125,15 @@ describe("creator scenario import", () => {
         premise: "封锁线外的伤员突然涌入，镇民要求一个公开答案。",
         playerName: "临时镇医",
         startLocationName: "临时诊所",
+        startLocationDescription: "临时诊所被雨布分成三块分诊区，门口贴着伤员登记表。",
+        startLocationPublicInfo: "轻伤者愿意排队登记;镇民正在等待放行名单",
+        startLocationHiddenInfo: "第一批重伤者曾被转移到哨卡后仓",
+        startLocationDangerLevel: 2,
         pressureLocationName: "封锁哨卡",
+        pressureLocationDescription: "封锁哨卡堆着路障和空药箱，巡逻队把通行证收走。",
+        pressureLocationPublicInfo: "巡逻队要求所有人退回诊所;哨卡后仓传来咳嗽声",
+        pressureLocationHiddenInfo: "延误记录藏在哨卡值班簿里;赫然队长知道药箱去向",
+        pressureLocationDangerLevel: 4,
         crisisName: "伤员潮",
         crisisInitialProgress: 1,
         crisisMax: 5,
@@ -177,6 +185,22 @@ describe("creator scenario import", () => {
     expect(scenario.counts).toEqual({ combat: 1, social: 1, endings: 2 });
     expect(world.player.name).toBe("临时镇医");
     expect(Object.values(world.locations).map((location) => location.name)).toContain("封锁哨卡");
+    expect(Object.values(world.locations).map((location) => location.description)).toEqual([
+      "临时诊所被雨布分成三块分诊区，门口贴着伤员登记表。",
+      "封锁哨卡堆着路障和空药箱，巡逻队把通行证收走。",
+    ]);
+    expect(Object.values(world.locations).map((location) => location.publicInfo)).toEqual([
+      ["轻伤者愿意排队登记", "镇民正在等待放行名单"],
+      ["巡逻队要求所有人退回诊所", "哨卡后仓传来咳嗽声"],
+    ]);
+    expect(Object.values(world.locations).map((location) => location.hiddenInfo)).toEqual([
+      ["第一批重伤者曾被转移到哨卡后仓"],
+      ["延误记录藏在哨卡值班簿里", "赫然队长知道药箱去向"],
+    ]);
+    expect(Object.values(world.locations).map((location) => location.dangerLevel)).toEqual([
+      2,
+      4,
+    ]);
     expect(Object.values(world.characters).map((npc) => npc.name)).toContain("赫然队长");
     expect(Object.values(world.factions).map((faction) => faction.publicGoal)).toEqual([
       "公开分诊并保护愿意登记的伤员。",

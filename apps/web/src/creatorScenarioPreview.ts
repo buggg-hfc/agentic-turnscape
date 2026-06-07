@@ -19,6 +19,8 @@ export type CreatorDraftPreview = {
 const namedValues = <T extends { name: string }>(values: Record<string, T>) =>
   Object.values(values).map((value) => value.name);
 
+const listSummary = (values: string[]) => values.join("，") || "无";
+
 const resourceSummary = (resources: Record<string, number>) =>
   Object.entries(resources)
     .map(([name, amount]) => `${name} ${amount}`)
@@ -58,7 +60,10 @@ export const buildCreatorDraftPreview = (
   input: CreatorScenarioDraftInput,
 ): CreatorDraftPreview => {
   const draft = buildCreatorScenarioDraft(input);
-  const locations = namedValues(draft.world.locations);
+  const locations = Object.values(draft.world.locations).map(
+    (location) =>
+      `${location.name}：${location.description}；公开：${listSummary(location.publicInfo)}；隐藏：${listSummary(location.hiddenInfo)}；危险：${location.dangerLevel}`,
+  );
   const characters = namedValues(draft.world.characters);
   const factions = Object.values(draft.world.factions).map(
     (faction) =>

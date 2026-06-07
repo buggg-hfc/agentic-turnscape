@@ -9,7 +9,15 @@ describe("creator scenario draft preview", () => {
       premise: "风暴夜后，港务厅和走私者都想控制唯一的灯塔。",
       playerName: "临时调停人",
       startLocationName: "潮汐议事厅",
+      startLocationDescription: "墙上挂着潮汐钟和维修账页。",
+      startLocationPublicInfo: "船工愿意公开作证;潮汐记录还没被黑帆拿走",
+      startLocationHiddenInfo: "议事厅地板下有备用灯芯发票",
+      startLocationDangerLevel: 1,
       pressureLocationName: "旧灯塔机房",
+      pressureLocationDescription: "旧灯塔机房里满是盐雾和被拆开的灯座。",
+      pressureLocationPublicInfo: "机房门锁被撬开;黑帆守着外侧楼梯",
+      pressureLocationHiddenInfo: "备用灯芯被换成劣质芯;墙后夹层有黑帆账页",
+      pressureLocationDangerLevel: 4,
       crisisName: "灯塔停摆",
       crisisInitialProgress: 2,
       crisisMax: 6,
@@ -63,7 +71,10 @@ describe("creator scenario draft preview", () => {
       {
         title: "地点",
         count: 2,
-        items: ["潮汐议事厅", "旧灯塔机房"],
+        items: [
+          "潮汐议事厅：墙上挂着潮汐钟和维修账页。；公开：船工愿意公开作证，潮汐记录还没被黑帆拿走；隐藏：议事厅地板下有备用灯芯发票；危险：1",
+          "旧灯塔机房：旧灯塔机房里满是盐雾和被拆开的灯座。；公开：机房门锁被撬开，黑帆守着外侧楼梯；隐藏：备用灯芯被换成劣质芯，墙后夹层有黑帆账页；危险：4",
+        ],
       },
       {
         title: "NPC",

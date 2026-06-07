@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Creator Editable Location Details
+
+### Scope
+
+- Added TDD coverage proving creator quick drafts can author each generated location's `description`, `publicInfo`, `hiddenInfo`, and `dangerLevel` instead of only changing location names.
+- Extended `CreatorScenarioDraftInput` with editable start/conflict location description, public-info, hidden-info, and danger fields; generated drafts and imported creator packages now preserve those values in `WorldState.locations`.
+- The creator GUI now exposes Chinese `起始地点描述`, `起始地点公开信息`, `起始地点隐藏信息`, `起始地点危险`, `冲突地点描述`, `冲突地点公开信息`, `冲突地点隐藏信息`, and `冲突地点危险` controls, and the preview location section displays `地点名：描述；公开：信息；隐藏：信息；危险：等级` before import.
+
+### Runtime Screenshot
+
+![Creator editable location details](screenshots/creator-location-runtime-2026-06-08.png)
+
+The screenshot was captured from a local runtime session after setting both location detail blocks and verifying the creator preview reflected the authored public facts, hidden facts, and danger levels.
+
+### Verification
+
+```bash
+npm test -- packages/shared/src/creatorScenarioDraft.test.ts apps/web/src/creatorScenarioPreview.test.ts packages/content/src/creatorScenario.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - Creator Editable Faction Plans
 
 ### Scope

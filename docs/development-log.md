@@ -4,6 +4,17 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added tested editable location descriptions, public facts, hidden facts, and danger levels for creator quick drafts. The GUI now shows `起始地点描述`, `起始地点公开信息`, `起始地点隐藏信息`, `起始地点危险`, `冲突地点描述`, `冲突地点公开信息`, `冲突地点隐藏信息`, and `冲突地点危险`; generated drafts preserve those values in `WorldState.locations`; imported creator packages keep them; and the preview location section displays `地点名：描述；公开：信息；隐藏：信息；危险：等级`.
+- Captured a runtime screenshot showing the editable location controls and location preview:
+
+![Creator editable location details](screenshots/creator-location-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- packages/shared/src/creatorScenarioDraft.test.ts apps/web/src/creatorScenarioPreview.test.ts packages/content/src/creatorScenario.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added tested editable faction goals, plans, and resources for creator quick drafts. The GUI now shows `支援阵营目标`, `支援阵营计划`, `支援阵营资源`, `施压阵营目标`, `施压阵营计划`, and `施压阵营资源`; generated drafts preserve the authored faction fields; imported creator packages expose them through `WorldState.factions`; and the preview faction section displays `阵营名：公开目标；计划：当前计划；资源：资源 数量`.
 - Captured a runtime screenshot showing the editable faction controls and faction preview:
 

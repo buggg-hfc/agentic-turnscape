@@ -1077,6 +1077,54 @@ const CreatorScenarioImportPanel = ({
           }
         />
       </label>
+      <label className="creator-field wide">
+        <span>起始地点描述</span>
+        <textarea
+          value={draft.startLocationDescription}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("startLocationDescription", event.target.value)
+          }
+        />
+      </label>
+      <label className="creator-field wide">
+        <span>起始地点公开信息</span>
+        <textarea
+          value={draft.startLocationPublicInfo}
+          disabled={disabled}
+          placeholder="用分号或换行分隔"
+          onChange={(event) =>
+            onDraftChange("startLocationPublicInfo", event.target.value)
+          }
+        />
+      </label>
+      <label className="creator-field wide">
+        <span>起始地点隐藏信息</span>
+        <textarea
+          value={draft.startLocationHiddenInfo}
+          disabled={disabled}
+          placeholder="用分号或换行分隔"
+          onChange={(event) =>
+            onDraftChange("startLocationHiddenInfo", event.target.value)
+          }
+        />
+      </label>
+      <label className="creator-field">
+        <span>起始地点危险</span>
+        <input
+          type="number"
+          min={0}
+          max={5}
+          value={draft.startLocationDangerLevel}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange(
+              "startLocationDangerLevel",
+              Number.parseInt(event.target.value, 10),
+            )
+          }
+        />
+      </label>
       <label className="creator-field">
         <span>冲突地点</span>
         <input
@@ -1084,6 +1132,54 @@ const CreatorScenarioImportPanel = ({
           disabled={disabled}
           onChange={(event) =>
             onDraftChange("pressureLocationName", event.target.value)
+          }
+        />
+      </label>
+      <label className="creator-field wide">
+        <span>冲突地点描述</span>
+        <textarea
+          value={draft.pressureLocationDescription}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("pressureLocationDescription", event.target.value)
+          }
+        />
+      </label>
+      <label className="creator-field wide">
+        <span>冲突地点公开信息</span>
+        <textarea
+          value={draft.pressureLocationPublicInfo}
+          disabled={disabled}
+          placeholder="用分号或换行分隔"
+          onChange={(event) =>
+            onDraftChange("pressureLocationPublicInfo", event.target.value)
+          }
+        />
+      </label>
+      <label className="creator-field wide">
+        <span>冲突地点隐藏信息</span>
+        <textarea
+          value={draft.pressureLocationHiddenInfo}
+          disabled={disabled}
+          placeholder="用分号或换行分隔"
+          onChange={(event) =>
+            onDraftChange("pressureLocationHiddenInfo", event.target.value)
+          }
+        />
+      </label>
+      <label className="creator-field">
+        <span>冲突地点危险</span>
+        <input
+          type="number"
+          min={0}
+          max={5}
+          value={draft.pressureLocationDangerLevel}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange(
+              "pressureLocationDangerLevel",
+              Number.parseInt(event.target.value, 10),
+            )
           }
         />
       </label>

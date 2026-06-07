@@ -79,6 +79,7 @@ For gameplay work, tests should prove the rule invariant rather than a single lu
 - Creator tooling now supports tested editable action types in the quick-create GUI. The `行动一类型`, `行动二类型`, and `行动三类型` select controls feed `primaryActionType`, `secondaryActionType`, and `tertiaryActionType` into `PlayerAction.actionType`, and the creator preview displays each entry as `行动名：说明（类型：调查/谈判/战斗/保护/交易/休整/旅行/放弃；风险：低/中/高）` before import.
 - Creator tooling now supports tested editable action targets in the quick-create GUI. The `行动一目标`, `行动二目标`, and `行动三目标` select controls feed `primaryActionTarget`, `secondaryActionTarget`, and `tertiaryActionTarget` into `PlayerAction.targetId`, and the creator preview displays each entry as `行动名：说明（类型：...；目标：...；风险：...）` before import.
 - Creator tooling now supports tested editable faction goals, current plans, and resource lists in the quick-create GUI. The `支援阵营目标/计划/资源` and `施压阵营目标/计划/资源` controls feed the authored values into `WorldState.factions[*].publicGoal`, `currentPlan`, and `resources`, and the creator preview displays each faction as `阵营名：公开目标；计划：当前计划；资源：资源 数量` before import.
+- Creator tooling now supports tested editable location descriptions, public facts, hidden facts, and danger levels in the quick-create GUI. The start/conflict location detail controls feed authored values into `WorldState.locations[*].description`, `publicInfo`, `hiddenInfo`, and `dangerLevel`, and the creator preview displays each location as `地点名：描述；公开：信息；隐藏：信息；危险：等级` before import.
 
 ## MVP Completion Gate
 

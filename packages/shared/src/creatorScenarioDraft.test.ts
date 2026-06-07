@@ -22,7 +22,15 @@ describe("creator scenario draft builder", () => {
       premise: "旧城区的雨声里混入了失踪者的敲门声。",
       playerName: "临时调查员",
       startLocationName: "长明巷口",
+      startLocationDescription: "长明巷口贴满寻人启事，雨水从屋檐滴进临时取证箱。",
+      startLocationPublicInfo: "居民愿意交换巡逻时间;巷口监控只剩半小时备份",
+      startLocationHiddenInfo: "互助会藏着一份未公开失踪名单;林姐知道仓库钥匙来源",
+      startLocationDangerLevel: 2,
       pressureLocationName: "旧仓库雨棚",
+      pressureLocationDescription: "旧仓库雨棚下有被水泡开的封条，拆迁队把入口围住。",
+      pressureLocationPublicInfo: "雨棚下发现新脚印;承包队要求立刻清场",
+      pressureLocationHiddenInfo: "最后一段监控藏在雨棚配电箱;周队曾调走看守",
+      pressureLocationDangerLevel: 5,
       crisisName: "雨声怨念",
       crisisInitialProgress: 2,
       crisisMax: 6,
@@ -79,6 +87,22 @@ describe("creator scenario draft builder", () => {
     expect(Object.values(draft.world.locations).map((location) => location.name)).toEqual(
       expect.arrayContaining(["长明巷口", "旧仓库雨棚"]),
     );
+    expect(Object.values(draft.world.locations).map((location) => location.description)).toEqual([
+      "长明巷口贴满寻人启事，雨水从屋檐滴进临时取证箱。",
+      "旧仓库雨棚下有被水泡开的封条，拆迁队把入口围住。",
+    ]);
+    expect(Object.values(draft.world.locations).map((location) => location.publicInfo)).toEqual([
+      ["居民愿意交换巡逻时间", "巷口监控只剩半小时备份"],
+      ["雨棚下发现新脚印", "承包队要求立刻清场"],
+    ]);
+    expect(Object.values(draft.world.locations).map((location) => location.hiddenInfo)).toEqual([
+      ["互助会藏着一份未公开失踪名单", "林姐知道仓库钥匙来源"],
+      ["最后一段监控藏在雨棚配电箱", "周队曾调走看守"],
+    ]);
+    expect(Object.values(draft.world.locations).map((location) => location.dangerLevel)).toEqual([
+      2,
+      5,
+    ]);
     expect(Object.values(draft.world.factions).map((faction) => faction.publicGoal)).toEqual([
       "公开保护旧城住户并建立夜巡表。",
       "声称封街可以保护居民安全。",
