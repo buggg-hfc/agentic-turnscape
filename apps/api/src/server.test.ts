@@ -332,6 +332,7 @@ describe("campaign turn API", () => {
         campaign?: {
           chapter: number;
           experience: number;
+          base: { assets: Record<string, number> };
           legacyFlags: string[];
         };
       };
@@ -346,6 +347,7 @@ describe("campaign turn API", () => {
     expect(progressed.state.time).toEqual({ day: 1, phase: "morning" });
     expect(progressed.state.campaign?.chapter).toBe(2);
     expect(progressed.state.campaign?.experience).toBe(3);
+    expect(progressed.state.campaign?.base.assets.public_case_archive).toBe(1);
     expect(progressed.state.campaign?.legacyFlags).toContain(
       "ending:guild_reform",
     );

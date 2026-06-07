@@ -2,6 +2,20 @@
 
 This log records tested implementation slices as the project moves from the Border Seven Days MVP toward the full game. Each entry should name the behavior that changed and the verification gate used before publishing.
 
+## 2026-06-05
+
+- Added tested terminal-ending consequence assets for the long campaign aftermath. All 6 Border Seven Days endings now unlock a distinct `campaign.base.assets` entry and apply a referee-owned faction-front consequence instead of only recording a legacy flag.
+- Extended the web long-campaign dashboard summary to show inherited campaign assets, so a completed ending becomes visible playable history on the campaign panel.
+- Captured a runtime screenshot from a real `guild_case` API playthrough after `/campaigns/:id/campaign/progress` inherited `ending:guild_reform` and displayed `public_case_archive x1`:
+
+![Ending legacy asset panel](screenshots/ending-legacy-assets-runtime-2026-06-05.png)
+
+- Verification used for this slice:
+  - `npm test -- packages/core/src/campaignProgression.test.ts apps/api/src/server.test.ts apps/web/src/campaignProgression.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 ## 2026-06-03
 
 - Added a tested post-MVP continuation bridge from terminal endings into long campaign play. A day 7 night ending can now become an `ending:<id>` legacy flag, add campaign XP, record a public ending memory, and transition into the next chapter through referee-owned patches.

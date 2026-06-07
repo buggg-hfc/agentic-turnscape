@@ -984,6 +984,13 @@ const CampaignProgressionPanel = ({
         )}
       </div>
     </div>
+    {summary.assets.length > 0 ? (
+      <div className="tag-row compact campaign-assets">
+        {summary.assets.map((asset) => (
+          <span key={asset}>{asset}</span>
+        ))}
+      </div>
+    ) : null}
     <div className="front-list">
       {summary.fronts.slice(0, 3).map((front) => (
         <div key={front.id} className={`front-row ${front.status}`}>

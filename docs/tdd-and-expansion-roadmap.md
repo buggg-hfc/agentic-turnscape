@@ -51,6 +51,7 @@ For gameplay work, tests should prove the rule invariant rather than a single lu
 - Border Seven Days faction plans now have tested outcome coverage for all 3 MVP factions: each faction can advance, be blocked, or redirect through referee-owned `StatePatch` results.
 - Border Seven Days now has API-level full-campaign acceptance coverage for all 6 MVP endings: each deterministic route reaches day 7 night through public `/turns/run` calls and leaves matching replay, turn, snapshot, and final referee patch records.
 - Terminal MVP endings now feed the long campaign expansion path: the server derives the finished ending, records an ending legacy flag and campaign XP, and opens the next chapter through referee-owned patches.
+- Terminal MVP endings now also unlock tested long-campaign consequences: each of the 6 endings grants a distinct base asset, shifts faction-war fronts through referee-owned patches, and can be surfaced in the web dashboard.
 
 ## MVP Completion Gate
 

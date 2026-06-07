@@ -30,6 +30,48 @@ export type LongCampaignStepInput = {
 
 const clamp = (value: number, min: number, max: number): number => Math.max(min, Math.min(value, max));
 
+type EndingLegacyConsequence = {
+  assetId: string;
+  frontDeltas: FactionFrontDelta[];
+  publicBody: string;
+};
+
+const endingLegacyConsequences: Record<string, EndingLegacyConsequence> = {
+  ritual_stopped: {
+    assetId: "sealed_ritual_site",
+    frontDeltas: [{ factionId: "rift_cult", influenceDelta: -1, pressureDelta: -2 }],
+    publicBody: "The sealed ritual site becomes a strategic asset and weakens the cult's wider front."
+  },
+  guild_reform: {
+    assetId: "public_case_archive",
+    frontDeltas: [
+      { factionId: "frontier_guild", influenceDelta: 2, pressureDelta: -1 },
+      { factionId: "blackstone_consortium", influenceDelta: -2, pressureDelta: 1 }
+    ],
+    publicBody: "The public case archive gives the reformed guild legitimacy while Blackstone reorganizes in opposition."
+  },
+  cure_with_exiles: {
+    assetId: "exile_clinic_network",
+    frontDeltas: [{ factionId: "rift_cult", influenceDelta: 1, pressureDelta: -1 }],
+    publicBody: "The exile clinic network becomes a durable medical route and keeps the rift cult politically visible."
+  },
+  town_quarantined: {
+    assetId: "quarantine_relief_route",
+    frontDeltas: [{ factionId: "frontier_guild", influenceDelta: -1, pressureDelta: 2 }],
+    publicBody: "The quarantine relief route keeps survivors alive, but the guild front enters the next chapter under strain."
+  },
+  consortium_rule: {
+    assetId: "blackstone_credit_line",
+    frontDeltas: [{ factionId: "blackstone_consortium", influenceDelta: 2, pressureDelta: 2 }],
+    publicBody: "Blackstone credit opens new resources while making the consortium a dominant long-campaign front."
+  },
+  rift_opened: {
+    assetId: "rift_scar_map",
+    frontDeltas: [{ factionId: "rift_cult", influenceDelta: 2, pressureDelta: 3 }],
+    publicBody: "The rift scar map turns the opened breach into a campaign-scale threat and opportunity."
+  }
+};
+
 const event = (state: WorldState, turnId: string, title: string, body: string, tags: string[]): ChronicleEvent => ({
   id: `evt_${turnId}_${tags[0] ?? "campaign"}`,
   turnId,
@@ -46,6 +88,30 @@ const frontStatus = (influence: number, pressure: number): CampaignProgressionSt
   if (pressure >= 8) return "dominant";
   if (pressure <= 2) return "contained";
   return "active";
+};
+
+const applyFrontDeltas = (
+  fronts: CampaignProgressionState["fronts"],
+  deltas: FactionFrontDelta[]
+): CampaignProgressionState["fronts"] => {
+  const nextFronts = { ...fronts };
+  for (const delta of deltas) {
+    const current = nextFronts[delta.factionId] ?? {
+      factionId: delta.factionId,
+      influence: 5,
+      pressure: 5,
+      status: "active" as const
+    };
+    const influence = clamp(current.influence + (delta.influenceDelta ?? 0), 0, 10);
+    const pressure = clamp(current.pressure + (delta.pressureDelta ?? 0), 0, 10);
+    nextFronts[delta.factionId] = {
+      factionId: delta.factionId,
+      influence,
+      pressure,
+      status: frontStatus(influence, pressure)
+    };
+  }
+  return nextFronts;
 };
 
 const initialFronts = (state: WorldState): CampaignProgressionState["fronts"] =>
@@ -101,6 +167,7 @@ export const resolveLongCampaignStep = ({
   const startingCampaign = state.campaign ?? defaultCampaignProgression(state);
   const changes: StatePatch["changes"] = [];
   const terminalEndingId = endingId && isTerminalNight(state) ? endingId : undefined;
+  let latestFronts = startingCampaign.fronts;
 
   if (!state.campaign) {
     changes.push({
@@ -157,6 +224,29 @@ export const resolveLongCampaignStep = ({
           ["campaign", "ending"]
         ),
         reason: "Record terminal ending legacy"
+      }
+    );
+  }
+
+  const endingConsequence = terminalEndingId ? endingLegacyConsequences[terminalEndingId] : undefined;
+  if (endingConsequence) {
+    const assets = {
+      ...startingCampaign.base.assets,
+      [endingConsequence.assetId]: clamp((startingCampaign.base.assets[endingConsequence.assetId] ?? 0) + 1, 0, 99)
+    };
+    latestFronts = applyFrontDeltas(latestFronts, endingConsequence.frontDeltas);
+    changes.push(
+      { op: "set", path: "campaign.base.assets", value: assets, reason: "Unlock terminal ending campaign asset" },
+      { op: "set", path: "campaign.fronts", value: latestFronts, reason: "Apply terminal ending faction-front consequence" },
+      {
+        op: "append",
+        path: "publicEvents",
+        value: event(state, turnId, "Legacy consequence unlocked", endingConsequence.publicBody, [
+          "consequence",
+          "campaign",
+          "ending"
+        ]),
+        reason: "Record terminal ending consequence"
       }
     );
   }
@@ -233,23 +323,8 @@ export const resolveLongCampaignStep = ({
   }
 
   if (factionFronts.length > 0) {
-    const fronts = { ...startingCampaign.fronts };
-    for (const delta of factionFronts) {
-      const current = fronts[delta.factionId] ?? {
-        factionId: delta.factionId,
-        influence: 5,
-        pressure: 5,
-        status: "active" as const
-      };
-      const influence = clamp(current.influence + (delta.influenceDelta ?? 0), 0, 10);
-      const pressure = clamp(current.pressure + (delta.pressureDelta ?? 0), 0, 10);
-      fronts[delta.factionId] = {
-        factionId: delta.factionId,
-        influence,
-        pressure,
-        status: frontStatus(influence, pressure)
-      };
-    }
+    const fronts = applyFrontDeltas(latestFronts, factionFronts);
+    latestFronts = fronts;
     changes.push(
       { op: "set", path: "campaign.fronts", value: fronts, reason: "Update long campaign faction fronts" },
       {

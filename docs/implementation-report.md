@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-05 - Ending Consequence Assets
+
+### Scope
+
+- Added a tested consequence table for all 6 Border Seven Days terminal endings.
+- Each inherited ending now unlocks a distinct long-campaign base asset and shifts one or more faction-war fronts through referee-owned `StatePatch` records.
+- The web long-campaign dashboard now lists inherited campaign assets alongside facilities, chapter XP, and faction-front pressure.
+
+### Runtime Screenshot
+
+![Ending legacy asset panel](screenshots/ending-legacy-assets-runtime-2026-06-05.png)
+
+The screenshot was captured from a local runtime session after a real `guild_case` playthrough reached `guild_reform`, then `/campaigns/:id/campaign/progress` advanced the game into chapter 2 and displayed `public_case_archive x1` in the long-campaign panel.
+
+### Verification
+
+```bash
+npm test -- packages/core/src/campaignProgression.test.ts apps/api/src/server.test.ts apps/web/src/campaignProgression.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-03 - Ending Legacy Continuation
 
 ### Scope

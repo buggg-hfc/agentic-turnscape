@@ -16,6 +16,7 @@ export type CampaignProgressionSummary = {
   experienceLabel: string;
   baseLabel: string;
   facilities: string[];
+  assets: string[];
   fronts: CampaignFrontSummary[];
   legacyFlags: string[];
 };
@@ -51,6 +52,7 @@ export const buildCampaignProgressionSummary = (
       experienceLabel: "0 XP",
       baseLabel: "未建立",
       facilities: [],
+      assets: [],
       fronts: [],
       legacyFlags: [],
     };
@@ -60,6 +62,10 @@ export const buildCampaignProgressionSummary = (
     .filter(([, level]) => level > 0)
     .sort(([leftId, leftLevel], [rightId, rightLevel]) => rightLevel - leftLevel || leftId.localeCompare(rightId))
     .map(([id, level]) => `${id} Lv.${level}`);
+  const assets = Object.entries(state.campaign.base.assets)
+    .filter(([, count]) => count > 0)
+    .sort(([leftId, leftCount], [rightId, rightCount]) => rightCount - leftCount || leftId.localeCompare(rightId))
+    .map(([id, count]) => `${id} x${count}`);
   const fronts = Object.values(state.campaign.fronts)
     .sort((left, right) => right.pressure - left.pressure)
     .map((front) => ({
@@ -80,6 +86,7 @@ export const buildCampaignProgressionSummary = (
     experienceLabel: `${state.campaign.experience} XP`,
     baseLabel: `${state.campaign.base.name} Lv.${state.campaign.base.level}`,
     facilities,
+    assets,
     fronts,
     legacyFlags: state.campaign.legacyFlags,
   };

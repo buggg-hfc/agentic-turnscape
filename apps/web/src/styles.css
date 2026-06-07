@@ -629,6 +629,12 @@ button {
   margin: 8px 0 0;
 }
 
+.campaign-assets span {
+  border-color: rgba(227, 193, 111, 0.42);
+  background: rgba(227, 193, 111, 0.12);
+  color: #fff1c5;
+}
+
 .front-list {
   display: grid;
   gap: 8px;

@@ -13,6 +13,7 @@ describe("campaign progression view model", () => {
       experienceLabel: "0 XP",
       baseLabel: "未建立",
       facilities: [],
+      assets: [],
       fronts: [],
       legacyFlags: [],
     });
@@ -27,7 +28,7 @@ describe("campaign progression view model", () => {
         name: "Border House",
         level: 2,
         facilities: { infirmary: 2, archive: 1, workshop: 0 },
-        assets: {},
+        assets: { public_case_archive: 1, militia_oath: 2 },
       },
       fronts: {
         blackstone_consortium: {
@@ -52,6 +53,7 @@ describe("campaign progression view model", () => {
       experienceLabel: "5 XP",
       baseLabel: "Border House Lv.2",
       facilities: ["infirmary Lv.2", "archive Lv.1"],
+      assets: ["militia_oath x2", "public_case_archive x1"],
       fronts: [
         {
           id: "blackstone_consortium",
