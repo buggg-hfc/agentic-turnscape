@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Creator Editable Main Quest Goal
+
+### Scope
+
+- Added TDD coverage proving creator quick drafts can author the main quest's player-facing objective instead of relying on a crisis-name template.
+- Extended `CreatorScenarioDraftInput` with `mainQuestGoal`; generated worlds and imported creator packages now preserve that authored text in `WorldState.quests[*].surfaceGoal`.
+- The creator GUI now exposes a Chinese `主线目标` text area, and the preview outline includes a `任务` section with the quest name and objective before import.
+
+### Runtime Screenshot
+
+![Creator editable main quest goal](screenshots/creator-main-quest-goal-runtime-2026-06-08.png)
+
+The screenshot was captured from a local runtime session after opening the scenario selection screen and verifying the creator panel showed the main quest goal field and the preview task section reflected the authored objective.
+
+### Verification
+
+```bash
+npm test -- packages/shared/src/creatorScenarioDraft.test.ts apps/web/src/creatorScenarioPreview.test.ts packages/content/src/creatorScenario.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - Creator Editable Crisis Consequences
 
 ### Scope

@@ -15,6 +15,7 @@ export type CreatorScenarioDraftInput = {
   pressureNpcName: string;
   allyFactionName: string;
   pressureFactionName: string;
+  mainQuestGoal: string;
   primaryActionLabel: string;
   secondaryActionLabel: string;
   tertiaryActionLabel: string;
@@ -72,6 +73,7 @@ export const defaultCreatorScenarioDraftInput: CreatorScenarioDraftInput = {
   pressureNpcName: "施压代表",
   allyFactionName: "本地互助会",
   pressureFactionName: "施压者联盟",
+  mainQuestGoal: "在三天内稳住危机并给出公开解释。",
   primaryActionLabel: "安抚现场",
   secondaryActionLabel: "追查源头",
   tertiaryActionLabel: "争取证人",
@@ -160,6 +162,10 @@ export const buildCreatorScenarioDraft = (
   const pressureFactionName = textOr(
     input.pressureFactionName,
     defaultCreatorScenarioDraftInput.pressureFactionName,
+  );
+  const mainQuestGoal = textOr(
+    input.mainQuestGoal,
+    defaultCreatorScenarioDraftInput.mainQuestGoal,
   );
   const primaryActionLabel = textOr(
     input.primaryActionLabel,
@@ -381,7 +387,7 @@ export const buildCreatorScenarioDraft = (
         trigger: premise,
         patron: guideId,
         realBackground: `${pressureFactionName}正在利用${crisisName}遮掩一条关键证据。`,
-        surfaceGoal: `在三天内稳住${crisisName}并给出公开解释。`,
+        surfaceGoal: mainQuestGoal,
         hiddenGoal: "找出谁在推动危机失控。",
         locationIds: [startLocationId, pressureLocationId],
         npcIds: [guideId, pressureNpcId],

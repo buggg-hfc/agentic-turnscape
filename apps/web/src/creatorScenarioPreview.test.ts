@@ -18,6 +18,7 @@ describe("creator scenario draft preview", () => {
       pressureNpcName: "黑帆船长",
       allyFactionName: "码头互助会",
       pressureFactionName: "黑帆承包队",
+      mainQuestGoal: "在下一次潮汐前修复灯塔并公开黑帆的封航证据。",
       primaryActionLabel: "安抚码头",
       secondaryActionLabel: "追查灯塔",
       tertiaryActionLabel: "召集船工",
@@ -30,7 +31,8 @@ describe("creator scenario draft preview", () => {
     expect(preview).toMatchObject({
       title: "港口试作",
       scenarioId: "harbor-maker",
-      summary: "3 天 / 3 场景 / 2 地点 / 2 NPC / 2 阵营 / 3 行动 / 2 结局",
+      summary:
+        "3 天 / 3 场景 / 2 地点 / 2 NPC / 2 阵营 / 1 任务 / 3 行动 / 2 结局",
     });
     expect(preview.sections).toEqual([
       {
@@ -54,6 +56,13 @@ describe("creator scenario draft preview", () => {
         items: [
           "港口试作稳定度 0/4：稳定度满格时，玩家能把危机转化为长期优势。",
           "灯塔停摆 2/6：灯塔停摆满格时，黑帆将控制外海航标。",
+        ],
+      },
+      {
+        title: "任务",
+        count: 1,
+        items: [
+          "港口试作主线：在下一次潮汐前修复灯塔并公开黑帆的封航证据。",
         ],
       },
       {

@@ -29,6 +29,9 @@ export const buildCreatorDraftPreview = (
   const clocks = Object.values(draft.world.clocks).map(
     (clock) => `${clock.name} ${clock.progress}/${clock.max}：${clock.consequence}`,
   );
+  const quests = Object.values(draft.world.quests).map(
+    (quest) => `${quest.name}：${quest.surfaceGoal}`,
+  );
   const actions = draft.actions.map((action) => action.label);
   const endings = draft.endings.map(
     (ending) => `${ending.title}：${ending.summary}`,
@@ -43,6 +46,7 @@ export const buildCreatorDraftPreview = (
       `${locations.length} 地点`,
       `${characters.length} NPC`,
       `${factions.length} 阵营`,
+      `${quests.length} 任务`,
       `${actions.length} 行动`,
       `${endings.length} 结局`,
     ].join(" / "),
@@ -51,6 +55,7 @@ export const buildCreatorDraftPreview = (
       { title: "NPC", count: characters.length, items: characters },
       { title: "阵营", count: factions.length, items: factions },
       { title: "危机钟", count: clocks.length, items: clocks },
+      { title: "任务", count: quests.length, items: quests },
       { title: "行动", count: actions.length, items: actions },
       { title: "结局", count: endings.length, items: endings },
     ],

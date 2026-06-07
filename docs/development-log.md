@@ -4,6 +4,17 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added tested editable main quest goals for creator quick drafts. The GUI now shows `主线目标`, generated drafts preserve `mainQuestGoal`, imported creator packages keep it in `WorldState.quests[*].surfaceGoal`, and the preview outline includes a `任务` section.
+- Captured a runtime screenshot showing the main quest goal field and preview task objective:
+
+![Creator editable main quest goal](screenshots/creator-main-quest-goal-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- packages/shared/src/creatorScenarioDraft.test.ts apps/web/src/creatorScenarioPreview.test.ts packages/content/src/creatorScenario.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added tested editable crisis consequence text for creator quick drafts. The GUI now shows `危机后果`, generated drafts preserve `crisisConsequence`, and imported creator packages keep that text in `WorldState.clocks[*].consequence`.
 - Captured a runtime screenshot showing the crisis consequence field and preview `当前/上限：后果` display:
 

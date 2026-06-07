@@ -31,6 +31,7 @@ describe("creator scenario draft builder", () => {
       pressureNpcName: "周队",
       allyFactionName: "街坊互助会",
       pressureFactionName: "拆迁承包队",
+      mainQuestGoal: "在雨夜结束前公开怨念来源并保护旧城住户。",
       primaryActionLabel: "安抚街坊",
       secondaryActionLabel: "追查雨声",
       tertiaryActionLabel: "争取证人",
@@ -69,6 +70,9 @@ describe("creator scenario draft builder", () => {
         }),
       ]),
     );
+    expect(Object.values(draft.world.quests).map((quest) => quest.surfaceGoal)).toEqual([
+      "在雨夜结束前公开怨念来源并保护旧城住户。",
+    ]);
     expect(draft.actions).toHaveLength(3);
     for (const action of draft.actions) {
       expect(PlayerActionSchema.parse(action).label).toMatch(

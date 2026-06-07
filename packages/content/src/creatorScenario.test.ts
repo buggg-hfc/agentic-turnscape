@@ -134,6 +134,7 @@ describe("creator scenario import", () => {
         pressureNpcName: "赫然队长",
         allyFactionName: "志愿护理队",
         pressureFactionName: "封锁巡逻队",
+        mainQuestGoal: "在哨卡封闭前建立公开分诊线并争取放行窗口。",
         primaryActionLabel: "稳定分诊",
         secondaryActionLabel: "谈判放行",
         tertiaryActionLabel: "转移伤员",
@@ -152,6 +153,9 @@ describe("creator scenario import", () => {
     expect(world.player.name).toBe("临时镇医");
     expect(Object.values(world.locations).map((location) => location.name)).toContain("封锁哨卡");
     expect(Object.values(world.characters).map((npc) => npc.name)).toContain("赫然队长");
+    expect(Object.values(world.quests).map((quest) => quest.surfaceGoal)).toEqual([
+      "在哨卡封闭前建立公开分诊线并争取放行窗口。",
+    ]);
     const importedPressureClock = Object.values(world.clocks).find(
       (clock) => clock.name === "伤员潮",
     );
