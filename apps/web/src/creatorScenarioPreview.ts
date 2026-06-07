@@ -28,7 +28,9 @@ export const buildCreatorDraftPreview = (
   const factions = namedValues(draft.world.factions);
   const clocks = namedValues(draft.world.clocks);
   const actions = draft.actions.map((action) => action.label);
-  const endings = draft.endings.map((ending) => ending.title);
+  const endings = draft.endings.map(
+    (ending) => `${ending.title}：${ending.summary}`,
+  );
 
   return {
     title: draft.title,

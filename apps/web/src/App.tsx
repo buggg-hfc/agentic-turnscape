@@ -1140,6 +1140,16 @@ const CreatorScenarioImportPanel = ({
           }
         />
       </label>
+      <label className="creator-field wide">
+        <span>成功结局摘要</span>
+        <textarea
+          value={draft.successEndingSummary}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("successEndingSummary", event.target.value)
+          }
+        />
+      </label>
       <label className="creator-field">
         <span>压力结局</span>
         <input
@@ -1147,6 +1157,16 @@ const CreatorScenarioImportPanel = ({
           disabled={disabled}
           onChange={(event) =>
             onDraftChange("pressureEndingTitle", event.target.value)
+          }
+        />
+      </label>
+      <label className="creator-field wide">
+        <span>压力结局摘要</span>
+        <textarea
+          value={draft.pressureEndingSummary}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("pressureEndingSummary", event.target.value)
           }
         />
       </label>

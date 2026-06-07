@@ -136,6 +136,8 @@ describe("creator scenario import", () => {
         tertiaryActionLabel: "转移伤员",
         successEndingTitle: "伤员安置",
         pressureEndingTitle: "哨卡接管",
+        successEndingSummary: "镇民接受公开分诊，伤员被送进可持续照护线。",
+        pressureEndingSummary: "巡逻队接管哨卡，镇民只能等待下一轮放行。",
       }),
     );
     const world = scenario.createWorld();
@@ -155,11 +157,17 @@ describe("creator scenario import", () => {
     ]);
     successWorld.player.momentum = 3;
     expect(scenario.evaluateEnding(successWorld)?.title).toBe("伤员安置");
+    expect(scenario.evaluateEnding(successWorld)?.summary).toBe(
+      "镇民接受公开分诊，伤员被送进可持续照护线。",
+    );
     const pressureClock = Object.values(pressureWorld.clocks).find(
       (clock) => clock.name === "伤员潮",
     );
     expect(pressureClock).toBeDefined();
     pressureClock!.progress = pressureClock!.max;
     expect(scenario.evaluateEnding(pressureWorld)?.title).toBe("哨卡接管");
+    expect(scenario.evaluateEnding(pressureWorld)?.summary).toBe(
+      "巡逻队接管哨卡，镇民只能等待下一轮放行。",
+    );
   });
 });

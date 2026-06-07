@@ -65,6 +65,7 @@ For gameplay work, tests should prove the rule invariant rather than a single lu
 - Creator tooling now supports a tested editable opposing NPC in the quick-create GUI. The `对手 NPC` field feeds `pressureNpcName` into generated worlds, preview outlines, and imported creator packages, expanding the quick-create form toward a real cast editor.
 - Creator tooling now supports a tested editable conflict location in the quick-create GUI. The `冲突地点` field feeds `pressureLocationName` into generated worlds, preview outlines, scene/action text, and imported creator packages, expanding the quick-create form toward a real location editor.
 - Creator tooling now supports tested editable success and pressure ending titles in the quick-create GUI. The `成功结局` and `压力结局` fields feed `successEndingTitle` and `pressureEndingTitle` into generated drafts, preview outlines, and imported creator package `evaluateEnding` results while leaving trigger conditions under rules.
+- Creator tooling now supports tested editable success and pressure ending summaries in the quick-create GUI. The `成功结局摘要` and `压力结局摘要` fields feed `successEndingSummary` and `pressureEndingSummary` into generated drafts and imported package `evaluateEnding` results, and the preview ending section displays consequence text before import.
 
 ## MVP Completion Gate
 

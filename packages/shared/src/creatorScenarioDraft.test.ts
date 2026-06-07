@@ -33,6 +33,8 @@ describe("creator scenario draft builder", () => {
       tertiaryActionLabel: "争取证人",
       successEndingTitle: "雨声停歇",
       pressureEndingTitle: "旧城封门",
+      successEndingSummary: "居民愿意公开作证，旧城获得继续修复的机会。",
+      pressureEndingSummary: "承包队封锁街口，雨声成了拆迁命令的借口。",
     });
 
     expect(draft).toMatchObject({
@@ -65,6 +67,10 @@ describe("creator scenario draft builder", () => {
     expect(draft.endings.map((ending) => ending.title)).toEqual([
       "雨声停歇",
       "旧城封门",
+    ]);
+    expect(draft.endings.map((ending) => ending.summary)).toEqual([
+      "居民愿意公开作证，旧城获得继续修复的机会。",
+      "承包队封锁街口，雨声成了拆迁命令的借口。",
     ]);
   });
 });

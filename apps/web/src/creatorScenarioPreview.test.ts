@@ -20,6 +20,8 @@ describe("creator scenario draft preview", () => {
       tertiaryActionLabel: "召集船工",
       successEndingTitle: "灯塔复明",
       pressureEndingTitle: "黑帆接管",
+      successEndingSummary: "灯塔重新照亮外海，码头有了继续谈判的资本。",
+      pressureEndingSummary: "黑帆控制航道，港口进入被迫交易的新局势。",
     });
 
     expect(preview).toMatchObject({
@@ -56,7 +58,10 @@ describe("creator scenario draft preview", () => {
       {
         title: "结局",
         count: 2,
-        items: ["灯塔复明", "黑帆接管"],
+        items: [
+          "灯塔复明：灯塔重新照亮外海，码头有了继续谈判的资本。",
+          "黑帆接管：黑帆控制航道，港口进入被迫交易的新局势。",
+        ],
       },
     ]);
   });

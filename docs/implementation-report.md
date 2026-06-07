@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Creator Editable Ending Summaries
+
+### Scope
+
+- Added TDD coverage proving creator quick drafts can author the success and pressure ending summaries, not only the ending titles.
+- Extended `CreatorScenarioDraftInput` with `successEndingSummary` and `pressureEndingSummary`; generated drafts and imported creator packages now preserve those authored summaries through `evaluateEnding`.
+- The creator GUI now exposes Chinese `成功结局摘要` and `压力结局摘要` text areas, and the preview ending section shows `标题：摘要` so creators can inspect consequences before import.
+
+### Runtime Screenshot
+
+![Creator editable ending summaries](screenshots/creator-ending-summaries-runtime-2026-06-08.png)
+
+The screenshot was captured from a local runtime session after opening the scenario selection screen and verifying the creator panel showed both ending summary fields and the preview ending list included the authored consequence text.
+
+### Verification
+
+```bash
+npm test -- packages/shared/src/creatorScenarioDraft.test.ts apps/web/src/creatorScenarioPreview.test.ts packages/content/src/creatorScenario.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - Creator Editable Ending Titles
 
 ### Scope
