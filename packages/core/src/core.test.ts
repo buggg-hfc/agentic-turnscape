@@ -128,7 +128,12 @@ describe("dice and adjudication", () => {
     const freeformEvent = next.publicEvents.find((item) => item.tags.includes("freeform"));
 
     expect(resolution.patch.source).toBe("referee");
+    expect(resolution.publicSummary).toContain("自由行动");
+    expect(resolution.publicSummary).not.toMatch(/Freeform action|accepted as|stalled as/);
+    expect(freeformEvent?.title).toBe("自由行动推进");
     expect(freeformEvent?.body).toContain(action.description);
+    expect(freeformEvent?.body).toContain("裁判将意图判定为");
+    expect(freeformEvent?.body).not.toMatch(/Player intent|accepted the intent|converted it into legal/);
     expect(next.player.momentum).toBeGreaterThan(state.player.momentum);
     expect(next).not.toHaveProperty("伪装成药材车绕开封锁，把病人送到旧哨站。");
   });

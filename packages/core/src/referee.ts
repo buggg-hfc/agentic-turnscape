@@ -76,6 +76,16 @@ const freeformRuleChannels = new Set<FreeformRuleChannel>([
   "travel",
   "ignore"
 ]);
+const freeformIntentLabels: Record<FreeformRuleChannel, string> = {
+  investigate: "调查",
+  negotiate: "谈判",
+  fight: "战斗",
+  protect: "保护",
+  trade: "交易",
+  rest: "休整",
+  travel: "移动",
+  ignore: "观望"
+};
 
 const freeformIntentOf = (playerAction: PlayerAction): FreeformRuleChannel | undefined => {
   const intent = tokenValue(playerAction, "freeform:intent:");
@@ -479,79 +489,80 @@ export const adjudicateTurn = ({ state, playerAction, proposals, turnId, seed = 
   } else if (playerAction.actionType === "custom") {
     const freeformText = playerAction.description.trim() || playerAction.label;
     const inferredIntent = freeformIntentOf(playerAction) ?? "ignore";
+    const inferredIntentLabel = freeformIntentLabels[inferredIntent];
     const freeformTags = ["freeform", inferredIntent];
     if (isSuccess(roll.level)) {
       changes.push(
-        { op: "inc", path: "player.momentum", delta: 1, reason: "Freeform action succeeded and created visible progress" },
+        { op: "inc", path: "player.momentum", delta: 1, reason: "自由行动成功并制造可见进展" },
         {
           op: "append",
           path: "publicEvents",
           value: event(
             state,
             turnId,
-            "Freeform action advances",
-            `Player intent: ${freeformText} The referee accepted the intent as ${inferredIntent} and converted it into legal state changes.`,
+            "自由行动推进",
+            `玩家意图：${freeformText}。裁判将意图判定为“${inferredIntentLabel}”，并把它转换为合法的状态变化。`,
             freeformTags
           ),
-          reason: "Record freeform referee result"
+          reason: "记录自由行动裁判结果"
         }
       );
       switch (inferredIntent) {
         case "protect":
-          addClockInc(changes, state, "plague_spread", -1, "Freeform protection slows the visible plague clock");
+          addClockInc(changes, state, "plague_spread", -1, "自由保护行动延缓可见瘟疫时钟");
           break;
         case "investigate":
-          changes.push({ op: "inc", path: "player.resources.intel", delta: 1, reason: "Freeform investigation produces usable intel" });
+          changes.push({ op: "inc", path: "player.resources.intel", delta: 1, reason: "自由调查产出可用情报" });
           break;
         case "negotiate":
           if (playerAction.targetId?.startsWith("npc_") && hasRelationship(state, playerAction.targetId)) {
-            changes.push({ op: "inc", path: relationshipPath(playerAction.targetId, "respect"), delta: 1, reason: "Freeform negotiation improves respect with the target" });
+            changes.push({ op: "inc", path: relationshipPath(playerAction.targetId, "respect"), delta: 1, reason: "自由谈判提升目标尊重" });
           }
           break;
         case "trade":
           if ((state.player.resources.money ?? 0) > 0) {
-            changes.push({ op: "inc", path: "player.resources.money", delta: -1, reason: "Freeform trade spends money" });
+            changes.push({ op: "inc", path: "player.resources.money", delta: -1, reason: "自由交易消耗金钱" });
           }
-          changes.push({ op: "inc", path: "player.resources.favor", delta: 1, reason: "Freeform trade earns a usable favor" });
+          changes.push({ op: "inc", path: "player.resources.favor", delta: 1, reason: "自由交易换来可用人情" });
           break;
         case "travel":
           if (playerAction.targetId && state.locations[playerAction.targetId]) {
-            changes.push({ op: "set", path: "currentLocationId", value: playerAction.targetId, reason: "Freeform travel changes the active scene" });
+            changes.push({ op: "set", path: "currentLocationId", value: playerAction.targetId, reason: "自由移动改变当前场景" });
           }
           break;
         case "rest":
-          changes.push({ op: "inc", path: "player.resources.stamina", delta: 1, reason: "Freeform rest restores stamina" });
+          changes.push({ op: "inc", path: "player.resources.stamina", delta: 1, reason: "自由休整恢复体力" });
           break;
         case "fight":
-          changes.push({ op: "tag", path: "player.reputationTags", value: "freeform combatant", reason: "Freeform violence changes public reputation" });
-          addClockInc(changes, state, "martial_lockdown", 1, "Freeform violence raises martial pressure");
+          changes.push({ op: "tag", path: "player.reputationTags", value: "自由行动斗士", reason: "自由暴力行动改变公开名声" });
+          addClockInc(changes, state, "martial_lockdown", 1, "自由暴力行动提高戒严压力");
           break;
         case "ignore":
           break;
       }
-      publicSummary = `Freeform action accepted as ${inferredIntent}: ${freeformText}`;
-      hiddenSummary = "Freeform text is only player intent; referee rules choose the numeric and world-state consequences.";
+      publicSummary = `自由行动按“${inferredIntentLabel}”推进：${freeformText}`;
+      hiddenSummary = "自由行动文本只代表玩家意图；数值和世界状态后果仍由裁判规则决定。";
     } else {
       changes.push(
-        { op: "inc", path: "player.resources.pressure", delta: 1, reason: "Freeform action setback increases pressure" },
+        { op: "inc", path: "player.resources.pressure", delta: 1, reason: "自由行动受阻提高压力" },
         {
           op: "append",
           path: "publicEvents",
           value: event(
             state,
             turnId,
-            "Freeform action stalls",
-            `Player intent: ${freeformText} The referee treated it as ${inferredIntent}, but it did not unfold as hoped.`,
+            "自由行动受阻",
+            `玩家意图：${freeformText}。裁判将意图判定为“${inferredIntentLabel}”，但局势没有按预想展开。`,
             [...freeformTags, "setback"]
           ),
-          reason: "Record freeform setback"
+          reason: "记录自由行动受阻"
         }
       );
       if (inferredIntent === "fight") {
-        addClockInc(changes, state, "martial_lockdown", 1, "Failed freeform violence still raises martial pressure");
+        addClockInc(changes, state, "martial_lockdown", 1, "失败的自由暴力行动仍提高戒严压力");
       }
-      publicSummary = `Freeform action stalled as ${inferredIntent}: ${freeformText}`;
-      hiddenSummary = "The referee rejected treating player prose as fact and only recorded legal setback consequences.";
+      publicSummary = `自由行动按“${inferredIntentLabel}”受阻：${freeformText}`;
+      hiddenSummary = "裁判没有把玩家叙述直接当作事实，只记录了合法的受阻后果。";
     }
   } else if (playerAction.actionType === "rest" || playerAction.actionType === "ignore") {
     changes.push(

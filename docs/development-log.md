@@ -4,6 +4,11 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-07
 
+- Added tested source/API-level Chinese referee feedback for freeform player actions. Success and setback chronicle events now use Chinese titles and bodies such as `自由行动推进` / `自由行动受阻`, while still proving player prose is only intent and state changes remain referee-owned.
+- Captured a runtime screenshot showing a direct freeform action result with Chinese referee feedback in the visible GUI:
+
+![Chinese freeform referee feedback](screenshots/freeform-referee-feedback-cn-runtime-2026-06-07.png)
+
 - Added a tested Chinese GUI quick-create path for creator scenarios. The starter form captures scenario id, title, premise, player role, starting location, crisis clock, key NPC, two factions, and two actions, then generates a schema-valid creator scenario draft that can be imported through the existing creator API.
 - Captured a runtime screenshot showing the new creator scenario quick-create form on the scenario selection screen:
 
@@ -60,6 +65,7 @@ This log records tested implementation slices as the project moves from the Bord
   - `npm test -- apps/web/src/playerActionDisplay.test.ts apps/web/src/chronicle.test.ts apps/web/src/displayLabels.test.ts --reporter=dot`
   - `npm test -- packages/content/src/expansionLocalization.test.ts packages/content/src/scenarioRegistry.test.ts apps/api/src/server.test.ts apps/web/src/campaignArcStatus.test.ts --reporter=dot`
   - `npm test -- packages/shared/src/creatorScenarioDraft.test.ts packages/content/src/creatorScenario.test.ts apps/web/src/scenarioImport.test.ts --reporter=dot`
+  - `npm test -- packages/core/src/core.test.ts apps/api/src/server.test.ts --reporter=dot`
   - `npm run typecheck`
   - `npm test -- --reporter=dot`
   - `npm run build`

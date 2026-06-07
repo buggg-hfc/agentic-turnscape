@@ -174,13 +174,19 @@ describe("campaign turn API", () => {
               op: "append",
               path: "publicEvents",
               value: expect.objectContaining({
+                title: expect.stringMatching(/^自由行动(推进|受阻)$/),
+                body: expect.stringContaining("裁判将意图判定为"),
                 tags: expect.arrayContaining(["freeform", "protect"]),
               }),
             }),
           ]),
         },
+        publicSummary: expect.stringContaining("自由行动"),
       },
     });
+    expect(JSON.stringify(turnResponse.json())).not.toMatch(
+      /Freeform action|Player intent|accepted the intent|treated it as/,
+    );
   });
 
   it("applies long campaign progression through the rules engine and persists the snapshot", async () => {

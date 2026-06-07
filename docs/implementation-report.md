@@ -2,6 +2,30 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-07 - Chinese Freeform Referee Feedback
+
+### Scope
+
+- Added TDD coverage proving freeform `custom` actions no longer emit English runtime referee feedback in core or API responses.
+- The referee now labels inferred freeform channels in Chinese and records public chronicle events as `自由行动推进` or `自由行动受阻`.
+- Public summaries and chronicle bodies explain that the referee converted the player's intent into legal state changes; player prose still cannot directly mutate world state.
+- Freeform success and setback patch reasons are localized at the source so replay/debug surfaces do not depend on a web-only translation layer.
+
+### Runtime Screenshot
+
+![Chinese freeform referee feedback](screenshots/freeform-referee-feedback-cn-runtime-2026-06-07.png)
+
+The screenshot was captured from a local runtime session after opening a completed Chinese freeform action in the GUI and verifying the visible turn feedback showed `自由行动按“保护”推进` without old English phrases. The API/runtime probe for the same slice also verified the public chronicle event body includes `裁判将意图判定为`.
+
+### Verification
+
+```bash
+npm test -- packages/core/src/core.test.ts apps/api/src/server.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-07 - Creator Scenario Quick Draft GUI
 
 ### Scope
