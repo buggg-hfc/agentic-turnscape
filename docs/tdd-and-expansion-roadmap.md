@@ -70,6 +70,7 @@ For gameplay work, tests should prove the rule invariant rather than a single lu
 - Creator tooling now supports tested editable crisis consequence text in the quick-create GUI. The `危机后果` field feeds `crisisConsequence` into generated worlds and imported creator package clock state, and the preview crisis-clock section displays `当前/上限：后果` before import.
 - Creator tooling now supports tested editable main quest goals in the quick-create GUI. The `主线目标` field feeds `mainQuestGoal` into generated worlds and imported creator package quest state, and the preview outline now includes a `任务` section before import.
 - Creator tooling now supports tested editable main quest failure consequences in the quick-create GUI. The `任务失败后果` field feeds `mainQuestFailureConsequence` into `WorldState.quests[*].failureConsequence`, and the preview task section displays `任务目标；失败：后果` before import.
+- Creator tooling now supports tested editable main quest true background text in the quick-create GUI. The `任务真相` field feeds `mainQuestRealBackground` into `WorldState.quests[*].realBackground`, and the creator preview displays `任务目标；真相：背景；失败：后果` before import while player-visible redaction remains rule-owned elsewhere.
 
 ## MVP Completion Gate
 

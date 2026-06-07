@@ -4,6 +4,17 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added tested editable main quest true background text for creator quick drafts. The GUI now shows `任务真相`, generated drafts preserve `mainQuestRealBackground`, imported creator packages keep it in `WorldState.quests[*].realBackground`, and the preview task section displays `任务目标；真相：背景；失败：后果`.
+- Captured a runtime screenshot showing the quest truth field and preview task truth branch:
+
+![Creator editable quest truth](screenshots/creator-quest-truth-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- packages/shared/src/creatorScenarioDraft.test.ts apps/web/src/creatorScenarioPreview.test.ts packages/content/src/creatorScenario.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added tested editable main quest failure consequences for creator quick drafts. The GUI now shows `任务失败后果`, generated drafts preserve `mainQuestFailureConsequence`, imported creator packages keep it in `WorldState.quests[*].failureConsequence`, and the preview task section displays `任务目标；失败：后果`.
 - Captured a runtime screenshot showing the quest failure consequence field and preview task failure branch:
 

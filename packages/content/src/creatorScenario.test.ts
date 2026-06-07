@@ -135,6 +135,8 @@ describe("creator scenario import", () => {
         allyFactionName: "志愿护理队",
         pressureFactionName: "封锁巡逻队",
         mainQuestGoal: "在哨卡封闭前建立公开分诊线并争取放行窗口。",
+        mainQuestRealBackground:
+          "巡逻队曾把第一批伤员转移到哨卡后仓，公开分诊会暴露延误。",
         mainQuestFailureConsequence:
           "巡逻队会宣布分诊失败，哨卡进入长期封闭。",
         primaryActionLabel: "稳定分诊",
@@ -157,6 +159,9 @@ describe("creator scenario import", () => {
     expect(Object.values(world.characters).map((npc) => npc.name)).toContain("赫然队长");
     expect(Object.values(world.quests).map((quest) => quest.surfaceGoal)).toEqual([
       "在哨卡封闭前建立公开分诊线并争取放行窗口。",
+    ]);
+    expect(Object.values(world.quests).map((quest) => quest.realBackground)).toEqual([
+      "巡逻队曾把第一批伤员转移到哨卡后仓，公开分诊会暴露延误。",
     ]);
     expect(
       Object.values(world.quests).map((quest) => quest.failureConsequence),

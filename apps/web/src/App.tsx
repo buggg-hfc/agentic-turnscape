@@ -1151,6 +1151,16 @@ const CreatorScenarioImportPanel = ({
         />
       </label>
       <label className="creator-field wide">
+        <span>任务真相</span>
+        <textarea
+          value={draft.mainQuestRealBackground}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("mainQuestRealBackground", event.target.value)
+          }
+        />
+      </label>
+      <label className="creator-field wide">
         <span>任务失败后果</span>
         <textarea
           value={draft.mainQuestFailureConsequence}
