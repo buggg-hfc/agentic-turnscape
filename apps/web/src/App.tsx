@@ -1100,6 +1100,16 @@ const CreatorScenarioImportPanel = ({
           }
         />
       </label>
+      <label className="creator-field">
+        <span>行动三</span>
+        <input
+          value={draft.tertiaryActionLabel}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("tertiaryActionLabel", event.target.value)
+          }
+        />
+      </label>
     </div>
     <CreatorDraftPreviewPanel preview={buildCreatorDraftPreview(draft)} />
     <div className="creator-draft-actions">

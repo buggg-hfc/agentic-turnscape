@@ -2,6 +2,30 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Creator Third Action Editor
+
+### Scope
+
+- Added TDD coverage proving the creator quick draft can define a third playable action, not just two fixed action cards.
+- Extended `CreatorScenarioDraftInput` with `tertiaryActionLabel`; generated drafts now include a schema-valid `protect` action with referee-readable leverage tokens.
+- The creator GUI now exposes a Chinese `行动三` field, and the draft preview counts and lists all three generated actions before import.
+- The imported creator scenario package exposes the third action through the same `getActions` contract used by normal scenario play.
+
+### Runtime Screenshot
+
+![Creator third action field](screenshots/creator-third-action-runtime-2026-06-08.png)
+
+The screenshot was captured from a local runtime session after opening the scenario selection screen and verifying the creator panel showed `行动三`, default `争取证人`, and the outline summary `3 行动` with all three playable action names.
+
+### Verification
+
+```bash
+npm test -- packages/shared/src/creatorScenarioDraft.test.ts apps/web/src/creatorScenarioPreview.test.ts packages/content/src/creatorScenario.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - Creator Draft Outline Preview
 
 ### Scope

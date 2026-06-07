@@ -28,6 +28,7 @@ describe("creator scenario draft builder", () => {
       pressureFactionName: "拆迁承包队",
       primaryActionLabel: "安抚街坊",
       secondaryActionLabel: "追查雨声",
+      tertiaryActionLabel: "争取证人",
     });
 
     expect(draft).toMatchObject({
@@ -45,10 +46,10 @@ describe("creator scenario draft builder", () => {
         }),
       ]),
     );
-    expect(draft.actions).toHaveLength(2);
+    expect(draft.actions).toHaveLength(3);
     for (const action of draft.actions) {
       expect(PlayerActionSchema.parse(action).label).toMatch(
-        /安抚街坊|追查雨声/,
+        /安抚街坊|追查雨声|争取证人/,
       );
     }
   });

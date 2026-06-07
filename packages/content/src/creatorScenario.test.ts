@@ -131,6 +131,7 @@ describe("creator scenario import", () => {
         pressureFactionName: "封锁巡逻队",
         primaryActionLabel: "稳定分诊",
         secondaryActionLabel: "谈判放行",
+        tertiaryActionLabel: "转移伤员",
       }),
     );
     const world = scenario.createWorld();
@@ -142,6 +143,7 @@ describe("creator scenario import", () => {
     expect(scenario.getActions(world).map((action) => action.label)).toEqual([
       "稳定分诊",
       "谈判放行",
+      "转移伤员",
     ]);
   });
 });

@@ -15,12 +15,13 @@ describe("creator scenario draft preview", () => {
       pressureFactionName: "黑帆承包队",
       primaryActionLabel: "安抚码头",
       secondaryActionLabel: "追查灯塔",
+      tertiaryActionLabel: "召集船工",
     });
 
     expect(preview).toMatchObject({
       title: "港口试作",
       scenarioId: "harbor-maker",
-      summary: "3 天 / 3 场景 / 2 地点 / 2 NPC / 2 阵营 / 2 行动 / 2 结局",
+      summary: "3 天 / 3 场景 / 2 地点 / 2 NPC / 2 阵营 / 3 行动 / 2 结局",
     });
     expect(preview.sections).toEqual([
       {
@@ -45,8 +46,8 @@ describe("creator scenario draft preview", () => {
       },
       {
         title: "行动",
-        count: 2,
-        items: ["安抚码头", "追查灯塔"],
+        count: 3,
+        items: ["安抚码头", "追查灯塔", "召集船工"],
       },
       {
         title: "结局",

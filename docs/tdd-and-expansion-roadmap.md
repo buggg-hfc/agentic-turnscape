@@ -61,6 +61,7 @@ For gameplay work, tests should prove the rule invariant rather than a single lu
 - Freeform referee feedback now has source/API-level Chinese acceptance coverage: public summaries and chronicle records use Chinese success/setback wording, and regression tests reject the old English `Freeform action` / `Player intent` phrases in runtime responses.
 - Creator tooling now has a tested GUI starting point: a Chinese quick-create form generates a schema-valid creator scenario draft, proves it imports through the existing scenario package contract, and keeps the advanced JSON path for precise edits.
 - Creator tooling now also has a tested draft outline preview: the GUI summarizes the generated days, scenes, locations, NPCs, factions, crisis clocks, actions, and endings before import, using the same draft model that export/import will persist.
+- Creator tooling now supports a tested third playable action in the quick-create GUI. The extra `行动三` field is persisted into generated creator drafts, previewed as part of the outline, and exposed by imported creator packages through the normal `getActions` contract.
 
 ## MVP Completion Gate
 

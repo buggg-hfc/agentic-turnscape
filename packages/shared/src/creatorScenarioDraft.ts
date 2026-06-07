@@ -12,6 +12,7 @@ export type CreatorScenarioDraftInput = {
   pressureFactionName: string;
   primaryActionLabel: string;
   secondaryActionLabel: string;
+  tertiaryActionLabel: string;
 };
 
 export type CreatorScenarioDraft = Record<string, unknown> & {
@@ -59,6 +60,7 @@ export const defaultCreatorScenarioDraftInput: CreatorScenarioDraftInput = {
   pressureFactionName: "施压者联盟",
   primaryActionLabel: "安抚现场",
   secondaryActionLabel: "追查源头",
+  tertiaryActionLabel: "争取证人",
 };
 
 export const normalizeCreatorScenarioId = (value: string): string => {
@@ -114,6 +116,10 @@ export const buildCreatorScenarioDraft = (
   const secondaryActionLabel = textOr(
     input.secondaryActionLabel,
     defaultCreatorScenarioDraftInput.secondaryActionLabel,
+  );
+  const tertiaryActionLabel = textOr(
+    input.tertiaryActionLabel,
+    defaultCreatorScenarioDraftInput.tertiaryActionLabel,
   );
 
   const startLocationId = `${prefix}_start`;
@@ -437,6 +443,19 @@ export const buildCreatorScenarioDraft = (
           "creator_draft",
         ],
         riskLevel: "high",
+      },
+      {
+        id: `${prefix}_tertiary_action`,
+        actionType: "protect",
+        label: tertiaryActionLabel,
+        description: `保护愿意开口的证人和${guideName}，让${allyFactionName}能把${crisisName}转化为公开证词。`,
+        targetId: guideId,
+        leverage: [
+          `scenario:${id}`,
+          `clock:${stabilityClockId}`,
+          "creator_draft",
+        ],
+        riskLevel: "medium",
       },
     ],
     endings: [
