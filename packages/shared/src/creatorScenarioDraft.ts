@@ -27,7 +27,15 @@ export type CreatorScenarioDraftInput = {
   crisisMax: number;
   crisisConsequence: string;
   guideName: string;
+  guideRole: string;
+  guidePublicImage: string;
+  guideShortTermGoal: string;
+  guideSecret: string;
   pressureNpcName: string;
+  pressureNpcRole: string;
+  pressureNpcPublicImage: string;
+  pressureNpcShortTermGoal: string;
+  pressureNpcSecret: string;
   allyFactionName: string;
   pressureFactionName: string;
   allyFactionPublicGoal: string;
@@ -115,7 +123,15 @@ export const defaultCreatorScenarioDraftInput: CreatorScenarioDraftInput = {
   crisisMax: 4,
   crisisConsequence: "局势失控满格时，施压阵营会夺取局势解释权。",
   guideName: "向导",
+  guideRole: "本地向导",
+  guidePublicImage: "熟悉起始地点的人，愿意给玩家第一份可信情报。",
+  guideShortTermGoal: "协助玩家建立第一条公开线索。",
+  guideSecret: "曾经和施压阵营做过一次失败交易。",
   pressureNpcName: "施压代表",
+  pressureNpcRole: "施压代表",
+  pressureNpcPublicImage: "不断要求立刻处理危机的人。",
+  pressureNpcShortTermGoal: "把现场选择推向对自己有利的一边。",
+  pressureNpcSecret: "隐藏了一条会改变公众判断的证据。",
   allyFactionName: "本地互助会",
   pressureFactionName: "施压者联盟",
   allyFactionPublicGoal: "公开处理危机，让居民看到可执行的办法。",
@@ -301,9 +317,41 @@ export const buildCreatorScenarioDraft = (
     input.guideName,
     defaultCreatorScenarioDraftInput.guideName,
   );
+  const guideRole = textOr(
+    input.guideRole ?? "",
+    defaultCreatorScenarioDraftInput.guideRole,
+  );
+  const guidePublicImage = textOr(
+    input.guidePublicImage ?? "",
+    defaultCreatorScenarioDraftInput.guidePublicImage,
+  );
+  const guideShortTermGoal = textOr(
+    input.guideShortTermGoal ?? "",
+    defaultCreatorScenarioDraftInput.guideShortTermGoal,
+  );
+  const guideSecret = textOr(
+    input.guideSecret ?? "",
+    defaultCreatorScenarioDraftInput.guideSecret,
+  );
   const pressureNpcName = textOr(
     input.pressureNpcName,
     defaultCreatorScenarioDraftInput.pressureNpcName,
+  );
+  const pressureNpcRole = textOr(
+    input.pressureNpcRole ?? "",
+    defaultCreatorScenarioDraftInput.pressureNpcRole,
+  );
+  const pressureNpcPublicImage = textOr(
+    input.pressureNpcPublicImage ?? "",
+    defaultCreatorScenarioDraftInput.pressureNpcPublicImage,
+  );
+  const pressureNpcShortTermGoal = textOr(
+    input.pressureNpcShortTermGoal ?? "",
+    defaultCreatorScenarioDraftInput.pressureNpcShortTermGoal,
+  );
+  const pressureNpcSecret = textOr(
+    input.pressureNpcSecret ?? "",
+    defaultCreatorScenarioDraftInput.pressureNpcSecret,
   );
   const allyFactionName = textOr(
     input.allyFactionName,
@@ -510,15 +558,15 @@ export const buildCreatorScenarioDraft = (
       [guideId]: {
         id: guideId,
         name: guideName,
-        role: "本地向导",
+        role: guideRole,
         factionId: allyFactionId,
-        publicImage: `熟悉${startLocationName}的人，愿意给玩家第一份可信情报。`,
+        publicImage: guidePublicImage,
         truePersonality: "务实、谨慎，但愿意押注在能承担后果的人身上。",
         desire: `阻止${crisisName}伤害更多普通人。`,
         fear: `${pressureFactionName}把局势推向不可挽回。`,
-        shortTermGoal: "协助玩家建立第一条公开线索。",
+        shortTermGoal: guideShortTermGoal,
         longTermGoal: `让${allyFactionName}在危机后还能被信任。`,
-        secret: "曾经和施压阵营做过一次失败交易。",
+        secret: guideSecret,
         bottomLine: "不会牺牲无辜者来换取短期胜利。",
         weakness: "太容易把责任背到自己身上。",
         attributes: {
@@ -538,15 +586,15 @@ export const buildCreatorScenarioDraft = (
       [pressureNpcId]: {
         id: pressureNpcId,
         name: pressureNpcName,
-        role: "施压代表",
+        role: pressureNpcRole,
         factionId: pressureFactionId,
-        publicImage: `不断要求立刻处理${crisisName}的人。`,
+        publicImage: pressureNpcPublicImage,
         truePersonality: "精明、急躁，善于利用群体恐惧。",
         desire: `借${crisisName}扩大自身影响力。`,
         fear: "玩家找到可以公开验证的证据。",
-        shortTermGoal: "把现场选择推向对自己有利的一边。",
+        shortTermGoal: pressureNpcShortTermGoal,
         longTermGoal: `让${pressureFactionName}控制危机后的规则。`,
-        secret: "隐藏了一条会改变公众判断的证据。",
+        secret: pressureNpcSecret,
         bottomLine: "不会主动承认自己制造了恐慌。",
         weakness: "害怕被迫在公开场合解释细节。",
         attributes: {

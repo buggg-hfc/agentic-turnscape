@@ -139,7 +139,15 @@ describe("creator scenario import", () => {
         crisisMax: 5,
         crisisConsequence: "伤员潮满格时，巡逻队会接管哨卡分诊权。",
         guideName: "米娜",
+        guideRole: "志愿护理队协调员",
+        guidePublicImage: "米娜拿着公开登记板，在诊所门口安抚家属。",
+        guideShortTermGoal: "让轻伤者先接受公开分诊。",
+        guideSecret: "米娜知道第一批药箱被谁扣在哨卡。",
         pressureNpcName: "赫然队长",
+        pressureNpcRole: "封锁巡逻队队长",
+        pressureNpcPublicImage: "赫然队长以维持秩序为由收走所有通行证。",
+        pressureNpcShortTermGoal: "把转运决定权留在巡逻队手里。",
+        pressureNpcSecret: "赫然队长签过延后公开伤员名单的命令。",
         allyFactionName: "志愿护理队",
         pressureFactionName: "封锁巡逻队",
         allyFactionPublicGoal: "公开分诊并保护愿意登记的伤员。",
@@ -202,6 +210,22 @@ describe("creator scenario import", () => {
       4,
     ]);
     expect(Object.values(world.characters).map((npc) => npc.name)).toContain("赫然队长");
+    expect(Object.values(world.characters).map((npc) => npc.role)).toEqual([
+      "志愿护理队协调员",
+      "封锁巡逻队队长",
+    ]);
+    expect(Object.values(world.characters).map((npc) => npc.publicImage)).toEqual([
+      "米娜拿着公开登记板，在诊所门口安抚家属。",
+      "赫然队长以维持秩序为由收走所有通行证。",
+    ]);
+    expect(Object.values(world.characters).map((npc) => npc.shortTermGoal)).toEqual([
+      "让轻伤者先接受公开分诊。",
+      "把转运决定权留在巡逻队手里。",
+    ]);
+    expect(Object.values(world.characters).map((npc) => npc.secret)).toEqual([
+      "米娜知道第一批药箱被谁扣在哨卡。",
+      "赫然队长签过延后公开伤员名单的命令。",
+    ]);
     expect(Object.values(world.factions).map((faction) => faction.publicGoal)).toEqual([
       "公开分诊并保护愿意登记的伤员。",
       "声称封锁哨卡能阻止伤员潮扩大。",

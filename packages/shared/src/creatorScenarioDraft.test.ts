@@ -36,7 +36,15 @@ describe("creator scenario draft builder", () => {
       crisisMax: 6,
       crisisConsequence: "雨棚下的怨念满格时，拆迁队会拿到封街理由。",
       guideName: "林姐",
+      guideRole: "旧城联络人",
+      guidePublicImage: "林姐熟悉每条巷子的门牌和住户关系。",
+      guideShortTermGoal: "帮玩家把第一批证词公开登记。",
+      guideSecret: "林姐曾替承包队保管过一晚仓库钥匙。",
       pressureNpcName: "周队",
+      pressureNpcRole: "拆迁现场指挥",
+      pressureNpcPublicImage: "周队总是带着封街文件和施工队一起出现。",
+      pressureNpcShortTermGoal: "逼居民承认雨声只是安全隐患。",
+      pressureNpcSecret: "周队调走了雨夜最后一名仓库看守。",
       allyFactionName: "街坊互助会",
       pressureFactionName: "拆迁承包队",
       allyFactionPublicGoal: "公开保护旧城住户并建立夜巡表。",
@@ -84,6 +92,22 @@ describe("creator scenario draft builder", () => {
     expect(Object.values(draft.world.characters).map((npc) => npc.name)).toEqual(
       expect.arrayContaining(["林姐", "周队"]),
     );
+    expect(Object.values(draft.world.characters).map((npc) => npc.role)).toEqual([
+      "旧城联络人",
+      "拆迁现场指挥",
+    ]);
+    expect(Object.values(draft.world.characters).map((npc) => npc.publicImage)).toEqual([
+      "林姐熟悉每条巷子的门牌和住户关系。",
+      "周队总是带着封街文件和施工队一起出现。",
+    ]);
+    expect(Object.values(draft.world.characters).map((npc) => npc.shortTermGoal)).toEqual([
+      "帮玩家把第一批证词公开登记。",
+      "逼居民承认雨声只是安全隐患。",
+    ]);
+    expect(Object.values(draft.world.characters).map((npc) => npc.secret)).toEqual([
+      "林姐曾替承包队保管过一晚仓库钥匙。",
+      "周队调走了雨夜最后一名仓库看守。",
+    ]);
     expect(Object.values(draft.world.locations).map((location) => location.name)).toEqual(
       expect.arrayContaining(["长明巷口", "旧仓库雨棚"]),
     );

@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Creator Editable NPC Profiles
+
+### Scope
+
+- Added TDD coverage proving creator quick drafts can author both key NPC profiles beyond names: `role`, `publicImage`, `shortTermGoal`, and `secret`.
+- Extended `CreatorScenarioDraftInput` with guide/opposing NPC profile fields; generated drafts and imported creator packages now preserve those values in `WorldState.characters`.
+- The creator GUI now exposes Chinese `关键 NPC 身份`, `关键 NPC 公开形象`, `关键 NPC 目标`, `关键 NPC 秘密`, `对手 NPC 身份`, `对手 NPC 公开形象`, `对手 NPC 目标`, and `对手 NPC 秘密` controls, and the preview NPC section displays `NPC 名：身份；公开：形象；目标：目标；秘密：秘密` before import.
+
+### Runtime Screenshot
+
+![Creator editable NPC profiles](screenshots/creator-npc-runtime-2026-06-08.png)
+
+The screenshot was captured from a local runtime session after setting both NPC profile blocks and verifying the creator preview reflected authored public and hidden character material.
+
+### Verification
+
+```bash
+npm test -- packages/shared/src/creatorScenarioDraft.test.ts apps/web/src/creatorScenarioPreview.test.ts packages/content/src/creatorScenario.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - Creator Editable Location Details
 
 ### Scope

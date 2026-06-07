@@ -23,7 +23,15 @@ describe("creator scenario draft preview", () => {
       crisisMax: 6,
       crisisConsequence: "灯塔停摆满格时，黑帆将控制外海航标。",
       guideName: "林澈",
+      guideRole: "码头调停人",
+      guidePublicImage: "林澈握着潮汐账本，能让船工先坐下来。",
+      guideShortTermGoal: "让维修时间表先被所有人承认。",
+      guideSecret: "林澈知道备用灯芯发票藏在哪里。",
       pressureNpcName: "黑帆船长",
+      pressureNpcRole: "走私船队领袖",
+      pressureNpcPublicImage: "黑帆船长把封航说成保护港口的唯一办法。",
+      pressureNpcShortTermGoal: "控制旧灯塔机房并拖慢维修。",
+      pressureNpcSecret: "黑帆船长提前换走了备用灯芯。",
       allyFactionName: "码头互助会",
       pressureFactionName: "黑帆承包队",
       allyFactionPublicGoal: "公开修复灯塔并保护船工证词。",
@@ -79,7 +87,10 @@ describe("creator scenario draft preview", () => {
       {
         title: "NPC",
         count: 2,
-        items: ["林澈", "黑帆船长"],
+        items: [
+          "林澈：码头调停人；公开：林澈握着潮汐账本，能让船工先坐下来。；目标：让维修时间表先被所有人承认。；秘密：林澈知道备用灯芯发票藏在哪里。",
+          "黑帆船长：走私船队领袖；公开：黑帆船长把封航说成保护港口的唯一办法。；目标：控制旧灯塔机房并拖慢维修。；秘密：黑帆船长提前换走了备用灯芯。",
+        ],
       },
       {
         title: "阵营",

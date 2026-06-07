@@ -1237,12 +1237,88 @@ const CreatorScenarioImportPanel = ({
         />
       </label>
       <label className="creator-field">
+        <span>关键 NPC 身份</span>
+        <input
+          value={draft.guideRole}
+          disabled={disabled}
+          onChange={(event) => onDraftChange("guideRole", event.target.value)}
+        />
+      </label>
+      <label className="creator-field wide">
+        <span>关键 NPC 公开形象</span>
+        <textarea
+          value={draft.guidePublicImage}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("guidePublicImage", event.target.value)
+          }
+        />
+      </label>
+      <label className="creator-field wide">
+        <span>关键 NPC 目标</span>
+        <textarea
+          value={draft.guideShortTermGoal}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("guideShortTermGoal", event.target.value)
+          }
+        />
+      </label>
+      <label className="creator-field wide">
+        <span>关键 NPC 秘密</span>
+        <textarea
+          value={draft.guideSecret}
+          disabled={disabled}
+          onChange={(event) => onDraftChange("guideSecret", event.target.value)}
+        />
+      </label>
+      <label className="creator-field">
         <span>对手 NPC</span>
         <input
           value={draft.pressureNpcName}
           disabled={disabled}
           onChange={(event) =>
             onDraftChange("pressureNpcName", event.target.value)
+          }
+        />
+      </label>
+      <label className="creator-field">
+        <span>对手 NPC 身份</span>
+        <input
+          value={draft.pressureNpcRole}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("pressureNpcRole", event.target.value)
+          }
+        />
+      </label>
+      <label className="creator-field wide">
+        <span>对手 NPC 公开形象</span>
+        <textarea
+          value={draft.pressureNpcPublicImage}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("pressureNpcPublicImage", event.target.value)
+          }
+        />
+      </label>
+      <label className="creator-field wide">
+        <span>对手 NPC 目标</span>
+        <textarea
+          value={draft.pressureNpcShortTermGoal}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("pressureNpcShortTermGoal", event.target.value)
+          }
+        />
+      </label>
+      <label className="creator-field wide">
+        <span>对手 NPC 秘密</span>
+        <textarea
+          value={draft.pressureNpcSecret}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("pressureNpcSecret", event.target.value)
           }
         />
       </label>

@@ -4,6 +4,17 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added tested editable NPC profile fields for creator quick drafts. The GUI now shows `关键 NPC 身份`, `关键 NPC 公开形象`, `关键 NPC 目标`, `关键 NPC 秘密`, `对手 NPC 身份`, `对手 NPC 公开形象`, `对手 NPC 目标`, and `对手 NPC 秘密`; generated drafts preserve those values in `WorldState.characters`; imported creator packages keep them; and the preview NPC section displays `NPC 名：身份；公开：形象；目标：目标；秘密：秘密`.
+- Captured a runtime screenshot showing the editable NPC profile controls and NPC preview:
+
+![Creator editable NPC profiles](screenshots/creator-npc-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- packages/shared/src/creatorScenarioDraft.test.ts apps/web/src/creatorScenarioPreview.test.ts packages/content/src/creatorScenario.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added tested editable location descriptions, public facts, hidden facts, and danger levels for creator quick drafts. The GUI now shows `起始地点描述`, `起始地点公开信息`, `起始地点隐藏信息`, `起始地点危险`, `冲突地点描述`, `冲突地点公开信息`, `冲突地点隐藏信息`, and `冲突地点危险`; generated drafts preserve those values in `WorldState.locations`; imported creator packages keep them; and the preview location section displays `地点名：描述；公开：信息；隐藏：信息；危险：等级`.
 - Captured a runtime screenshot showing the editable location controls and location preview:
 

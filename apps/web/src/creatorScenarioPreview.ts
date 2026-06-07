@@ -64,7 +64,10 @@ export const buildCreatorDraftPreview = (
     (location) =>
       `${location.name}：${location.description}；公开：${listSummary(location.publicInfo)}；隐藏：${listSummary(location.hiddenInfo)}；危险：${location.dangerLevel}`,
   );
-  const characters = namedValues(draft.world.characters);
+  const characters = Object.values(draft.world.characters).map(
+    (character) =>
+      `${character.name}：${character.role}；公开：${character.publicImage}；目标：${character.shortTermGoal}；秘密：${character.secret}`,
+  );
   const factions = Object.values(draft.world.factions).map(
     (faction) =>
       `${faction.name}：${faction.publicGoal}；计划：${faction.currentPlan}；资源：${resourceSummary(faction.resources)}`,
