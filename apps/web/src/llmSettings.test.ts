@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   applyLlmProviderPreset,
+  buildLlmRuntimeSummary,
   clearLlmSettings,
   detectLlmProviderPresetId,
   llmProviderPresets,
@@ -156,5 +157,45 @@ describe("LLM settings persistence", () => {
     expect(status.message).toContain("[API_KEY_REDACTED]");
     expect(status.message).not.toContain(secret);
     expect(redactLlmSecrets("safe")).toBe("safe");
+  });
+
+  it("builds a non-secret runtime summary for the in-game settings panel", () => {
+    const secret = ["sk", "deepseekLocalOnly123"].join("-");
+
+    expect(
+      buildLlmRuntimeSummary(
+        {
+          baseUrl: "https://api.deepseek.com/",
+          model: "deepseek-v4-pro",
+          apiKey: secret,
+          timeoutMs: 30000,
+          maxTokens: 4096,
+        },
+        true,
+      ),
+    ).toEqual({
+      providerLabel: "DeepSeek",
+      endpointLabel: "https://api.deepseek.com",
+      modelLabel: "deepseek-v4-pro",
+      secretLabel: "密钥已在本地配置",
+      budgetLabel: "30 秒 / 4096 Token",
+      savedLabel: "已保存",
+    });
+
+    const customSummary = buildLlmRuntimeSummary(
+      {
+        baseUrl: "http://localhost:11434/v1",
+        model: "local-story-model",
+        apiKey: "",
+        timeoutMs: 15000,
+        maxTokens: 2048,
+      },
+      false,
+    );
+
+    expect(customSummary.providerLabel).toBe("本地兼容");
+    expect(customSummary.secretLabel).toBe("未配置密钥");
+    expect(customSummary.savedLabel).toBe("有未保存更改");
+    expect(JSON.stringify(customSummary)).not.toContain(secret);
   });
 });

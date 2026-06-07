@@ -4,6 +4,17 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added a tested non-secret LLM runtime summary for the in-game settings panel. The GUI now shows the active provider, model, endpoint, timeout/token budget, save state, and whether a local API key is configured without ever rendering the key value.
+- Captured a runtime screenshot showing the DeepSeek-compatible configuration summary in the Chinese game UI:
+
+![LLM runtime summary](screenshots/llm-runtime-summary-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- apps/web/src/llmSettings.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added tested local history for freeform player actions. Successful custom actions are saved in browser storage as a normalized, deduplicated, five-item recent list; the GUI shows `最近自由行动` chips that can refill the textarea and rebuild intent/risk/target preview without letting prose bypass the referee.
 - Captured a runtime screenshot showing two saved freeform actions, one clicked back into the composer, and the rebuilt preview chips:
 

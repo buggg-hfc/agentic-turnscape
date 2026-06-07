@@ -19,6 +19,14 @@ export type LlmProviderPreset = {
   timeoutMs: number;
   maxTokens: number;
 };
+export type LlmRuntimeSummary = {
+  providerLabel: string;
+  endpointLabel: string;
+  modelLabel: string;
+  secretLabel: string;
+  budgetLabel: string;
+  savedLabel: string;
+};
 
 const defaultLlmProviderPreset: LlmProviderPreset = {
   id: "openai",
@@ -100,6 +108,29 @@ export const detectLlmProviderPresetId = (
       candidate.maxTokens === sanitized.maxTokens,
   );
   return preset?.id ?? "";
+};
+
+const localEndpointPattern = /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(?::\d+)?(?:\/|$)/i;
+
+export const buildLlmRuntimeSummary = (
+  settings: LlmConfig,
+  saved: boolean,
+): LlmRuntimeSummary => {
+  const sanitized = sanitizeLlmSettings(settings);
+  const presetId = detectLlmProviderPresetId(sanitized);
+  const preset = llmProviderPresets.find((candidate) => candidate.id === presetId);
+  const providerLabel =
+    preset?.label ??
+    (localEndpointPattern.test(sanitized.baseUrl) ? "本地兼容" : "自定义配置");
+
+  return {
+    providerLabel,
+    endpointLabel: sanitized.baseUrl,
+    modelLabel: sanitized.model,
+    secretLabel: sanitized.apiKey ? "密钥已在本地配置" : "未配置密钥",
+    budgetLabel: `${Math.max(1, Math.round(sanitized.timeoutMs / 1000))} 秒 / ${sanitized.maxTokens} Token`,
+    savedLabel: saved ? "已保存" : "有未保存更改",
+  };
 };
 
 export const loadLlmSettings = (storage: StorageLike | undefined = getBrowserStorage()): LlmConfig => {

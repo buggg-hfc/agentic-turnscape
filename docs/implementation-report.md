@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - LLM Runtime Summary
+
+### Scope
+
+- Added TDD coverage proving the in-game LLM settings layer can build a non-secret runtime summary for the current turn configuration.
+- The summary identifies DeepSeek, local-compatible, or custom settings, displays endpoint/model/runtime budget, and reports only whether a local API key exists.
+- The Chinese GUI now shows `本回合配置`, `模型`, `接口`, `密钥`, `预算`, and `状态` inside the LLM settings panel so players can confirm the active model before running a turn without exposing secrets.
+
+### Runtime Screenshot
+
+![LLM runtime summary](screenshots/llm-runtime-summary-runtime-2026-06-08.png)
+
+The screenshot was captured from a local Border Seven Days runtime session after loading a browser-local DeepSeek-compatible configuration with a fake local key, starting the campaign, and verifying the summary showed provider, model, endpoint, budget, and `密钥已在本地配置` without revealing the key.
+
+### Verification
+
+```bash
+npm test -- apps/web/src/llmSettings.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - Freeform Action History
 
 ### Scope

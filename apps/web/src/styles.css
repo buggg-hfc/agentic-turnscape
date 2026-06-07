@@ -1190,6 +1190,40 @@ meter {
   background: transparent;
 }
 
+.llm-runtime-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+  margin-top: 10px;
+}
+
+.llm-runtime-summary > div {
+  min-width: 0;
+  border: 1px solid rgba(103, 160, 143, 0.22);
+  border-radius: 8px;
+  padding: 7px 8px;
+  background: rgba(103, 160, 143, 0.08);
+}
+
+.llm-runtime-summary span,
+.llm-runtime-summary strong {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.llm-runtime-summary span {
+  color: #8fa29b;
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.llm-runtime-summary strong {
+  margin-top: 2px;
+  color: #eef2ee;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
 .settings-actions {
   display: flex;
   align-items: center;

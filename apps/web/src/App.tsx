@@ -70,6 +70,7 @@ import {
 } from "./freeformAction.js";
 import {
   applyLlmProviderPreset,
+  buildLlmRuntimeSummary,
   clearLlmSettings,
   detectLlmProviderPresetId,
   llmConnectionErrorStatus,
@@ -2162,6 +2163,7 @@ const LlmSettingsPanel = ({
   const detectedProviderPreset = llmProviderPresets.find(
     (preset) => preset.id === detectedProviderPresetId,
   );
+  const runtimeSummary = buildLlmRuntimeSummary(settings, saved);
 
   return (
   <section className="module">
@@ -2254,6 +2256,32 @@ const LlmSettingsPanel = ({
           }
         />
       </label>
+    </div>
+    <div className="llm-runtime-summary" aria-label="LLM 运行摘要">
+      <div>
+        <span>本回合配置</span>
+        <strong>{runtimeSummary.providerLabel}</strong>
+      </div>
+      <div>
+        <span>模型</span>
+        <strong>{runtimeSummary.modelLabel}</strong>
+      </div>
+      <div>
+        <span>接口</span>
+        <strong>{runtimeSummary.endpointLabel}</strong>
+      </div>
+      <div>
+        <span>密钥</span>
+        <strong>{runtimeSummary.secretLabel}</strong>
+      </div>
+      <div>
+        <span>预算</span>
+        <strong>{runtimeSummary.budgetLabel}</strong>
+      </div>
+      <div>
+        <span>状态</span>
+        <strong>{runtimeSummary.savedLabel}</strong>
+      </div>
     </div>
     <div className="settings-actions">
       <button className="secondary-button" onClick={onSave}>

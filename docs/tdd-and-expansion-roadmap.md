@@ -31,6 +31,7 @@ For gameplay work, tests should prove the rule invariant rather than a single lu
 
 ## Verified Slices
 
+- LLM settings now show a tested non-secret runtime summary in the Chinese GUI: provider, model, endpoint, timeout/token budget, save state, and local-key presence are visible before a turn runs, while the key value stays out of rendered text and game state.
 - Freeform player actions now keep tested local history: recent custom submissions are normalized, deduplicated, browser-persisted, visible as refill chips in the GUI, and still adjudicated only through the referee pipeline.
 - LLM provider presets now stay visible after selection: matching public settings select OpenAI, DeepSeek, or local-compatible automatically, while custom combinations fall back to custom configuration and API keys remain ignored by detection.
 - LLM settings now have tested provider presets in the Chinese GUI: OpenAI, DeepSeek, and local OpenAI-compatible presets populate endpoint/model/runtime fields while preserving the browser-local API key and keeping secrets out of world state.
