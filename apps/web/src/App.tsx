@@ -1045,6 +1045,16 @@ const CreatorScenarioImportPanel = ({
         />
       </label>
       <label className="creator-field">
+        <span>冲突地点</span>
+        <input
+          value={draft.pressureLocationName}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("pressureLocationName", event.target.value)
+          }
+        />
+      </label>
+      <label className="creator-field">
         <span>危机钟</span>
         <input
           value={draft.crisisName}

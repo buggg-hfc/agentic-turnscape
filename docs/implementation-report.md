@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Creator Editable Pressure Location
+
+### Scope
+
+- Added TDD coverage proving creator quick drafts can name the second/conflict location explicitly instead of deriving only `${crisisName}现场`.
+- Extended `CreatorScenarioDraftInput` with `pressureLocationName`; generated worlds, preview outlines, action descriptions, scene names, and imported creator packages now preserve that authored location name.
+- The creator GUI now exposes a Chinese `冲突地点` field between `起始地点` and `危机钟`, giving the quick-create path a clearer two-location scenario editor.
+
+### Runtime Screenshot
+
+![Creator editable pressure location](screenshots/creator-pressure-location-runtime-2026-06-08.png)
+
+The screenshot was captured from a local runtime session after opening the scenario selection screen and verifying the creator panel showed `冲突地点`, default `危机现场`, and the preview location list included the authored conflict location name.
+
+### Verification
+
+```bash
+npm test -- packages/shared/src/creatorScenarioDraft.test.ts apps/web/src/creatorScenarioPreview.test.ts packages/content/src/creatorScenario.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - Creator Editable Pressure NPC
 
 ### Scope

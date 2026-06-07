@@ -4,6 +4,17 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added a tested editable pressure location field for creator quick drafts. The GUI now shows `冲突地点`, generated worlds preserve `pressureLocationName`, and imported creator packages expose the authored conflict location in their world state.
+- Captured a runtime screenshot showing the editable conflict location field and preview location list:
+
+![Creator editable pressure location](screenshots/creator-pressure-location-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- packages/shared/src/creatorScenarioDraft.test.ts apps/web/src/creatorScenarioPreview.test.ts packages/content/src/creatorScenario.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added a tested editable pressure NPC field for creator quick drafts. The GUI now shows `对手 NPC`, generated worlds preserve `pressureNpcName`, and imported creator packages expose the authored opposing NPC name in their world state.
 - Captured a runtime screenshot showing the editable pressure NPC field and preview NPC list:
 

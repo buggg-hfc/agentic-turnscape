@@ -6,6 +6,7 @@ export type CreatorScenarioDraftInput = {
   premise: string;
   playerName: string;
   startLocationName: string;
+  pressureLocationName: string;
   crisisName: string;
   guideName: string;
   pressureNpcName: string;
@@ -55,6 +56,7 @@ export const defaultCreatorScenarioDraftInput: CreatorScenarioDraftInput = {
   premise: "一个小镇在三天内必须处理突然爆发的危机。",
   playerName: "调查者",
   startLocationName: "临时指挥所",
+  pressureLocationName: "危机现场",
   crisisName: "局势失控",
   guideName: "向导",
   pressureNpcName: "施压代表",
@@ -94,6 +96,10 @@ export const buildCreatorScenarioDraft = (
   const startLocationName = textOr(
     input.startLocationName,
     defaultCreatorScenarioDraftInput.startLocationName,
+  );
+  const pressureLocationName = textOr(
+    input.pressureLocationName,
+    defaultCreatorScenarioDraftInput.pressureLocationName,
   );
   const crisisName = textOr(
     input.crisisName,
@@ -189,13 +195,13 @@ export const buildCreatorScenarioDraft = (
       },
       [pressureLocationId]: {
         id: pressureLocationId,
-        name: `${crisisName}现场`,
-        description: `${crisisName}的迹象集中在这里，任何迟疑都会让${pressureFactionName}取得主动。`,
+        name: pressureLocationName,
+        description: `${pressureLocationName}聚集着${crisisName}的迹象，任何迟疑都会让${pressureFactionName}取得主动。`,
         publicInfo: [
           `${allyFactionName}需要玩家带回可公开说明的证据。`,
           `${pressureFactionName}正在催促人群做出仓促选择。`,
         ],
-        hiddenInfo: [`真正的转折点藏在${crisisName}现场的证据链里。`],
+        hiddenInfo: [`真正的转折点藏在${pressureLocationName}的证据链里。`],
         tags: ["creator", "pressure"],
         dangerLevel: 3,
       },
@@ -403,7 +409,7 @@ export const buildCreatorScenarioDraft = (
       },
       {
         id: combatSceneId,
-        name: `${crisisName}冲突`,
+        name: `${pressureLocationName}冲突`,
         kind: "combat",
         day: 2,
         locationId: pressureLocationId,
@@ -440,7 +446,7 @@ export const buildCreatorScenarioDraft = (
         id: `${prefix}_secondary_action`,
         actionType: "investigate",
         label: secondaryActionLabel,
-        description: `前往${pressureLocationId === startLocationId ? startLocationName : `${crisisName}现场`}寻找证据，阻止${pressureFactionName}独占解释权。`,
+        description: `前往${pressureLocationName}寻找证据，阻止${pressureFactionName}独占解释权。`,
         targetId: pressureLocationId,
         leverage: [
           `scenario:${id}`,

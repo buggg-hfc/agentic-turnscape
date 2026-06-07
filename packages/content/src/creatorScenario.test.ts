@@ -125,6 +125,7 @@ describe("creator scenario import", () => {
         premise: "封锁线外的伤员突然涌入，镇民要求一个公开答案。",
         playerName: "临时镇医",
         startLocationName: "临时诊所",
+        pressureLocationName: "封锁哨卡",
         crisisName: "伤员潮",
         guideName: "米娜",
         pressureNpcName: "赫然队长",
@@ -140,6 +141,7 @@ describe("creator scenario import", () => {
     expect(scenario.id).toBe("clinic-gui-draft");
     expect(scenario.counts).toEqual({ combat: 1, social: 1, endings: 2 });
     expect(world.player.name).toBe("临时镇医");
+    expect(Object.values(world.locations).map((location) => location.name)).toContain("封锁哨卡");
     expect(Object.values(world.characters).map((npc) => npc.name)).toContain("赫然队长");
     expect(scenario.getDayPlan(1)?.mainEvent).toContain("封锁线外");
     expect(scenario.getActions(world).map((action) => action.label)).toEqual([

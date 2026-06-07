@@ -22,6 +22,7 @@ describe("creator scenario draft builder", () => {
       premise: "旧城区的雨声里混入了失踪者的敲门声。",
       playerName: "临时调查员",
       startLocationName: "长明巷口",
+      pressureLocationName: "旧仓库雨棚",
       crisisName: "雨声怨念",
       guideName: "林姐",
       pressureNpcName: "周队",
@@ -41,6 +42,9 @@ describe("creator scenario draft builder", () => {
     );
     expect(Object.values(draft.world.characters).map((npc) => npc.name)).toEqual(
       expect.arrayContaining(["林姐", "周队"]),
+    );
+    expect(Object.values(draft.world.locations).map((location) => location.name)).toEqual(
+      expect.arrayContaining(["长明巷口", "旧仓库雨棚"]),
     );
     expect(draft.days).toEqual(
       expect.arrayContaining([

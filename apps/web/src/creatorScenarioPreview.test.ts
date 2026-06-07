@@ -9,6 +9,7 @@ describe("creator scenario draft preview", () => {
       premise: "风暴夜后，港务厅和走私者都想控制唯一的灯塔。",
       playerName: "临时调停人",
       startLocationName: "潮汐议事厅",
+      pressureLocationName: "旧灯塔机房",
       crisisName: "灯塔停摆",
       guideName: "林澈",
       pressureNpcName: "黑帆船长",
@@ -28,7 +29,7 @@ describe("creator scenario draft preview", () => {
       {
         title: "地点",
         count: 2,
-        items: ["潮汐议事厅", "灯塔停摆现场"],
+        items: ["潮汐议事厅", "旧灯塔机房"],
       },
       {
         title: "NPC",
