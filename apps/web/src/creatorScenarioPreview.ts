@@ -26,7 +26,9 @@ export const buildCreatorDraftPreview = (
   const locations = namedValues(draft.world.locations);
   const characters = namedValues(draft.world.characters);
   const factions = namedValues(draft.world.factions);
-  const clocks = namedValues(draft.world.clocks);
+  const clocks = Object.values(draft.world.clocks).map(
+    (clock) => `${clock.name} ${clock.progress}/${clock.max}`,
+  );
   const actions = draft.actions.map((action) => action.label);
   const endings = draft.endings.map(
     (ending) => `${ending.title}：${ending.summary}`,

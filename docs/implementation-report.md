@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Creator Editable Crisis Clock Values
+
+### Scope
+
+- Added TDD coverage proving creator quick drafts can set the crisis clock's initial progress and maximum value from GUI-backed fields.
+- Extended `CreatorScenarioDraftInput` with `crisisInitialProgress` and `crisisMax`; generated worlds and imported creator packages now preserve those values on the pressure crisis clock.
+- The creator GUI now exposes Chinese `危机初始值` and `危机上限` number inputs, and the preview crisis-clock section displays `当前/上限` values before import.
+
+### Runtime Screenshot
+
+![Creator editable crisis clock values](screenshots/creator-crisis-clock-values-runtime-2026-06-08.png)
+
+The screenshot was captured from a local runtime session after opening the scenario selection screen and verifying the creator panel showed both crisis clock number fields and the preview clock list reflected the authored `2/6` pressure clock.
+
+### Verification
+
+```bash
+npm test -- packages/shared/src/creatorScenarioDraft.test.ts apps/web/src/creatorScenarioPreview.test.ts packages/content/src/creatorScenario.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - Creator Editable Ending Summaries
 
 ### Scope

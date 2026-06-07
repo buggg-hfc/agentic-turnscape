@@ -11,6 +11,8 @@ describe("creator scenario draft preview", () => {
       startLocationName: "潮汐议事厅",
       pressureLocationName: "旧灯塔机房",
       crisisName: "灯塔停摆",
+      crisisInitialProgress: 2,
+      crisisMax: 6,
       guideName: "林澈",
       pressureNpcName: "黑帆船长",
       allyFactionName: "码头互助会",
@@ -48,7 +50,7 @@ describe("creator scenario draft preview", () => {
       {
         title: "危机钟",
         count: 2,
-        items: ["港口试作稳定度", "灯塔停摆"],
+        items: ["港口试作稳定度 0/4", "灯塔停摆 2/6"],
       },
       {
         title: "行动",

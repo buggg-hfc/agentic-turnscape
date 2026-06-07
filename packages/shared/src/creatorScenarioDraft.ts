@@ -8,6 +8,8 @@ export type CreatorScenarioDraftInput = {
   startLocationName: string;
   pressureLocationName: string;
   crisisName: string;
+  crisisInitialProgress: number;
+  crisisMax: number;
   guideName: string;
   pressureNpcName: string;
   allyFactionName: string;
@@ -62,6 +64,8 @@ export const defaultCreatorScenarioDraftInput: CreatorScenarioDraftInput = {
   startLocationName: "临时指挥所",
   pressureLocationName: "危机现场",
   crisisName: "局势失控",
+  crisisInitialProgress: 0,
+  crisisMax: 4,
   guideName: "向导",
   pressureNpcName: "施压代表",
   allyFactionName: "本地互助会",
@@ -90,6 +94,17 @@ const textOr = (value: string, fallback: string) => {
   return trimmed.length > 0 ? trimmed : fallback;
 };
 
+const boundedInt = (
+  value: number,
+  fallback: number,
+  min: number,
+  max?: number,
+) => {
+  const integer = Number.isFinite(value) ? Math.trunc(value) : fallback;
+  const lowerBounded = Math.max(min, integer);
+  return max === undefined ? lowerBounded : Math.min(max, lowerBounded);
+};
+
 export const buildCreatorScenarioDraft = (
   input: CreatorScenarioDraftInput,
 ): CreatorScenarioDraft => {
@@ -112,6 +127,17 @@ export const buildCreatorScenarioDraft = (
   const crisisName = textOr(
     input.crisisName,
     defaultCreatorScenarioDraftInput.crisisName,
+  );
+  const crisisMax = boundedInt(
+    input.crisisMax,
+    defaultCreatorScenarioDraftInput.crisisMax,
+    1,
+  );
+  const crisisInitialProgress = boundedInt(
+    input.crisisInitialProgress,
+    defaultCreatorScenarioDraftInput.crisisInitialProgress,
+    0,
+    crisisMax,
   );
   const guideName = textOr(
     input.guideName,
@@ -372,8 +398,8 @@ export const buildCreatorScenarioDraft = (
       [pressureClockId]: {
         id: pressureClockId,
         name: crisisName,
-        progress: 0,
-        max: 4,
+        progress: crisisInitialProgress,
+        max: crisisMax,
         consequence: `${crisisName}满格时，施压阵营会夺取局势解释权。`,
         visible: true,
       },

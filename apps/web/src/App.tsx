@@ -281,9 +281,9 @@ export const App = () => {
     }
   };
 
-  const updateCreatorDraftField = (
-    field: keyof CreatorScenarioDraftInput,
-    value: string,
+  const updateCreatorDraftField = <K extends keyof CreatorScenarioDraftInput>(
+    field: K,
+    value: CreatorScenarioDraftInput[K],
   ) => {
     setCreatorDraft((current) => ({ ...current, [field]: value }));
   };
@@ -989,7 +989,10 @@ const CreatorScenarioImportPanel = ({
   savedScenarios: SavedCreatorScenarioSummary[];
   disabled: boolean;
   onChange: (value: string) => void;
-  onDraftChange: (field: keyof CreatorScenarioDraftInput, value: string) => void;
+  onDraftChange: <K extends keyof CreatorScenarioDraftInput>(
+    field: K,
+    value: CreatorScenarioDraftInput[K],
+  ) => void;
   onGenerateDraft: () => void;
   onImportDraft: () => void;
   onImport: () => void;
@@ -1060,6 +1063,33 @@ const CreatorScenarioImportPanel = ({
           value={draft.crisisName}
           disabled={disabled}
           onChange={(event) => onDraftChange("crisisName", event.target.value)}
+        />
+      </label>
+      <label className="creator-field">
+        <span>危机初始值</span>
+        <input
+          type="number"
+          min={0}
+          value={draft.crisisInitialProgress}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange(
+              "crisisInitialProgress",
+              Number.parseInt(event.target.value, 10),
+            )
+          }
+        />
+      </label>
+      <label className="creator-field">
+        <span>危机上限</span>
+        <input
+          type="number"
+          min={1}
+          value={draft.crisisMax}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("crisisMax", Number.parseInt(event.target.value, 10))
+          }
         />
       </label>
       <label className="creator-field">

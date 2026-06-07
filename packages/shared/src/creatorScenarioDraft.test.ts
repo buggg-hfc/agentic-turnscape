@@ -24,6 +24,8 @@ describe("creator scenario draft builder", () => {
       startLocationName: "长明巷口",
       pressureLocationName: "旧仓库雨棚",
       crisisName: "雨声怨念",
+      crisisInitialProgress: 2,
+      crisisMax: 6,
       guideName: "林姐",
       pressureNpcName: "周队",
       allyFactionName: "街坊互助会",
@@ -50,6 +52,10 @@ describe("creator scenario draft builder", () => {
     expect(Object.values(draft.world.locations).map((location) => location.name)).toEqual(
       expect.arrayContaining(["长明巷口", "旧仓库雨棚"]),
     );
+    const pressureClock = Object.values(draft.world.clocks).find(
+      (clock) => clock.name === "雨声怨念",
+    );
+    expect(pressureClock).toMatchObject({ progress: 2, max: 6 });
     expect(draft.days).toEqual(
       expect.arrayContaining([
         expect.objectContaining({

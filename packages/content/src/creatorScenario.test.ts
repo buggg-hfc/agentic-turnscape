@@ -127,6 +127,8 @@ describe("creator scenario import", () => {
         startLocationName: "临时诊所",
         pressureLocationName: "封锁哨卡",
         crisisName: "伤员潮",
+        crisisInitialProgress: 1,
+        crisisMax: 5,
         guideName: "米娜",
         pressureNpcName: "赫然队长",
         allyFactionName: "志愿护理队",
@@ -149,6 +151,10 @@ describe("creator scenario import", () => {
     expect(world.player.name).toBe("临时镇医");
     expect(Object.values(world.locations).map((location) => location.name)).toContain("封锁哨卡");
     expect(Object.values(world.characters).map((npc) => npc.name)).toContain("赫然队长");
+    const importedPressureClock = Object.values(world.clocks).find(
+      (clock) => clock.name === "伤员潮",
+    );
+    expect(importedPressureClock).toMatchObject({ progress: 1, max: 5 });
     expect(scenario.getDayPlan(1)?.mainEvent).toContain("封锁线外");
     expect(scenario.getActions(world).map((action) => action.label)).toEqual([
       "稳定分诊",
