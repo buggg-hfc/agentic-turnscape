@@ -82,6 +82,10 @@ import {
   type SavedCreatorScenarioSummary,
 } from "./scenarioImport.js";
 import {
+  buildCreatorDraftPreview,
+  type CreatorDraftPreview,
+} from "./creatorScenarioPreview.js";
+import {
   buildScenarioSelection,
   type ScenarioOption,
 } from "./scenarioSelection.js";
@@ -934,6 +938,37 @@ const ScenarioPicker = ({
   </div>
 );
 
+const CreatorDraftPreviewPanel = ({
+  preview,
+}: {
+  preview: CreatorDraftPreview;
+}) => (
+  <div className="creator-preview" aria-label="创作者草稿大纲">
+    <div className="creator-preview-header">
+      <div>
+        <h4>{preview.title}</h4>
+        <span>{preview.scenarioId}</span>
+      </div>
+      <strong>{preview.summary}</strong>
+    </div>
+    <div className="creator-preview-grid">
+      {preview.sections.map((section) => (
+        <div className="creator-preview-section" key={section.title}>
+          <div>
+            <span>{section.title}</span>
+            <strong>{section.count}</strong>
+          </div>
+          <ul>
+            {section.items.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
 const CreatorScenarioImportPanel = ({
   value,
   status,
@@ -1066,6 +1101,7 @@ const CreatorScenarioImportPanel = ({
         />
       </label>
     </div>
+    <CreatorDraftPreviewPanel preview={buildCreatorDraftPreview(draft)} />
     <div className="creator-draft-actions">
       <button
         className="secondary-button"

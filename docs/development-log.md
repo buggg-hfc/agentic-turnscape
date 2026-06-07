@@ -2,6 +2,20 @@
 
 This log records tested implementation slices as the project moves from the Border Seven Days MVP toward the full game. Each entry should name the behavior that changed and the verification gate used before publishing.
 
+## 2026-06-08
+
+- Added a tested creator draft outline preview. The web GUI now summarizes the generated creator scenario before import, including days, scenes, locations, NPCs, factions, crisis clocks, actions, and endings.
+- Captured a runtime screenshot showing the Chinese creator outline on the scenario selection screen:
+
+![Creator draft outline preview](screenshots/creator-draft-outline-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- apps/web/src/creatorScenarioPreview.test.ts apps/web/src/scenarioImport.test.ts --reporter=dot`
+  - `npm run typecheck -w apps/web`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 ## 2026-06-07
 
 - Added tested Chinese source/API campaign arc text for Border Seven Days. The Campaign Arc panel now receives `边境危机`, `边境余波`, and `裂隙战线` from scenario metadata instead of rendering the previous English chapter titles.

@@ -60,6 +60,7 @@ For gameplay work, tests should prove the rule invariant rather than a single lu
 - Player freedom now has a tested freeform action path. The web GUI converts arbitrary player text into a `custom` action, previews inferred Chinese intent/risk/target chips, can submit the typed action directly, the API accepts those tokens, and the referee adjudicates them through deterministic rules without allowing prose to directly mutate state.
 - Freeform referee feedback now has source/API-level Chinese acceptance coverage: public summaries and chronicle records use Chinese success/setback wording, and regression tests reject the old English `Freeform action` / `Player intent` phrases in runtime responses.
 - Creator tooling now has a tested GUI starting point: a Chinese quick-create form generates a schema-valid creator scenario draft, proves it imports through the existing scenario package contract, and keeps the advanced JSON path for precise edits.
+- Creator tooling now also has a tested draft outline preview: the GUI summarizes the generated days, scenes, locations, NPCs, factions, crisis clocks, actions, and endings before import, using the same draft model that export/import will persist.
 
 ## MVP Completion Gate
 

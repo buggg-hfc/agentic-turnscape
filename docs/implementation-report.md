@@ -2,6 +2,30 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Creator Draft Outline Preview
+
+### Scope
+
+- Added a tested `buildCreatorDraftPreview` view model for creator scenario drafts.
+- The creator GUI now renders a Chinese outline before import, summarizing generated days, scenes, locations, NPCs, factions, crisis clocks, actions, and endings.
+- The preview is generated from the same schema-valid draft that will be exported/imported, so it reflects the actual playable scenario structure rather than a separate hand-written summary.
+
+### Runtime Screenshot
+
+![Creator draft outline preview](screenshots/creator-draft-outline-runtime-2026-06-08.png)
+
+The screenshot was captured from a local runtime session after opening the scenario selection screen and verifying the creator preview text contained `地点`, `NPC`, `阵营`, `危机钟`, `行动`, `结局`, and the summary `3 天 / 3 场景 / 2 地点 / 2 NPC / 2 阵营 / 2 行动 / 2 结局`.
+
+### Verification
+
+```bash
+npm test -- apps/web/src/creatorScenarioPreview.test.ts apps/web/src/scenarioImport.test.ts --reporter=dot
+npm run typecheck -w apps/web
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-07 - Border Campaign Arc Chinese Text
 
 ### Scope
