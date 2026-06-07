@@ -71,12 +71,11 @@ describe("chronicle timeline view model", () => {
     expect(buildChronicleTimeline(payload)).toEqual([
       {
         id: "turn-1",
-        title: "Turn 1: Support the clinic cure",
+        title: "第 1 回合：支援诊所治疗",
         body: "The clinic cure effort gains time.",
         detail: "Adele closes the ledger and nods.",
-        meta: "Day 1 · afternoon · clinic",
-        patchSummary: "2 confirmed changes",
-        endingTitle: undefined
+        meta: "第 1 天 · 午后 · 诊所",
+        patchSummary: "2 项已确认变化"
       }
     ]);
   });

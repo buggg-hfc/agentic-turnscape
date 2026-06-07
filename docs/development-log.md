@@ -4,6 +4,11 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-07
 
+- Added a tested player-action display layer. Built-in action cards and replay titles now render Chinese labels/descriptions in the web GUI and chronicle timeline while the original `PlayerAction` payload still goes to the referee unchanged.
+- Captured a runtime screenshot showing localized fixed action cards in an expansion campaign while the freeform composer remains available:
+
+![Localized action cards and chronicle](screenshots/action-cards-chronicle-cn-runtime-2026-06-07.png)
+
 - Added tested long-campaign asset project moves. Ending-inherited assets such as `public_case_archive` now appear as actionable Campaign Moves, are legality-checked by the API, are consumed through referee-owned `StatePatch` records, and update faction fronts plus public chronicle history.
 - Captured a runtime screenshot from a real `guild_case` playthrough after `public_case_archive x1` was inherited and surfaced as `Mobilize public case archive`:
 
@@ -42,6 +47,7 @@ This log records tested implementation slices as the project moves from the Bord
   - `npm test -- apps/web/src/freeformAction.test.ts packages/core/src/core.test.ts apps/api/src/server.test.ts --reporter=dot`
   - `npm test -- apps/web/src/freeformAction.test.ts --reporter=dot`
   - `npm test -- apps/web/src/displayLabels.test.ts apps/web/src/scenarioSelection.test.ts apps/web/src/campaignArcStatus.test.ts --reporter=dot`
+  - `npm test -- apps/web/src/playerActionDisplay.test.ts apps/web/src/chronicle.test.ts apps/web/src/displayLabels.test.ts --reporter=dot`
   - `npm run typecheck`
   - `npm test -- --reporter=dot`
   - `npm run build`

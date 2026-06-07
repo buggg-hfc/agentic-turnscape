@@ -67,6 +67,7 @@ import {
   saveLlmSettings,
   type LlmConnectionStatus,
 } from "./llmSettings.js";
+import { displayPlayerAction } from "./playerActionDisplay.js";
 import {
   formatCreatorScenarioDefinition,
   getSavedCreatorScenarioDefinition,
@@ -624,20 +625,23 @@ export const App = () => {
             <h2>行动</h2>
           </div>
           <div className="action-list">
-            {actions.map((action) => (
-              <button
-                key={`${action.actionType}-${action.label}`}
-                className={
-                  selectedAction?.label === action.label
-                    ? "action-choice selected"
-                    : "action-choice"
-                }
-                onClick={() => setSelectedAction(action)}
-              >
-                <span>{action.label}</span>
-                <small>{action.description}</small>
-              </button>
-            ))}
+            {actions.map((action) => {
+              const visibleAction = displayPlayerAction(action);
+              return (
+                <button
+                  key={action.id ?? `${action.actionType}-${action.label}`}
+                  className={
+                    selectedAction?.label === action.label
+                      ? "action-choice selected"
+                      : "action-choice"
+                  }
+                  onClick={() => setSelectedAction(action)}
+                >
+                  <span>{visibleAction.label}</span>
+                  <small>{visibleAction.description}</small>
+                </button>
+              );
+            })}
           </div>
           <section className="freeform-action-composer">
             <div className="panel-heading compact">

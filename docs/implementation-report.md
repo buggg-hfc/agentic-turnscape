@@ -2,6 +2,30 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-07 - Localized Action Cards and Chronicle Shell
+
+### Scope
+
+- Added a tested `displayPlayerAction` web display layer for built-in Border Seven Days scene actions, long-campaign replay labels, and first-wave expansion action labels.
+- The main GUI action panel now renders localized action card titles and descriptions while still submitting the original `PlayerAction` payload to the referee.
+- The chronicle timeline now uses Chinese turn titles, day/phase/location metadata, and confirmed-change summaries.
+- Added common location ids such as `clinic`, `town_square`, and `black_market` to the shared display-label map.
+
+### Runtime Screenshot
+
+![Localized action cards and chronicle](screenshots/action-cards-chronicle-cn-runtime-2026-06-07.png)
+
+The screenshot was captured from a local runtime session after creating a fresh Frost Lantern Trial campaign and verifying the fixed action cards show Chinese text such as `穿过雾门` and `直面试炼灵` while the freeform composer remains available.
+
+### Verification
+
+```bash
+npm test -- apps/web/src/playerActionDisplay.test.ts apps/web/src/chronicle.test.ts apps/web/src/displayLabels.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-07 - Localized Expansion Scenario Titles
 
 ### Scope
