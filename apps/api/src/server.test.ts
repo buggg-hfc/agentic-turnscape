@@ -222,7 +222,7 @@ describe("campaign turn API", () => {
           chapterNumber: 2,
           currentChapter: {
             id: "border-seven-days_aftermath",
-            title: "Border Aftermath",
+            title: "边境余波",
             unlocks: expect.arrayContaining(["infirmary", "archive"]),
           },
           baseFacilities: expect.arrayContaining(["infirmary", "archive"]),
@@ -647,6 +647,15 @@ describe("campaign turn API", () => {
       title: "边境七日",
       scenarioStatus: {
         sceneCounts: { combat: 5, social: 8, endings: 6 },
+        campaignArc: {
+          chapterCount: 3,
+          chapterNumber: 1,
+          currentChapter: {
+            id: "border-seven-days_crisis",
+            title: "边境危机",
+            focus: "解决七日内的小镇危机，决定哪一方的故事会成为历史。",
+          },
+        },
       },
     });
 

@@ -78,20 +78,20 @@ export const borderSevenDaysPackage: ScenarioPackage = {
     chapters: [
       {
         id: "border-seven-days_crisis",
-        title: "Border Crisis",
-        focus: "Resolve the seven-day town crisis and decide which faction story becomes history.",
+        title: "边境危机",
+        focus: "解决七日内的小镇危机，决定哪一方的故事会成为历史。",
         unlocks: ["missing_caravan", "clinic_conflict", "old_outpost"]
       },
       {
         id: "border-seven-days_aftermath",
-        title: "Border Aftermath",
-        focus: "Turn the ending into a playable base, faction front, and legacy record.",
+        title: "边境余波",
+        focus: "把结局转化为可游玩的基地、阵营战线和遗产记录。",
         unlocks: ["infirmary", "workshop", "archive"]
       },
       {
         id: "border-seven-days_rift_war",
-        title: "Rift War Front",
-        focus: "Carry surviving NPCs and crisis clocks into a wider regional campaign.",
+        title: "裂隙战线",
+        focus: "让幸存角色与危机时钟进入更广阔的边境战役。",
         unlocks: ["frontier_guild", "blackstone_consortium", "rift_cult"]
       }
     ],

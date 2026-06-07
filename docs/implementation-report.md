@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-07 - Border Campaign Arc Chinese Text
+
+### Scope
+
+- Added TDD coverage for Border Seven Days campaign arc chapter text so the MVP scenario no longer exposes English chapter titles or focus copy through content metadata.
+- Localized the three long-campaign arc chapters at source/API level: `边境危机`, `边境余波`, and `裂隙战线`.
+- Updated API expectations for initial campaign creation and chapter-2 progression so the web Campaign Arc panel receives Chinese data without relying on a display-only fallback.
+
+### Runtime Screenshot
+
+![Border campaign arc Chinese panel](screenshots/border-campaign-arc-cn-runtime-2026-06-07.png)
+
+The screenshot was captured from a local runtime session after opening a fresh Border Seven Days campaign and verifying the Campaign Arc panel showed `边境危机` plus Chinese focus text with the previous `Border Crisis` wording absent.
+
+### Verification
+
+```bash
+npm test -- packages/content/src/scenarioRegistry.test.ts apps/api/src/server.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-07 - Chinese Freeform Referee Feedback
 
 ### Scope

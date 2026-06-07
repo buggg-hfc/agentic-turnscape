@@ -2,6 +2,9 @@ import { describe, expect, it } from "vitest";
 import { WorldStateSchema } from "@agentic-turnscape/shared";
 import { createScenarioRegistry, getScenarioPackage, listScenarioPackages, requireScenarioPackage } from "./scenarioRegistry.js";
 
+const hasChinese = /[\u3400-\u9fff]/;
+const oldBorderArcEnglish = /Border Crisis|Border Aftermath|Rift War Front|Resolve the seven-day|playable base|regional campaign/;
+
 describe("scenario package registry", () => {
   it("exposes Border Seven Days through a stable scenario package contract", () => {
     const scenario = requireScenarioPackage("border-seven-days");
@@ -100,6 +103,18 @@ describe("scenario package registry", () => {
           unlocks: expect.any(Array)
         })
       );
+    }
+  });
+
+  it("keeps Border Seven Days campaign arc text Chinese for the GUI and API", () => {
+    const scenario = requireScenarioPackage("border-seven-days");
+    const chapters = scenario.campaignArc?.chapters ?? [];
+
+    expect(chapters).toHaveLength(3);
+    for (const chapter of chapters) {
+      expect(chapter.title, `${chapter.id} title`).toMatch(hasChinese);
+      expect(chapter.focus, `${chapter.id} focus`).toMatch(hasChinese);
+      expect(`${chapter.title} ${chapter.focus}`, chapter.id).not.toMatch(oldBorderArcEnglish);
     }
   });
 
