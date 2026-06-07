@@ -1,9 +1,29 @@
 import { describe, expect, it } from "vitest";
 import {
+  addFreeformActionHistoryEntry,
   buildFreeformActionPreview,
   buildFreeformComposerState,
   buildFreeformPlayerAction,
+  loadFreeformActionHistory,
+  saveFreeformActionHistory,
+  type FreeformActionHistoryStorage,
 } from "./freeformAction.js";
+
+class MemoryStorage implements FreeformActionHistoryStorage {
+  private values = new Map<string, string>();
+
+  getItem(key: string): string | null {
+    return this.values.get(key) ?? null;
+  }
+
+  setItem(key: string, value: string): void {
+    this.values.set(key, value);
+  }
+
+  removeItem(key: string): void {
+    this.values.delete(key);
+  }
+}
 
 describe("freeform action builder", () => {
   it("turns player text into a custom PlayerAction", () => {
@@ -131,5 +151,48 @@ describe("freeform action builder", () => {
       selectDisabled: true,
       directSubmitDisabled: true,
     });
+  });
+
+  it("keeps a deduplicated local history of recent freeform actions", () => {
+    expect(
+      addFreeformActionHistoryEntry(
+        [
+          "调查黑石商会最近买下矿区的账簿。",
+          "护送病人穿过封锁线。",
+        ],
+        "  护送病人穿过封锁线。 ",
+      ),
+    ).toEqual([
+      "护送病人穿过封锁线。",
+      "调查黑石商会最近买下矿区的账簿。",
+    ]);
+
+    expect(
+      addFreeformActionHistoryEntry(
+        ["a", "b", "c", "d", "e"],
+        "f",
+      ),
+    ).toEqual(["f", "a", "b", "c", "d"]);
+  });
+
+  it("persists sanitized freeform action history in local storage", () => {
+    const storage = new MemoryStorage();
+
+    saveFreeformActionHistory(
+      [
+        "  调查目标：东门水塔，寻找瞭望记录。 ",
+        "",
+        "护送病人穿过封锁线。",
+      ],
+      storage,
+    );
+
+    expect(loadFreeformActionHistory(storage)).toEqual([
+      "调查目标：东门水塔，寻找瞭望记录。",
+      "护送病人穿过封锁线。",
+    ]);
+
+    storage.setItem("agentic-turnscape.freeformActionHistory.v1", "{bad json");
+    expect(loadFreeformActionHistory(storage)).toEqual([]);
   });
 });

@@ -729,6 +729,43 @@ button {
   font-weight: 700;
 }
 
+.freeform-action-history {
+  display: grid;
+  gap: 7px;
+  padding-top: 2px;
+}
+
+.freeform-action-history > span {
+  color: #aebbb4;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.freeform-action-history > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.freeform-history-chip {
+  max-width: 100%;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 999px;
+  padding: 5px 8px;
+  background: rgba(255, 255, 255, 0.055);
+  color: #dbe5df;
+  font-size: 0.76rem;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.freeform-history-chip:hover {
+  border-color: rgba(227, 193, 111, 0.46);
+  color: #fff8e0;
+}
+
 .stat-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

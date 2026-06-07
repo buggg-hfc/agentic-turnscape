@@ -61,9 +61,12 @@ import {
 import { displayLabel } from "./displayLabels.js";
 import {
   FREEFORM_ACTION_MAX_LENGTH,
+  addFreeformActionHistoryEntry,
   buildFreeformActionPreview,
   buildFreeformComposerState,
   buildFreeformPlayerAction,
+  loadFreeformActionHistory,
+  saveFreeformActionHistory,
 } from "./freeformAction.js";
 import {
   applyLlmProviderPreset,
@@ -187,6 +190,9 @@ export const App = () => {
     useState<TransparencyMode>("inference");
   const [selectedAction, setSelectedAction] = useState<PlayerAction>();
   const [freeformActionText, setFreeformActionText] = useState("");
+  const [freeformActionHistory, setFreeformActionHistory] = useState<string[]>(
+    () => loadFreeformActionHistory(),
+  );
   const [llmSettings, setLlmSettings] = useState<LlmConfig>(() =>
     loadLlmSettings(),
   );
@@ -500,6 +506,14 @@ export const App = () => {
   const selectedTurnAction =
     selectedAction?.actionType === "custom" ? freeformAction : selectedAction;
 
+  const rememberFreeformAction = (description: string) => {
+    setFreeformActionHistory((current) =>
+      saveFreeformActionHistory(
+        addFreeformActionHistoryEntry(current, description),
+      ),
+    );
+  };
+
   const submitTurn = async (action: PlayerAction) => {
     if (!campaignId) return;
     setLoadState("running");
@@ -534,7 +548,10 @@ export const App = () => {
           setActions(payload.availableActions);
           setSelectedAction(payload.availableActions[0]);
           setLastResolution(payload.lastTurn.resolution);
-          if (action.actionType === "custom") setFreeformActionText("");
+          if (action.actionType === "custom") {
+            rememberFreeformAction(action.description);
+            setFreeformActionText("");
+          }
           setChronicleTimeline(
             buildChronicleTimeline(await api.chronicle(campaignId)),
           );
@@ -791,6 +808,27 @@ export const App = () => {
                 {freeformActionPreview.map((item) => (
                   <span key={item}>{item}</span>
                 ))}
+              </div>
+            ) : null}
+            {freeformActionHistory.length > 0 ? (
+              <div className="freeform-action-history">
+                <span>最近自由行动</span>
+                <div>
+                  {freeformActionHistory.map((entry) => (
+                    <button
+                      key={entry}
+                      className="freeform-history-chip"
+                      disabled={loadState === "running"}
+                      title={entry}
+                      onClick={() => {
+                        setFreeformActionText(entry);
+                        setSelectedAction(undefined);
+                      }}
+                    >
+                      {entry}
+                    </button>
+                  ))}
+                </div>
               </div>
             ) : null}
           </section>

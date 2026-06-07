@@ -4,6 +4,18 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added tested local history for freeform player actions. Successful custom actions are saved in browser storage as a normalized, deduplicated, five-item recent list; the GUI shows `最近自由行动` chips that can refill the textarea and rebuild intent/risk/target preview without letting prose bypass the referee.
+- Captured a runtime screenshot showing two saved freeform actions, one clicked back into the composer, and the rebuilt preview chips:
+
+![Freeform action history runtime](screenshots/freeform-history-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- apps/web/src/freeformAction.test.ts --reporter=dot`
+  - `npm test -- apps/web/src/freeformAction.test.ts apps/web/src/api.test.ts apps/api/src/server.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added tested LLM provider preset detection for the in-game settings panel. The DeepSeek preset now remains visibly selected after it populates the public endpoint/model/runtime fields, custom combinations return to `自定义配置`, and provider descriptions sit in a separate hint line so the right-side GUI stays readable.
 - Captured a runtime screenshot showing the DeepSeek preset selected and its hint visible in the Chinese LLM settings panel:
 

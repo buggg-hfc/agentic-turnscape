@@ -2,6 +2,30 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Freeform Action History
+
+### Scope
+
+- Added TDD coverage proving freeform player actions keep a local recent-history list: entries are normalized, deduplicated, limited to five, persisted in browser storage, and invalid stored data falls back safely.
+- The web GUI now records successful custom/freeform turn submissions into local history, then shows `最近自由行动` chips in the freeform composer.
+- Clicking a history chip fills the freeform text area and rebuilds the intent/risk/target preview, while the referee still owns all actual state changes.
+
+### Runtime Screenshot
+
+![Freeform action history runtime](screenshots/freeform-history-runtime-2026-06-08.png)
+
+The screenshot was captured from a local Border Seven Days runtime session after loading two locally saved freeform actions, clicking the East Gate water tower action, and verifying the textarea plus preview chips were rebuilt from the stored player-authored text.
+
+### Verification
+
+```bash
+npm test -- apps/web/src/freeformAction.test.ts --reporter=dot
+npm test -- apps/web/src/freeformAction.test.ts apps/web/src/api.test.ts apps/api/src/server.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - LLM Preset Detection
 
 ### Scope

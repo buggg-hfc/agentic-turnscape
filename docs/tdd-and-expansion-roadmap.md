@@ -31,6 +31,7 @@ For gameplay work, tests should prove the rule invariant rather than a single lu
 
 ## Verified Slices
 
+- Freeform player actions now keep tested local history: recent custom submissions are normalized, deduplicated, browser-persisted, visible as refill chips in the GUI, and still adjudicated only through the referee pipeline.
 - LLM provider presets now stay visible after selection: matching public settings select OpenAI, DeepSeek, or local-compatible automatically, while custom combinations fall back to custom configuration and API keys remain ignored by detection.
 - LLM settings now have tested provider presets in the Chinese GUI: OpenAI, DeepSeek, and local OpenAI-compatible presets populate endpoint/model/runtime fields while preserving the browser-local API key and keeping secrets out of world state.
 - Runtime creator scenarios can be imported, exported, protected from deletion while campaigns reference them, saved locally in the browser, and restored by the API store after server rebuilds.

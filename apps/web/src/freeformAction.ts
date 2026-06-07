@@ -8,7 +8,14 @@ import type {
 import { displayLabel } from "./displayLabels.js";
 
 export const FREEFORM_ACTION_MAX_LENGTH = 500;
+export const FREEFORM_ACTION_HISTORY_LIMIT = 5;
+export const FREEFORM_ACTION_HISTORY_STORAGE_KEY =
+  "agentic-turnscape.freeformActionHistory.v1";
 type FreeformIntent = Exclude<PlayerAction["actionType"], "custom">;
+export type FreeformActionHistoryStorage = Pick<
+  Storage,
+  "getItem" | "setItem" | "removeItem"
+>;
 export type FreeformTargetContext = {
   locations?: Record<
     string,
@@ -46,6 +53,63 @@ export type FreeformActionAnalysis = {
 
 const normalizeFreeformText = (value: string): string =>
   value.trim().replace(/\s+/g, " ").slice(0, FREEFORM_ACTION_MAX_LENGTH);
+
+const getBrowserStorage = (): FreeformActionHistoryStorage | undefined => {
+  if (typeof window === "undefined") return undefined;
+  return window.localStorage;
+};
+
+export const sanitizeFreeformActionHistory = (value: unknown): string[] => {
+  if (!Array.isArray(value)) return [];
+  const seen = new Set<string>();
+  const entries: string[] = [];
+  for (const item of value) {
+    if (typeof item !== "string") continue;
+    const normalized = normalizeFreeformText(item);
+    if (!normalized || seen.has(normalized)) continue;
+    seen.add(normalized);
+    entries.push(normalized);
+    if (entries.length >= FREEFORM_ACTION_HISTORY_LIMIT) break;
+  }
+  return entries;
+};
+
+export const addFreeformActionHistoryEntry = (
+  history: string[],
+  value: string,
+): string[] => {
+  const normalized = normalizeFreeformText(value);
+  if (!normalized) return sanitizeFreeformActionHistory(history);
+  return sanitizeFreeformActionHistory([
+    normalized,
+    ...history.filter((item) => normalizeFreeformText(item) !== normalized),
+  ]);
+};
+
+export const loadFreeformActionHistory = (
+  storage: FreeformActionHistoryStorage | undefined = getBrowserStorage(),
+): string[] => {
+  if (!storage) return [];
+  const raw = storage.getItem(FREEFORM_ACTION_HISTORY_STORAGE_KEY);
+  if (!raw) return [];
+  try {
+    return sanitizeFreeformActionHistory(JSON.parse(raw));
+  } catch {
+    return [];
+  }
+};
+
+export const saveFreeformActionHistory = (
+  history: string[],
+  storage: FreeformActionHistoryStorage | undefined = getBrowserStorage(),
+): string[] => {
+  const sanitized = sanitizeFreeformActionHistory(history);
+  storage?.setItem(
+    FREEFORM_ACTION_HISTORY_STORAGE_KEY,
+    JSON.stringify(sanitized),
+  );
+  return sanitized;
+};
 
 const shortLabel = (value: string): string => {
   const limit = 34;
