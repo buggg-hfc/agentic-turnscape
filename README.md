@@ -23,6 +23,7 @@ A multi-agent turn-based narrative simulation game. The current implementation i
 - Web dashboard faction-plan panel showing each visible faction's leader, current plan, public clock pressure, and strongest resources.
 - Faction-plan rules now cover advance, blocked, and redirected outcomes for all 3 Border Seven Days factions through referee-owned state patches.
 - First-wave expansion scenario packs for cultivation, science fiction, historical, urban supernatural, and realistic profession play, all using the same tested `ScenarioPackage` contract.
+- The web scenario picker localizes built-in expansion packs and campaign chapter labels into Chinese while preserving internal scenario ids and custom creator titles.
 - Deterministic expansion playthrough tests for all first-wave packs, covering both success and pressure endings with generic scenario clock progression and replayable state patches.
 - Long campaign progression rules for post-MVP expansion: chapter transitions, base facilities, character growth, and faction-war fronts all enter world state through referee-owned patches.
 - Long campaign progression is now available through `POST /campaigns/:id/campaign/progress`, persisted in snapshots/replay records, and surfaced in the web dashboard.

@@ -18,7 +18,7 @@ describe("campaign arc status view model", () => {
     });
   });
 
-  it("summarizes the current chapter, unlocks, base hooks, and faction fronts", () => {
+  it("summarizes the current chapter with Chinese display labels", () => {
     const status = {
       sceneCounts: { combat: 1, social: 1, endings: 2 },
       campaignArc: {
@@ -40,7 +40,7 @@ describe("campaign arc status view model", () => {
 
     expect(buildCampaignArcStatusSummary(status)).toEqual({
       available: true,
-      chapterLabel: "第 1/3 章 · Orbital Quarantine: Opening Crisis",
+      chapterLabel: "第 1/3 章 · 轨道隔离：开局危机",
       focus: "Contain the station signal before quarantine hardens.",
       unlocks: ["orbital-quarantine_signal", "orbital_medbay"],
       baseFacilities: ["medbay", "engineering_bay"],

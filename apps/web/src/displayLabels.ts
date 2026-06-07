@@ -24,6 +24,10 @@ const displayLabels: Record<string, string> = {
   favor: "人情",
   focus: "专注",
   frontier_guild: "边境公会",
+  "frost-lantern-trial": "霜灯试炼",
+  "frost-lantern-trial_opening_arc": "霜灯试炼：外门试炼",
+  "frost-lantern-trial_base_arc": "霜灯试炼：宗门席位",
+  "frost-lantern-trial_front_arc": "霜灯试炼：灰烬战线",
   frost_lantern_sect: "霜灯宗",
   gray_ash_cabal: "灰烬结社",
   guards: "守卫",
@@ -52,17 +56,29 @@ const displayLabels: Record<string, string> = {
   npc_rowan: "罗文",
   old_outpost: "旧哨站",
   omens: "预兆",
+  "orbital-quarantine": "轨道隔离",
+  "orbital-quarantine_opening_arc": "轨道隔离：开局危机",
+  "orbital-quarantine_base_arc": "轨道隔离：行动基地",
+  "orbital-quarantine_front_arc": "轨道隔离：阵营战线",
   orbital_medbay: "轨道医疗舱",
   "orbital-quarantine_allies": "轨道盟友战线",
   "orbital-quarantine_pressure": "轨道隔离压力",
   "orbital-quarantine_signal": "轨道信号",
   pressure: "压力",
   public_case_archive: "公开案卷档案",
+  "rain-alley-haunting": "雨巷异闻",
+  "rain-alley-haunting_opening_arc": "雨巷异闻：开局危机",
+  "rain-alley-haunting_base_arc": "雨巷异闻：行动基地",
+  "rain-alley-haunting_front_arc": "雨巷异闻：阵营战线",
   qi: "灵气",
   quarantine_relief_route: "隔离救援路线",
   relics: "圣物",
   rift_cult: "裂隙教团",
   rift_scar_map: "裂隙伤痕地图",
+  "salt-harbor-accord": "盐港协定",
+  "salt-harbor-accord_opening_arc": "盐港协定：开局危机",
+  "salt-harbor-accord_base_arc": "盐港协定：行动基地",
+  "salt-harbor-accord_front_arc": "盐港协定：阵营战线",
   shelter: "庇护",
   ships: "船只",
   soldiers: "士兵",
@@ -74,10 +90,14 @@ const displayLabels: Record<string, string> = {
   weapons: "武器",
   witnesses: "证人",
   workshop: "工坊",
+  "emergency-ward-night": "急诊夜班",
+  "emergency-ward-night_opening_arc": "急诊夜班：开局危机",
+  "emergency-ward-night_base_arc": "急诊夜班：行动基地",
+  "emergency-ward-night_front_arc": "急诊夜班：阵营战线",
 };
 
-export const displayLabel = (id: string): string =>
-  displayLabels[id] ?? id.replace(/[_-]+/g, " ");
+export const displayLabel = (id: string, fallback?: string): string =>
+  displayLabels[id] ?? fallback ?? id.replace(/[_-]+/g, " ");
 
 export const formatResourceBadge = (id: string, value: number): string =>
   `${displayLabel(id)} ${value}`;

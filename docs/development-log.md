@@ -24,6 +24,11 @@ This log records tested implementation slices as the project moves from the Bord
 
 ![Freeform direct submit](screenshots/freeform-direct-submit-runtime-2026-06-07.png)
 
+- Added tested Chinese display titles for the first-wave expansion scenario cards and campaign chapter labels. Internal scenario ids remain unchanged, while the web picker and arc panel now render titles such as `霜灯试炼`, `轨道隔离`, `盐港协定`, `雨巷异闻`, and `急诊夜班`.
+- Captured a runtime screenshot showing the localized scenario picker without the previous English expansion titles:
+
+![Localized scenario picker](screenshots/localized-scenario-picker-runtime-2026-06-07.png)
+
 - Added a tested in-game LLM connection check. The LLM settings panel now has a Chinese `测试` button that posts the locally configured OpenAI-compatible provider settings to `POST /llm/test`, returns only non-secret status metadata, and shows a clear Chinese success/error status in the GUI.
 - Localized dynamic dashboard labels used by the long-campaign GUI, including campaign action names, scenario arc summaries, inherited resources, faction resources, location ids, character ids, and Agent transparency details.
 - Captured a runtime screenshot showing the LLM connection check panel and missing-key feedback without exposing any API key:
@@ -36,6 +41,7 @@ This log records tested implementation slices as the project moves from the Bord
   - `npm test -- packages/shared/src/schemas.test.ts packages/core/src/core.test.ts apps/api/src/server.test.ts apps/web/src/freeformAction.test.ts --reporter=dot`
   - `npm test -- apps/web/src/freeformAction.test.ts packages/core/src/core.test.ts apps/api/src/server.test.ts --reporter=dot`
   - `npm test -- apps/web/src/freeformAction.test.ts --reporter=dot`
+  - `npm test -- apps/web/src/displayLabels.test.ts apps/web/src/scenarioSelection.test.ts apps/web/src/campaignArcStatus.test.ts --reporter=dot`
   - `npm run typecheck`
   - `npm test -- --reporter=dot`
   - `npm run build`

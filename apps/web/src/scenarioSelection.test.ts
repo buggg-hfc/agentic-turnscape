@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import type { ScenarioCatalogPayload } from "./api.js";
-import { buildScenarioSelection, DEFAULT_SCENARIO_ID, formatScenarioCounts } from "./scenarioSelection.js";
+import {
+  DEFAULT_SCENARIO_ID,
+  buildScenarioSelection,
+  formatScenarioCounts,
+} from "./scenarioSelection.js";
 
 const catalog: ScenarioCatalogPayload = {
   scenarios: [
@@ -11,20 +15,27 @@ const catalog: ScenarioCatalogPayload = {
       campaignArc: {
         chapterCount: 3,
         baseFacilities: ["training_hall", "archive"],
-        factionFronts: ["frost_lantern_sect", "gray_ash_cabal"]
-      }
+        factionFronts: ["frost_lantern_sect", "gray_ash_cabal"],
+      },
     },
     {
       id: "border-seven-days",
       title: "边境七日",
-      counts: { combat: 5, social: 8, endings: 6 }
-    }
-  ]
+      counts: { combat: 5, social: 8, endings: 6 },
+    },
+    {
+      id: "creator-pack",
+      title: "Creator Pack",
+      counts: { combat: 1, social: 1, endings: 1 },
+    },
+  ],
 };
 
 describe("scenario selection", () => {
   it("formats scenario counts for compact cards", () => {
-    expect(formatScenarioCounts(catalog.scenarios[1]!.counts)).toBe("战斗 5 · 社交 8 · 结局 6");
+    expect(formatScenarioCounts(catalog.scenarios[1]!.counts)).toBe(
+      "战斗 5 · 社交 8 · 结局 6",
+    );
   });
 
   it("formats long campaign arc metadata when a scenario exposes it", () => {
@@ -32,7 +43,8 @@ describe("scenario selection", () => {
 
     expect(selection.options[0]).toMatchObject({
       id: "frost-lantern-trial",
-      arcSummary: "长期 3 章 · 基地 2 · 战线 2"
+      title: "霜灯试炼",
+      arcSummary: "长期 3 章 · 基地 2 · 战线 2",
     });
   });
 
@@ -40,14 +52,25 @@ describe("scenario selection", () => {
     const selection = buildScenarioSelection(catalog);
 
     expect(selection.selectedId).toBe(DEFAULT_SCENARIO_ID);
-    expect(selection.options.map((option) => option.id)).toEqual(["frost-lantern-trial", "border-seven-days"]);
+    expect(selection.options.map((option) => option.id)).toEqual([
+      "frost-lantern-trial",
+      "border-seven-days",
+      "creator-pack",
+    ]);
     expect(selection.options[0]).toMatchObject({
       id: "frost-lantern-trial",
-      summary: "战斗 2 · 社交 3 · 结局 2"
+      title: "霜灯试炼",
+      summary: "战斗 2 · 社交 3 · 结局 2",
+    });
+    expect(selection.options[2]).toMatchObject({
+      id: "creator-pack",
+      title: "Creator Pack",
     });
   });
 
   it("falls back to the first listed scenario when a preferred id is missing", () => {
-    expect(buildScenarioSelection(catalog, "missing-scenario").selectedId).toBe("frost-lantern-trial");
+    expect(buildScenarioSelection(catalog, "missing-scenario").selectedId).toBe(
+      "frost-lantern-trial",
+    );
   });
 });

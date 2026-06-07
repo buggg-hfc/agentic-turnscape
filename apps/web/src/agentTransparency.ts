@@ -49,7 +49,7 @@ export const buildAgentTransparencyRows = (
       const target = proposal.target ? ` -> ${displayLabel(proposal.target)}` : "";
       const resources =
         proposal.usedResources.length > 0
-          ? ` · 资源：${proposal.usedResources.map(displayLabel).join(", ")}`
+          ? ` · 资源：${proposal.usedResources.map((id) => displayLabel(id)).join(", ")}`
           : "";
       return {
         id,

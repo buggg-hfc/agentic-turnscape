@@ -1,4 +1,5 @@
 import type { CampaignPayload } from "./api.js";
+import { displayLabel } from "./displayLabels.js";
 
 export type CampaignArcStatusSummary = {
   available: boolean;
@@ -31,7 +32,10 @@ export const buildCampaignArcStatusSummary = (
 
   return {
     available: true,
-    chapterLabel: `第 ${chapterNumber}/${campaignArc.chapterCount} 章 · ${campaignArc.currentChapter.title}`,
+    chapterLabel: `第 ${chapterNumber}/${campaignArc.chapterCount} 章 · ${displayLabel(
+      campaignArc.currentChapter.id,
+      campaignArc.currentChapter.title,
+    )}`,
     focus: campaignArc.currentChapter.focus,
     unlocks: [...campaignArc.currentChapter.unlocks],
     baseFacilities: [...campaignArc.baseFacilities],

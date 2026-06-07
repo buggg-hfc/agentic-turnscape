@@ -2,6 +2,30 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-07 - Localized Expansion Scenario Titles
+
+### Scope
+
+- Added display-label coverage for the first-wave expansion scenario ids and common campaign chapter ids.
+- `buildScenarioSelection` now renders known built-in scenario titles through the Chinese display-label layer while preserving unknown creator scenario titles as authored.
+- `buildCampaignArcStatusSummary` now localizes known chapter ids, so the Campaign Arc panel can show Chinese chapter labels without changing API payload ids.
+- Added focused tests for display labels, scenario picker options, fallback creator titles, and campaign arc chapter labels.
+
+### Runtime Screenshot
+
+![Localized scenario picker](screenshots/localized-scenario-picker-runtime-2026-06-07.png)
+
+The screenshot was captured from a local runtime session after opening the scenario picker and verifying `霜灯试炼`, `轨道隔离`, `盐港协定`, `雨巷异闻`, and `急诊夜班` appeared while the previous English expansion titles were absent from visible text.
+
+### Verification
+
+```bash
+npm test -- apps/web/src/displayLabels.test.ts apps/web/src/scenarioSelection.test.ts apps/web/src/campaignArcStatus.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-07 - Direct Freeform Submission
 
 ### Scope

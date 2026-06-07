@@ -1,4 +1,5 @@
 import type { ScenarioCatalogPayload } from "./api.js";
+import { displayLabel } from "./displayLabels.js";
 
 export const DEFAULT_SCENARIO_ID = "border-seven-days";
 
@@ -30,6 +31,7 @@ export const buildScenarioSelection = (
     const arcSummary = formatCampaignArcSummary(scenario.campaignArc);
     return {
       ...scenario,
+      title: displayLabel(scenario.id, scenario.title),
       summary: formatScenarioCounts(scenario.counts),
       ...(arcSummary ? { arcSummary } : {})
     };
