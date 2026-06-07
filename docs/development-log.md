@@ -4,6 +4,11 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-07
 
+- Added a tested Chinese GUI quick-create path for creator scenarios. The starter form captures scenario id, title, premise, player role, starting location, crisis clock, key NPC, two factions, and two actions, then generates a schema-valid creator scenario draft that can be imported through the existing creator API.
+- Captured a runtime screenshot showing the new creator scenario quick-create form on the scenario selection screen:
+
+![Creator quick draft form](screenshots/creator-quick-draft-runtime-2026-06-07.png)
+
 - Added tested source/API-level Chinese text for the first-wave expansion scenario packages. Scenario titles, player-facing day plans, chapter focus text, location/faction/NPC/quest/clock text, fixed action labels, and success/failure endings now come from Chinese content instead of only being translated in the web display layer.
 - Captured a runtime screenshot showing a fresh `霜灯试炼` campaign with Chinese source content in the campaign title, current location, scene/event text, and fixed action cards:
 
@@ -54,6 +59,7 @@ This log records tested implementation slices as the project moves from the Bord
   - `npm test -- apps/web/src/displayLabels.test.ts apps/web/src/scenarioSelection.test.ts apps/web/src/campaignArcStatus.test.ts --reporter=dot`
   - `npm test -- apps/web/src/playerActionDisplay.test.ts apps/web/src/chronicle.test.ts apps/web/src/displayLabels.test.ts --reporter=dot`
   - `npm test -- packages/content/src/expansionLocalization.test.ts packages/content/src/scenarioRegistry.test.ts apps/api/src/server.test.ts apps/web/src/campaignArcStatus.test.ts --reporter=dot`
+  - `npm test -- packages/shared/src/creatorScenarioDraft.test.ts packages/content/src/creatorScenario.test.ts apps/web/src/scenarioImport.test.ts --reporter=dot`
   - `npm run typecheck`
   - `npm test -- --reporter=dot`
   - `npm run build`

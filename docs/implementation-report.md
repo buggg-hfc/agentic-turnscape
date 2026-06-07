@@ -2,6 +2,30 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-07 - Creator Scenario Quick Draft GUI
+
+### Scope
+
+- Added a shared `buildCreatorScenarioDraft` helper that converts GUI fields into a deterministic creator scenario definition with a valid world state, scenes, day plans, actions, clocks, and two endings.
+- Added tests proving the generated draft is schema-valid and can be accepted by the existing `importCreatorScenarioPackage` contract.
+- Extended the scenario selection screen with a Chinese quick-create form for creator scenarios, while keeping the advanced JSON import/export path available.
+- The quick-create import still posts to `/scenarios/import`, saves the returned definition locally, refreshes the scenario catalog, and selects the imported scenario.
+
+### Runtime Screenshot
+
+![Creator quick draft form](screenshots/creator-quick-draft-runtime-2026-06-07.png)
+
+The screenshot was captured from a local runtime session after opening the scenario selection screen and verifying the new Chinese form fields and `生成 JSON` / `生成并导入` buttons render before the advanced JSON importer.
+
+### Verification
+
+```bash
+npm test -- packages/shared/src/creatorScenarioDraft.test.ts packages/content/src/creatorScenario.test.ts apps/web/src/scenarioImport.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-07 - Localized Expansion Content Text
 
 ### Scope

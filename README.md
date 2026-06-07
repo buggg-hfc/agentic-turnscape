@@ -36,6 +36,7 @@ A multi-agent turn-based narrative simulation game. The current implementation i
 - Built-in MVP and first-wave expansion scenarios declare long campaign arc metadata for chapters, base facilities, and faction fronts; the API catalog and web scenario picker expose the summary.
 - Active campaign state now exposes the current long campaign arc chapter, and the web dashboard shows a Campaign Arc panel with chapter focus, unlocks, base hooks, and faction fronts.
 - Built-in scenario registry plus runtime creator scenario import, export, protected deletion, local restore, and API-side persistence.
+- Creator scenarios can now start from a Chinese GUI quick-create form that generates a validated starter scenario JSON and can import it through the existing creator scenario API path.
 - Chronicle replay records, state snapshots, Agent run records, and hidden memory logs.
 - PostgreSQL/Redis Docker Compose, Prisma schema, optional `STORAGE_DRIVER=prisma` persistence, and optional `TURN_QUEUE_DRIVER=bullmq` turn workers.
 

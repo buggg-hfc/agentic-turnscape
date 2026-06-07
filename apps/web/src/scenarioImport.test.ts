@@ -47,14 +47,14 @@ describe("creator scenario import parsing", () => {
   it("rejects empty text", () => {
     expect(parseCreatorScenarioJson("   ")).toEqual({
       ok: false,
-      error: "Paste a creator scenario JSON object before importing."
+      error: "请先粘贴创作者剧本 JSON 对象。"
     });
   });
 
   it("rejects non-object JSON", () => {
     expect(parseCreatorScenarioJson('[{ "id": "pack" }]')).toEqual({
       ok: false,
-      error: "Creator scenario import must be a JSON object."
+      error: "创作者剧本导入内容必须是 JSON 对象。"
     });
   });
 

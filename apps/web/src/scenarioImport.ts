@@ -46,7 +46,7 @@ const isSavedCreatorScenarioDefinition = (value: unknown): value is SavedCreator
 export const parseCreatorScenarioJson = (input: string): ScenarioImportParseResult => {
   const trimmed = input.trim();
   if (!trimmed) {
-    return { ok: false, error: "Paste a creator scenario JSON object before importing." };
+    return { ok: false, error: "请先粘贴创作者剧本 JSON 对象。" };
   }
 
   let parsed: unknown;
@@ -54,11 +54,11 @@ export const parseCreatorScenarioJson = (input: string): ScenarioImportParseResu
     parsed = JSON.parse(trimmed);
   } catch (caught) {
     const detail = caught instanceof Error ? caught.message : "Invalid JSON";
-    return { ok: false, error: `Invalid scenario JSON: ${detail}` };
+    return { ok: false, error: `剧本 JSON 无法解析：${detail}` };
   }
 
   if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
-    return { ok: false, error: "Creator scenario import must be a JSON object." };
+    return { ok: false, error: "创作者剧本导入内容必须是 JSON 对象。" };
   }
 
   return { ok: true, definition: parsed as Record<string, unknown> };

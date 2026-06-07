@@ -82,10 +82,33 @@ button {
   padding-top: 14px;
 }
 
-.creator-import-panel textarea {
+.creator-draft-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.creator-field {
+  display: grid;
+  gap: 6px;
+}
+
+.creator-field.wide {
+  grid-column: 1 / -1;
+}
+
+.creator-field span,
+.creator-json-heading {
+  color: #c8d6ce;
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.creator-field input,
+.creator-field textarea,
+.creator-import-panel > textarea {
   width: 100%;
-  min-height: 118px;
-  resize: vertical;
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 8px;
   padding: 10px 11px;
@@ -95,9 +118,33 @@ button {
   line-height: 1.45;
 }
 
-.creator-import-panel textarea:disabled {
+.creator-field textarea {
+  min-height: 76px;
+  resize: vertical;
+}
+
+.creator-import-panel > textarea {
+  min-height: 118px;
+  resize: vertical;
+}
+
+.creator-field input:disabled,
+.creator-field textarea:disabled,
+.creator-import-panel > textarea:disabled {
   cursor: wait;
   opacity: 0.68;
+}
+
+.creator-draft-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.creator-json-heading {
+  margin: 14px 0 8px;
 }
 
 .creator-import-actions {
@@ -1059,6 +1106,10 @@ meter {
 }
 
 @media (max-width: 760px) {
+  .creator-draft-grid {
+    grid-template-columns: 1fr;
+  }
+
   .app-shell {
     padding: 12px;
   }

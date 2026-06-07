@@ -57,6 +57,7 @@ For gameplay work, tests should prove the rule invariant rather than a single lu
 - Terminal MVP endings now also unlock tested long-campaign consequences: each of the 6 endings grants a distinct base asset, shifts faction-war fronts through referee-owned patches, and can be surfaced in the web dashboard.
 - Ending-inherited base assets now become tested long-campaign Campaign Moves. The API rejects unknown or unowned asset projects, and valid projects consume assets, shift campaign fronts, and record replayable public history through referee-owned patches.
 - Player freedom now has a tested freeform action path. The web GUI converts arbitrary player text into a `custom` action, previews inferred Chinese intent/risk/target chips, can submit the typed action directly, the API accepts those tokens, and the referee adjudicates them through deterministic rules without allowing prose to directly mutate state.
+- Creator tooling now has a tested GUI starting point: a Chinese quick-create form generates a schema-valid creator scenario draft, proves it imports through the existing scenario package contract, and keeps the advanced JSON path for precise edits.
 
 ## MVP Completion Gate
 
@@ -82,7 +83,7 @@ After MVP completion, expand toward the full game in tested slices:
 1. Persistence slice: replace in-memory campaigns with PostgreSQL while keeping current API contract tests green.
 2. Long campaign slice: deepen the tested campaign progression foundation with multi-session chapter arcs, richer base-building choices, character growth UI, and faction-war scenario consequences. The first API/UI bridge is already in place and must remain replayable through stored referee patches.
 3. Scenario pack slice: deepen cultivation, science fiction, historical, urban supernatural, and realistic profession packs from tested three-day playthroughs into multi-session arcs with dedicated scenes, richer rules hooks, and broader playthrough regression seeds. The first arc metadata bridge is now in place and must keep matching API/UI summaries.
-4. Creator tooling slice: add editors for worlds, factions, NPCs, abilities, quests, locations, and clocks with import/export validation tests.
+4. Creator tooling slice: deepen the quick-create form into editors for worlds, factions, NPCs, abilities, quests, locations, and clocks with import/export validation tests.
 5. Production hardening slice: cost monitoring, LLM retry budgets, model compatibility tests, save migration tests, and playthrough regression seeds.
 
 Each slice must start with acceptance tests that fail against the current build.

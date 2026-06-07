@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { buildCreatorScenarioDraft } from "@agentic-turnscape/shared";
 import { createBorderSevenDaysWorld } from "./borderSevenDays.js";
 import { importCreatorScenarioPackage } from "./creatorScenario.js";
 import { createScenarioRegistry } from "./scenarioRegistry.js";
@@ -114,5 +115,33 @@ describe("creator scenario import", () => {
       }
     ]);
     expect(registry.require("creator-border-lite").createWorld().currentLocationId).toBe("town_square");
+  });
+
+  it("accepts the GUI quick-create draft through the same import contract", () => {
+    const scenario = importCreatorScenarioPackage(
+      buildCreatorScenarioDraft({
+        id: "clinic-gui-draft",
+        title: "诊所草稿",
+        premise: "封锁线外的伤员突然涌入，镇民要求一个公开答案。",
+        playerName: "临时镇医",
+        startLocationName: "临时诊所",
+        crisisName: "伤员潮",
+        guideName: "米娜",
+        allyFactionName: "志愿护理队",
+        pressureFactionName: "封锁巡逻队",
+        primaryActionLabel: "稳定分诊",
+        secondaryActionLabel: "谈判放行",
+      }),
+    );
+    const world = scenario.createWorld();
+
+    expect(scenario.id).toBe("clinic-gui-draft");
+    expect(scenario.counts).toEqual({ combat: 1, social: 1, endings: 2 });
+    expect(world.player.name).toBe("临时镇医");
+    expect(scenario.getDayPlan(1)?.mainEvent).toContain("封锁线外");
+    expect(scenario.getActions(world).map((action) => action.label)).toEqual([
+      "稳定分诊",
+      "谈判放行",
+    ]);
   });
 });

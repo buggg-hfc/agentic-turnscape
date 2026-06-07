@@ -1,11 +1,14 @@
-import type {
-  CharacterState,
-  ClockState,
-  LlmConfig,
-  PlayerAction,
-  TransparencyMode,
-  TurnResolution,
-  WorldState,
+import {
+  buildCreatorScenarioDraft,
+  defaultCreatorScenarioDraftInput,
+  type CharacterState,
+  type ClockState,
+  type CreatorScenarioDraftInput,
+  type LlmConfig,
+  type PlayerAction,
+  type TransparencyMode,
+  type TurnResolution,
+  type WorldState,
 } from "@agentic-turnscape/shared";
 import {
   AlertTriangle,
@@ -132,6 +135,9 @@ export const App = () => {
   const [scenarioImportText, setScenarioImportText] = useState("");
   const [scenarioImportStatus, setScenarioImportStatus] =
     useState<ScenarioImportStatus>();
+  const [creatorDraft, setCreatorDraft] = useState<CreatorScenarioDraftInput>(
+    defaultCreatorScenarioDraftInput,
+  );
   const [savedCreatorScenarios, setSavedCreatorScenarios] = useState<
     SavedCreatorScenarioSummary[]
   >([]);
@@ -266,6 +272,56 @@ export const App = () => {
       setScenarioImportStatus({
         kind: "error",
         message: caught instanceof Error ? caught.message : "导入剧本失败",
+      });
+      setLoadState("selecting");
+    }
+  };
+
+  const updateCreatorDraftField = (
+    field: keyof CreatorScenarioDraftInput,
+    value: string,
+  ) => {
+    setCreatorDraft((current) => ({ ...current, [field]: value }));
+  };
+
+  const generateCreatorDraftJson = () => {
+    const definition = buildCreatorScenarioDraft(creatorDraft);
+    setScenarioImportText(formatCreatorScenarioDefinition(definition));
+    setScenarioImportStatus({
+      kind: "success",
+      message: `已生成 ${definition.title} 草稿 JSON`,
+    });
+  };
+
+  const importCreatorDraft = async () => {
+    const definition = buildCreatorScenarioDraft(creatorDraft);
+    setScenarioImportText(formatCreatorScenarioDefinition(definition));
+    setLoadState("booting");
+    setError(undefined);
+    setScenarioImportStatus(undefined);
+    try {
+      const imported = await api.importScenario(definition);
+      saveCreatorScenarioDefinition(imported.scenario.id, definition);
+      setSavedCreatorScenarios(listSavedCreatorScenarioSummaries());
+      const [catalog, campaigns] = await Promise.all([
+        api.scenarios(),
+        api.campaigns(6),
+      ]);
+      const selection = buildScenarioSelection(catalog, imported.scenario.id);
+      setScenarioOptions(selection.options);
+      setCampaignSummaries(campaigns.campaigns);
+      setSelectedScenarioId(selection.selectedId);
+      setScenarioImportText("");
+      setScenarioImportStatus({
+        kind: "success",
+        message: `已生成并导入 ${imported.scenario.title}`,
+      });
+      setLoadState("selecting");
+    } catch (caught) {
+      setScenarioImportStatus({
+        kind: "error",
+        message:
+          caught instanceof Error ? caught.message : "生成导入剧本失败",
       });
       setLoadState("selecting");
     }
@@ -542,9 +598,13 @@ export const App = () => {
           <CreatorScenarioImportPanel
             value={scenarioImportText}
             status={scenarioImportStatus}
+            draft={creatorDraft}
             savedScenarios={savedCreatorScenarios}
             disabled={loadState === "booting"}
             onChange={setScenarioImportText}
+            onDraftChange={updateCreatorDraftField}
+            onGenerateDraft={generateCreatorDraftJson}
+            onImportDraft={() => void importCreatorDraft()}
             onImport={() => void importCreatorScenario()}
             onExport={(scenarioId) => void exportCreatorScenario(scenarioId)}
             onDelete={(scenarioId) => void deleteCreatorScenario(scenarioId)}
@@ -877,18 +937,26 @@ const ScenarioPicker = ({
 const CreatorScenarioImportPanel = ({
   value,
   status,
+  draft,
   savedScenarios,
   disabled,
   onChange,
+  onDraftChange,
+  onGenerateDraft,
+  onImportDraft,
   onImport,
   onExport,
   onDelete,
 }: {
   value: string;
   status: ScenarioImportStatus | undefined;
+  draft: CreatorScenarioDraftInput;
   savedScenarios: SavedCreatorScenarioSummary[];
   disabled: boolean;
   onChange: (value: string) => void;
+  onDraftChange: (field: keyof CreatorScenarioDraftInput, value: string) => void;
+  onGenerateDraft: () => void;
+  onImportDraft: () => void;
   onImport: () => void;
   onExport: (scenarioId: string) => void;
   onDelete: (scenarioId: string) => void;
@@ -896,11 +964,130 @@ const CreatorScenarioImportPanel = ({
   <section className="creator-import-panel">
     <div className="panel-heading compact">
       <Upload size={17} />
-      <h3>导入创作者剧本</h3>
+      <h3>创作剧本</h3>
     </div>
+    <div className="creator-draft-grid">
+      <label className="creator-field">
+        <span>剧本 ID</span>
+        <input
+          value={draft.id}
+          disabled={disabled}
+          onChange={(event) => onDraftChange("id", event.target.value)}
+        />
+      </label>
+      <label className="creator-field">
+        <span>剧本名</span>
+        <input
+          value={draft.title}
+          disabled={disabled}
+          onChange={(event) => onDraftChange("title", event.target.value)}
+        />
+      </label>
+      <label className="creator-field wide">
+        <span>开局危机</span>
+        <textarea
+          value={draft.premise}
+          disabled={disabled}
+          onChange={(event) => onDraftChange("premise", event.target.value)}
+        />
+      </label>
+      <label className="creator-field">
+        <span>玩家身份</span>
+        <input
+          value={draft.playerName}
+          disabled={disabled}
+          onChange={(event) => onDraftChange("playerName", event.target.value)}
+        />
+      </label>
+      <label className="creator-field">
+        <span>起始地点</span>
+        <input
+          value={draft.startLocationName}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("startLocationName", event.target.value)
+          }
+        />
+      </label>
+      <label className="creator-field">
+        <span>危机钟</span>
+        <input
+          value={draft.crisisName}
+          disabled={disabled}
+          onChange={(event) => onDraftChange("crisisName", event.target.value)}
+        />
+      </label>
+      <label className="creator-field">
+        <span>关键 NPC</span>
+        <input
+          value={draft.guideName}
+          disabled={disabled}
+          onChange={(event) => onDraftChange("guideName", event.target.value)}
+        />
+      </label>
+      <label className="creator-field">
+        <span>支援阵营</span>
+        <input
+          value={draft.allyFactionName}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("allyFactionName", event.target.value)
+          }
+        />
+      </label>
+      <label className="creator-field">
+        <span>施压阵营</span>
+        <input
+          value={draft.pressureFactionName}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("pressureFactionName", event.target.value)
+          }
+        />
+      </label>
+      <label className="creator-field">
+        <span>行动一</span>
+        <input
+          value={draft.primaryActionLabel}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("primaryActionLabel", event.target.value)
+          }
+        />
+      </label>
+      <label className="creator-field">
+        <span>行动二</span>
+        <input
+          value={draft.secondaryActionLabel}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("secondaryActionLabel", event.target.value)
+          }
+        />
+      </label>
+    </div>
+    <div className="creator-draft-actions">
+      <button
+        className="secondary-button"
+        disabled={disabled}
+        onClick={onGenerateDraft}
+      >
+        <Sparkles size={15} />
+        生成 JSON
+      </button>
+      <button
+        className="primary-button"
+        disabled={disabled}
+        onClick={onImportDraft}
+      >
+        <Upload size={15} />
+        生成并导入
+      </button>
+    </div>
+    <h4 className="creator-json-heading">高级 JSON 导入</h4>
     <textarea
       aria-label="创作者剧本 JSON"
-      placeholder='{ "id": "my-scenario", "title": "My Scenario", ... }'
+      placeholder='{ "id": "my-scenario", "title": "我的剧本", ... }'
       value={value}
       disabled={disabled}
       onChange={(event) => onChange(event.target.value)}
