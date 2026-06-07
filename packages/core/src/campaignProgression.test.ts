@@ -109,6 +109,54 @@ describe("long campaign progression", () => {
     expect(next.publicEvents.at(-1)?.tags).toContain("base");
   });
 
+  it.each([
+    ["sealed_ritual_site", "rift_cult"],
+    ["public_case_archive", "blackstone_consortium"],
+    ["exile_clinic_network", "rift_cult"],
+    ["quarantine_relief_route", "frontier_guild"],
+    ["blackstone_credit_line", "blackstone_consortium"],
+    ["rift_scar_map", "rift_cult"]
+  ])("mobilizes campaign asset %s through a referee-owned project", (assetId, frontId) => {
+    const state = createBorderSevenDaysWorld();
+    state.campaign = {
+      chapter: 2,
+      experience: 3,
+      base: {
+        name: "Border House",
+        level: 0,
+        facilities: { infirmary: 0, archive: 0, workshop: 0 },
+        assets: { [assetId]: 1 }
+      },
+      fronts: {
+        frontier_guild: { factionId: "frontier_guild", influence: 5, pressure: 5, status: "active" },
+        blackstone_consortium: { factionId: "blackstone_consortium", influence: 6, pressure: 6, status: "active" },
+        rift_cult: { factionId: "rift_cult", influence: 6, pressure: 7, status: "active" }
+      },
+      legacyFlags: []
+    };
+    const beforeFront = state.campaign.fronts[frontId];
+
+    const patch = resolveLongCampaignStep({
+      state,
+      turnId: `asset-${assetId}`,
+      assetProjects: [{ assetId }]
+    });
+    const next = applyStatePatch(state, patch);
+
+    expect(next.campaign?.base.assets[assetId]).toBe(0);
+    expect(next.campaign?.legacyFlags).toContain(`asset:${assetId}:mobilized`);
+    expect(next.campaign?.fronts[frontId]).not.toEqual(beforeFront);
+    expect(next.publicEvents).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          title: "Campaign asset mobilized",
+          tags: expect.arrayContaining(["campaign", "asset"])
+        })
+      ])
+    );
+    expect(() => WorldStateSchema.parse(next)).not.toThrow();
+  });
+
   it("spends earned experience on character growth and updates faction war fronts", () => {
     const state = createBorderSevenDaysWorld();
     state.campaign = {

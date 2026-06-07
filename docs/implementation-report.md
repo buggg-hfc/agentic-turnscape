@@ -2,6 +2,53 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-07 - Campaign Asset Project Moves
+
+### Scope
+
+- Added a tested asset-project table for inherited long-campaign assets.
+- `POST /campaigns/:id/campaign/progress` now rejects unknown or unowned asset projects before creating a progression turn.
+- Valid asset projects consume one owned base asset, shift campaign faction fronts, append a public chronicle event, and persist the result as a referee-owned patch.
+- The web Campaign Moves panel now derives asset moves from current campaign state so ending rewards become usable strategic choices.
+
+### Runtime Screenshot
+
+![Campaign asset project move](screenshots/asset-project-move-runtime-2026-06-07.png)
+
+The screenshot was captured from a local runtime session after a real `guild_case` playthrough inherited `public_case_archive x1`, resumed the campaign, and displayed `Mobilize public case archive` as an actionable Campaign Move.
+
+### Verification
+
+```bash
+npm test -- packages/core/src/campaignProgression.test.ts apps/api/src/server.test.ts apps/web/src/campaignProgression.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
+## 2026-06-07 - Freeform Player Actions
+
+### Scope
+
+- Added `custom` to the shared `PlayerActionSchema` so arbitrary player intent can be submitted through the same turn endpoint as fixed actions.
+- Added a web freeform action composer beside fixed action cards. The player can type any action, select it, and execute the turn through the normal GUI flow.
+- The core referee adjudicates custom actions with the same deterministic 2d6 path, emits legal `StatePatch` changes, and records public freeform outcomes without treating player prose as direct state mutation.
+
+### Runtime Screenshot
+
+![Freeform action composer](screenshots/freeform-action-runtime-2026-06-07.png)
+
+The screenshot was captured from a local runtime session after creating a fresh `border-seven-days` campaign, typing a freeform Chinese action into the GUI composer, selecting it, and verifying the unified execute button stayed available.
+
+### Verification
+
+```bash
+npm test -- packages/shared/src/schemas.test.ts packages/core/src/core.test.ts apps/api/src/server.test.ts apps/web/src/freeformAction.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-05 - Ending Consequence Assets
 
 ### Scope

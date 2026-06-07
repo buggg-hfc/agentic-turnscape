@@ -14,6 +14,7 @@ import {
 } from "@agentic-turnscape/content";
 import {
   applyStatePatch,
+  isKnownCampaignAssetProject,
   resolveLongCampaignStep,
   toPlayerVisibleState,
 } from "@agentic-turnscape/core";
@@ -180,6 +181,13 @@ const LongCampaignProgressBodySchema = z.object({
       }),
     )
     .default([]),
+  assetProjects: z
+    .array(
+      z.object({
+        assetId: z.string(),
+      }),
+    )
+    .default([]),
 });
 type LongCampaignProgressBody = z.infer<typeof LongCampaignProgressBodySchema>;
 
@@ -219,6 +227,13 @@ const invalidLongCampaignProgression = (
       !allowedFronts.has(front.factionId)
     ) {
       return `Unavailable faction front: ${front.factionId}`;
+    }
+  }
+
+  for (const project of body.assetProjects) {
+    const count = state.campaign?.base.assets[project.assetId] ?? 0;
+    if (!isKnownCampaignAssetProject(project.assetId) || count <= 0) {
+      return `Unavailable campaign asset: ${project.assetId}`;
     }
   }
 
@@ -508,6 +523,7 @@ export const buildServer = (options: ServerOptions = {}) => {
       completedQuestIds: body.completedQuestIds,
       baseInvestments: body.baseInvestments,
       ...(body.training ? { training: body.training } : {}),
+      assetProjects: body.assetProjects,
       factionFronts: body.factionFronts.map((front) => ({
         factionId: front.factionId,
         ...(front.influenceDelta !== undefined

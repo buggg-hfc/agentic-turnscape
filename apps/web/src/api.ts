@@ -128,6 +128,9 @@ export type LongCampaignProgressionRequest = {
     influenceDelta?: number;
     pressureDelta?: number;
   }>;
+  assetProjects?: Array<{
+    assetId: string;
+  }>;
 };
 
 export type ChroniclePayload = {

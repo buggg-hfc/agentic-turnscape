@@ -2,6 +2,25 @@
 
 This log records tested implementation slices as the project moves from the Border Seven Days MVP toward the full game. Each entry should name the behavior that changed and the verification gate used before publishing.
 
+## 2026-06-07
+
+- Added tested long-campaign asset project moves. Ending-inherited assets such as `public_case_archive` now appear as actionable Campaign Moves, are legality-checked by the API, are consumed through referee-owned `StatePatch` records, and update faction fronts plus public chronicle history.
+- Captured a runtime screenshot from a real `guild_case` playthrough after `public_case_archive x1` was inherited and surfaced as `Mobilize public case archive`:
+
+![Campaign asset project move](screenshots/asset-project-move-runtime-2026-06-07.png)
+
+- Added tested freeform player actions. The web action panel now combines fixed action cards with a GUI composer for arbitrary player intent; submitted text becomes a `custom` `PlayerAction`, then the core referee rolls, writes a legal patch, and records a public freeform event without letting the text directly mutate state.
+- Captured a runtime screenshot showing the freeform composer, selected custom action, and unified execute button:
+
+![Freeform action composer](screenshots/freeform-action-runtime-2026-06-07.png)
+
+- Verification used for this slice:
+  - `npm test -- packages/core/src/campaignProgression.test.ts apps/api/src/server.test.ts apps/web/src/campaignProgression.test.ts --reporter=dot`
+  - `npm test -- packages/shared/src/schemas.test.ts packages/core/src/core.test.ts apps/api/src/server.test.ts apps/web/src/freeformAction.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 ## 2026-06-05
 
 - Added tested terminal-ending consequence assets for the long campaign aftermath. All 6 Border Seven Days endings now unlock a distinct `campaign.base.assets` entry and apply a referee-owned faction-front consequence instead of only recording a legacy flag.

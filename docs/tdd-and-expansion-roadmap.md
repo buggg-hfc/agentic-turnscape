@@ -52,6 +52,8 @@ For gameplay work, tests should prove the rule invariant rather than a single lu
 - Border Seven Days now has API-level full-campaign acceptance coverage for all 6 MVP endings: each deterministic route reaches day 7 night through public `/turns/run` calls and leaves matching replay, turn, snapshot, and final referee patch records.
 - Terminal MVP endings now feed the long campaign expansion path: the server derives the finished ending, records an ending legacy flag and campaign XP, and opens the next chapter through referee-owned patches.
 - Terminal MVP endings now also unlock tested long-campaign consequences: each of the 6 endings grants a distinct base asset, shifts faction-war fronts through referee-owned patches, and can be surfaced in the web dashboard.
+- Ending-inherited base assets now become tested long-campaign Campaign Moves. The API rejects unknown or unowned asset projects, and valid projects consume assets, shift campaign fronts, and record replayable public history through referee-owned patches.
+- Player freedom now has a tested freeform action path. The web GUI converts arbitrary player text into a `custom` action, the API accepts it, and the referee adjudicates it through deterministic rules without allowing prose to directly mutate state.
 
 ## MVP Completion Gate
 
@@ -67,6 +69,7 @@ The "Border Seven Days" MVP is complete only when tests and smoke checks prove a
 - Deterministic full-campaign playthrough tests must run from day 1 morning to day 7 night and prove each MVP ending is reachable.
 - Player failure creates a new branch instead of immediate game over.
 - LLM settings can be configured in-game, saved locally, sent per turn, and kept out of world state.
+- The turn UI includes a freeform action composer so the player is not limited to scenario-provided fixed action cards.
 
 ## Expansion Gate After MVP
 

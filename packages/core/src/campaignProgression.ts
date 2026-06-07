@@ -17,6 +17,10 @@ export type FactionFrontDelta = {
   pressureDelta?: number;
 };
 
+export type CampaignAssetProject = {
+  assetId: string;
+};
+
 export type LongCampaignStepInput = {
   state: WorldState;
   turnId: string;
@@ -26,6 +30,7 @@ export type LongCampaignStepInput = {
   baseInvestments?: BaseInvestment[];
   training?: SkillTraining;
   factionFronts?: FactionFrontDelta[];
+  assetProjects?: CampaignAssetProject[];
 };
 
 const clamp = (value: number, min: number, max: number): number => Math.max(min, Math.min(value, max));
@@ -71,6 +76,41 @@ const endingLegacyConsequences: Record<string, EndingLegacyConsequence> = {
     publicBody: "The rift scar map turns the opened breach into a campaign-scale threat and opportunity."
   }
 };
+
+type CampaignAssetProjectConsequence = {
+  frontDeltas: FactionFrontDelta[];
+  publicBody: string;
+};
+
+export const campaignAssetProjectConsequences: Record<string, CampaignAssetProjectConsequence> = {
+  sealed_ritual_site: {
+    frontDeltas: [{ factionId: "rift_cult", influenceDelta: -1, pressureDelta: -2 }],
+    publicBody: "The sealed ritual site is surveyed and turned into leverage against the cult front."
+  },
+  public_case_archive: {
+    frontDeltas: [{ factionId: "blackstone_consortium", influenceDelta: -1, pressureDelta: -2 }],
+    publicBody: "The public case archive is mobilized to pressure Blackstone's contracts and witnesses."
+  },
+  exile_clinic_network: {
+    frontDeltas: [{ factionId: "rift_cult", influenceDelta: 1, pressureDelta: -2 }],
+    publicBody: "The exile clinic network moves patients and goodwill through contested territory."
+  },
+  quarantine_relief_route: {
+    frontDeltas: [{ factionId: "frontier_guild", influenceDelta: 1, pressureDelta: -2 }],
+    publicBody: "The quarantine relief route keeps survivors supplied and reduces guild-side pressure."
+  },
+  blackstone_credit_line: {
+    frontDeltas: [{ factionId: "blackstone_consortium", influenceDelta: 1, pressureDelta: -2 }],
+    publicBody: "Blackstone credit is spent to buy time, supplies, and temporary calm on the consortium front."
+  },
+  rift_scar_map: {
+    frontDeltas: [{ factionId: "rift_cult", influenceDelta: -1, pressureDelta: -2 }],
+    publicBody: "The rift scar map turns breach knowledge into a concrete operation against cult pressure."
+  }
+};
+
+export const isKnownCampaignAssetProject = (assetId: string): boolean =>
+  Object.prototype.hasOwnProperty.call(campaignAssetProjectConsequences, assetId);
 
 const event = (state: WorldState, turnId: string, title: string, body: string, tags: string[]): ChronicleEvent => ({
   id: `evt_${turnId}_${tags[0] ?? "campaign"}`,
@@ -162,12 +202,14 @@ export const resolveLongCampaignStep = ({
   completedQuestIds = [],
   baseInvestments = [],
   training,
-  factionFronts = []
+  factionFronts = [],
+  assetProjects = []
 }: LongCampaignStepInput): StatePatch => {
   const startingCampaign = state.campaign ?? defaultCampaignProgression(state);
   const changes: StatePatch["changes"] = [];
   const terminalEndingId = endingId && isTerminalNight(state) ? endingId : undefined;
   let latestFronts = startingCampaign.fronts;
+  let latestAssets = startingCampaign.base.assets;
 
   if (!state.campaign) {
     changes.push({
@@ -231,9 +273,10 @@ export const resolveLongCampaignStep = ({
   const endingConsequence = terminalEndingId ? endingLegacyConsequences[terminalEndingId] : undefined;
   if (endingConsequence) {
     const assets = {
-      ...startingCampaign.base.assets,
-      [endingConsequence.assetId]: clamp((startingCampaign.base.assets[endingConsequence.assetId] ?? 0) + 1, 0, 99)
+      ...latestAssets,
+      [endingConsequence.assetId]: clamp((latestAssets[endingConsequence.assetId] ?? 0) + 1, 0, 99)
     };
+    latestAssets = assets;
     latestFronts = applyFrontDeltas(latestFronts, endingConsequence.frontDeltas);
     changes.push(
       { op: "set", path: "campaign.base.assets", value: assets, reason: "Unlock terminal ending campaign asset" },
@@ -247,6 +290,30 @@ export const resolveLongCampaignStep = ({
           "ending"
         ]),
         reason: "Record terminal ending consequence"
+      }
+    );
+  }
+
+  const usableAssetProjects = assetProjects.filter(
+    (project) => isKnownCampaignAssetProject(project.assetId) && (latestAssets[project.assetId] ?? 0) > 0
+  );
+  for (const project of usableAssetProjects) {
+    const consequence = campaignAssetProjectConsequences[project.assetId];
+    if (!consequence) continue;
+    latestAssets = {
+      ...latestAssets,
+      [project.assetId]: clamp((latestAssets[project.assetId] ?? 0) - 1, 0, 99)
+    };
+    latestFronts = applyFrontDeltas(latestFronts, consequence.frontDeltas);
+    changes.push(
+      { op: "set", path: "campaign.base.assets", value: latestAssets, reason: "Spend inherited campaign asset" },
+      { op: "set", path: "campaign.fronts", value: latestFronts, reason: "Apply campaign asset project to faction fronts" },
+      { op: "tag", path: "campaign.legacyFlags", value: `asset:${project.assetId}:mobilized`, reason: "Record mobilized campaign asset" },
+      {
+        op: "append",
+        path: "publicEvents",
+        value: event(state, turnId, "Campaign asset mobilized", consequence.publicBody, ["campaign", "asset"]),
+        reason: "Record campaign asset project"
       }
     );
   }

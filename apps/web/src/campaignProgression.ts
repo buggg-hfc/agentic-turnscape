@@ -23,7 +23,7 @@ export type CampaignProgressionSummary = {
 
 export type CampaignProgressionChoice = {
   id: string;
-  kind: "base" | "training" | "front";
+  kind: "base" | "training" | "front" | "asset";
   label: string;
   description: string;
   request: LongCampaignProgressionRequest;
@@ -93,6 +93,33 @@ export const buildCampaignProgressionSummary = (
 };
 
 const defaultBaseFacilities = ["infirmary", "workshop", "archive"];
+
+const assetProjectLabels: Record<string, { label: string; description: string }> = {
+  sealed_ritual_site: {
+    label: "Mobilize sealed ritual site",
+    description: "Use this inherited ending asset to disrupt the cult front.",
+  },
+  public_case_archive: {
+    label: "Mobilize public case archive",
+    description: "Use this inherited ending asset to pressure Blackstone's front.",
+  },
+  exile_clinic_network: {
+    label: "Mobilize exile clinic network",
+    description: "Use this inherited ending asset to move patients and calm rift pressure.",
+  },
+  quarantine_relief_route: {
+    label: "Mobilize quarantine relief route",
+    description: "Use this inherited ending asset to stabilize relief work.",
+  },
+  blackstone_credit_line: {
+    label: "Mobilize Blackstone credit line",
+    description: "Use this inherited ending asset to buy down consortium pressure.",
+  },
+  rift_scar_map: {
+    label: "Mobilize rift scar map",
+    description: "Use this inherited ending asset to turn breach knowledge into action.",
+  },
+};
 
 const factionName = (state: WorldState, factionId: string): string =>
   fallbackFactionNames[factionId] ?? state.factions[factionId]?.name ?? factionId;
@@ -173,6 +200,20 @@ export const buildCampaignProgressionChoices = (
       request: {
         factionFronts: [{ factionId: front.factionId, pressureDelta: -2 }],
       },
+    });
+  }
+
+  for (const [assetId, count] of Object.entries(state.campaign?.base.assets ?? {}).sort(([left], [right]) =>
+    left.localeCompare(right),
+  )) {
+    const project = assetProjectLabels[assetId];
+    if (!project || count <= 0) continue;
+    choices.push({
+      id: `asset:${assetId}`,
+      kind: "asset",
+      label: project.label,
+      description: project.description,
+      request: { assetProjects: [{ assetId }] },
     });
   }
 

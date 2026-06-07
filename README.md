@@ -28,6 +28,8 @@ A multi-agent turn-based narrative simulation game. The current implementation i
 - Long campaign progression is now available through `POST /campaigns/:id/campaign/progress`, persisted in snapshots/replay records, and surfaced in the web dashboard.
 - Terminal MVP endings can now be inherited into the long campaign aftermath as ending legacy flags, chapter transition history, and campaign XP.
 - Terminal ending inheritance now unlocks distinct long-campaign assets and faction-front consequences for all 6 Border Seven Days endings, with those assets visible in the web dashboard.
+- Inherited ending assets can now be mobilized as Campaign Moves, spending the asset through the referee-owned long-campaign progression API and recording replayable public history.
+- The web turn panel now supports fixed action cards plus a freeform action composer. Freeform player text is accepted as a `custom` action, then adjudicated by the same 2d6/referee/state-patch path instead of directly mutating world state.
 - Built-in MVP and first-wave expansion scenarios declare long campaign arc metadata for chapters, base facilities, and faction fronts; the API catalog and web scenario picker expose the summary.
 - Active campaign state now exposes the current long campaign arc chapter, and the web dashboard shows a Campaign Arc panel with chapter focus, unlocks, base hooks, and faction fronts.
 - Built-in scenario registry plus runtime creator scenario import, export, protected deletion, local restore, and API-side persistence.

@@ -130,6 +130,53 @@ const creatorScenarioDefinition = () => {
 };
 
 describe("campaign turn API", () => {
+  it("accepts freeform custom player actions and still records referee-owned patches", async () => {
+    const store = new InMemoryCampaignStore();
+    const app = buildServer({ store });
+
+    const campaignResponse = await app.inject({
+      method: "POST",
+      url: "/campaigns",
+      headers: { "content-type": "application/json" },
+      payload: { scenarioId: "border-seven-days" },
+    });
+    const campaign = campaignResponse.json<{ campaignId: string }>();
+
+    const turnResponse = await app.inject({
+      method: "POST",
+      url: `/campaigns/${campaign.campaignId}/turns/run`,
+      headers: { "content-type": "application/json" },
+      payload: {
+        action: {
+          actionType: "custom",
+          label: "自由行动：伪装药材车",
+          description: "伪装成药材车绕开封锁，把病人送到旧哨站。",
+          leverage: ["freeform"],
+          riskLevel: "medium",
+        },
+        seed: "api-freeform-turn",
+      },
+    });
+
+    expect(turnResponse.statusCode).toBe(200);
+    expect(turnResponse.json()).toMatchObject({
+      resolution: {
+        statePatch: {
+          source: "referee",
+          changes: expect.arrayContaining([
+            expect.objectContaining({
+              op: "append",
+              path: "publicEvents",
+              value: expect.objectContaining({
+                tags: expect.arrayContaining(["freeform"]),
+              }),
+            }),
+          ]),
+        },
+      },
+    });
+  });
+
   it("applies long campaign progression through the rules engine and persists the snapshot", async () => {
     const store = new InMemoryCampaignStore();
     const app = buildServer({ store });
@@ -276,6 +323,12 @@ describe("campaign turn API", () => {
         },
         message: "Unavailable faction front: ghost_faction",
       },
+      {
+        payload: {
+          assetProjects: [{ assetId: "public_case_archive" }],
+        },
+        message: "Unavailable campaign asset: public_case_archive",
+      },
     ];
 
     for (const { payload, message } of invalidPayloads) {
@@ -295,6 +348,75 @@ describe("campaign turn API", () => {
 
     expect(store.get(campaign.campaignId)?.turns).toHaveLength(0);
     expect(store.get(campaign.campaignId)?.state.campaign).toBeUndefined();
+    await app.close();
+  });
+
+  it("applies an owned campaign asset project through the progress API", async () => {
+    const store = new InMemoryCampaignStore();
+    const app = buildServer({ store });
+
+    const campaignResponse = await app.inject({
+      method: "POST",
+      url: "/campaigns",
+      headers: { "content-type": "application/json" },
+      payload: { scenarioId: "border-seven-days" },
+    });
+    const campaign = campaignResponse.json<{ campaignId: string }>();
+    const record = store.get(campaign.campaignId);
+    if (!record) throw new Error("test campaign was not created");
+    record.state.campaign = {
+      chapter: 2,
+      experience: 3,
+      base: {
+        name: "Border House",
+        level: 0,
+        facilities: { infirmary: 0, archive: 0, workshop: 0 },
+        assets: { public_case_archive: 1 },
+      },
+      fronts: {
+        blackstone_consortium: {
+          factionId: "blackstone_consortium",
+          influence: 6,
+          pressure: 6,
+          status: "active",
+        },
+      },
+      legacyFlags: ["ending:guild_reform"],
+    };
+
+    const progressResponse = await app.inject({
+      method: "POST",
+      url: `/campaigns/${campaign.campaignId}/campaign/progress`,
+      headers: { "content-type": "application/json" },
+      payload: {
+        assetProjects: [{ assetId: "public_case_archive" }],
+      },
+    });
+
+    expect(progressResponse.statusCode).toBe(200);
+    expect(progressResponse.json()).toMatchObject({
+      state: {
+        campaign: {
+          base: { assets: { public_case_archive: 0 } },
+          legacyFlags: expect.arrayContaining([
+            "ending:guild_reform",
+            "asset:public_case_archive:mobilized",
+          ]),
+          fronts: {
+            blackstone_consortium: {
+              influence: 5,
+              pressure: 4,
+              status: "active",
+            },
+          },
+        },
+      },
+      resolution: {
+        statePatch: { source: "referee" },
+      },
+    });
+
+    expect(store.get(campaign.campaignId)?.turns).toHaveLength(1);
     await app.close();
   });
 

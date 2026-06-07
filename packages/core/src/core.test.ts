@@ -105,6 +105,33 @@ describe("dice and adjudication", () => {
     expect(next.publicEvents.at(-1)?.tags).toContain("recovery");
     expect(next.player.reputationTags).toContain("危机补救者");
   });
+  it("adjudicates freeform player actions without letting text mutate state directly", () => {
+    const state = createBorderSevenDaysWorld();
+    state.player.attributes.insight = 5;
+    state.player.skills.survival = 5;
+    const action: PlayerAction = {
+      actionType: "custom",
+      label: "自由行动：伪装药材车",
+      description: "伪装成药材车绕开封锁，把病人送到旧哨站。",
+      leverage: ["freeform"],
+      riskLevel: "medium"
+    };
+
+    const resolution = adjudicateTurn({
+      state,
+      playerAction: action,
+      proposals: [],
+      turnId: "turn-freeform",
+      seed: "freeform-success"
+    });
+    const next = applyStatePatch(state, resolution.patch);
+    const freeformEvent = next.publicEvents.find((item) => item.tags.includes("freeform"));
+
+    expect(resolution.patch.source).toBe("referee");
+    expect(freeformEvent?.body).toContain(action.description);
+    expect(next.player.momentum).toBeGreaterThan(state.player.momentum);
+    expect(next).not.toHaveProperty("伪装成药材车绕开封锁，把病人送到旧哨站。");
+  });
 });
 
 describe("state patches", () => {

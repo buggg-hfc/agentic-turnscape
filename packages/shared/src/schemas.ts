@@ -238,7 +238,7 @@ export type EndingSummary = z.infer<typeof EndingSummarySchema>;
 
 export const PlayerActionSchema = z.object({
   id: z.string().optional(),
-  actionType: z.enum(["investigate", "negotiate", "fight", "protect", "trade", "rest", "travel", "ignore"]),
+  actionType: z.enum(["investigate", "negotiate", "fight", "protect", "trade", "rest", "travel", "ignore", "custom"]),
   label: z.string(),
   description: z.string(),
   targetId: z.string().optional(),

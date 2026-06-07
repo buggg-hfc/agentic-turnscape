@@ -85,7 +85,8 @@ const check = (
     trade: { attribute: "charm", skill: "trade", difficulty: 10 },
     rest: { attribute: "will", skill: "survival", difficulty: 7 },
     travel: { attribute: "agility", skill: "survival", difficulty: 10 },
-    ignore: { attribute: "insight", skill: "insight", difficulty: 10 }
+    ignore: { attribute: "insight", skill: "insight", difficulty: 10 },
+    custom: { attribute: "insight", skill: "survival", difficulty: 11 }
   } satisfies Record<PlayerAction["actionType"], { attribute: keyof WorldState["player"]["attributes"]; skill: string; difficulty: number }>;
 
   const config = actionMap[playerAction.actionType];
@@ -458,6 +459,45 @@ export const adjudicateTurn = ({ state, playerAction, proposals, turnId, seed = 
     );
     publicSummary = "玩家用资源换到黑市情报，鸦九开始认真评估这位外来者。";
     hiddenSummary = "鸦九保留了商会走私派联系人的名字，等待更高价码。";
+  } else if (playerAction.actionType === "custom") {
+    const freeformIntent = playerAction.description.trim() || playerAction.label;
+    if (isSuccess(roll.level)) {
+      changes.push(
+        { op: "inc", path: "player.momentum", delta: 1, reason: "自由行动成功获得可见推进" },
+        {
+          op: "append",
+          path: "publicEvents",
+          value: event(
+            state,
+            turnId,
+            "自由行动推进",
+            `玩家尝试：${freeformIntent} 裁判确认该行动带来了可见进展，但未让自由文本直接改写世界状态。`,
+            ["freeform", "custom"]
+          ),
+          reason: "记录自由行动裁判结果"
+        }
+      );
+      publicSummary = `自由行动得到裁判确认：${freeformIntent}`;
+      hiddenSummary = "自由行动只作为玩家意图输入，具体数值与后果仍由规则裁判写入。";
+    } else {
+      changes.push(
+        { op: "inc", path: "player.resources.pressure", delta: 1, reason: "自由行动受阻增加压力" },
+        {
+          op: "append",
+          path: "publicEvents",
+          value: event(
+            state,
+            turnId,
+            "自由行动受阻",
+            `玩家尝试：${freeformIntent} 行动没有按预期展开，局势压力上升。`,
+            ["freeform", "setback"]
+          ),
+          reason: "记录自由行动受阻结果"
+        }
+      );
+      publicSummary = `自由行动受阻：${freeformIntent}`;
+      hiddenSummary = "裁判拒绝把玩家文本当作事实，只记录可验证的失败后果。";
+    }
   } else if (playerAction.actionType === "rest" || playerAction.actionType === "ignore") {
     changes.push(
       { op: "inc", path: "player.resources.stamina", delta: 1, reason: "玩家降低直接消耗" },

@@ -154,4 +154,45 @@ describe("campaign progression view model", () => {
       },
     ]);
   });
+
+  it("offers a clear asset-project move from inherited ending assets", () => {
+    const state = createBorderSevenDaysWorld();
+    state.campaign = {
+      chapter: 2,
+      experience: 3,
+      base: {
+        name: "Border House",
+        level: 0,
+        facilities: { infirmary: 0, archive: 0, workshop: 0 },
+        assets: { public_case_archive: 1 },
+      },
+      fronts: {
+        blackstone_consortium: {
+          factionId: "blackstone_consortium",
+          influence: 6,
+          pressure: 6,
+          status: "active",
+        },
+      },
+      legacyFlags: ["ending:guild_reform"],
+    };
+
+    expect(
+      buildCampaignProgressionChoices(state, {
+        baseFacilities: ["infirmary", "archive", "workshop"],
+      }),
+    ).toEqual(
+      expect.arrayContaining([
+        {
+          id: "asset:public_case_archive",
+          kind: "asset",
+          label: "Mobilize public case archive",
+          description: "Use this inherited ending asset to pressure Blackstone's front.",
+          request: {
+            assetProjects: [{ assetId: "public_case_archive" }],
+          },
+        },
+      ]),
+    );
+  });
 });

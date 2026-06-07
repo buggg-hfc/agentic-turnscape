@@ -53,6 +53,10 @@ import {
   type FactionPlanSummary,
 } from "./factionPlans.js";
 import {
+  FREEFORM_ACTION_MAX_LENGTH,
+  buildFreeformPlayerAction,
+} from "./freeformAction.js";
+import {
   clearLlmSettings,
   loadLlmSettings,
   saveLlmSettings,
@@ -131,6 +135,7 @@ export const App = () => {
   const [transparency, setTransparency] =
     useState<TransparencyMode>("inference");
   const [selectedAction, setSelectedAction] = useState<PlayerAction>();
+  const [freeformActionText, setFreeformActionText] = useState("");
   const [llmSettings, setLlmSettings] = useState<LlmConfig>(() =>
     loadLlmSettings(),
   );
@@ -371,6 +376,12 @@ export const App = () => {
     () => buildCampaignArcStatusSummary(scenarioStatus),
     [scenarioStatus],
   );
+  const freeformAction = useMemo(
+    () => buildFreeformPlayerAction(freeformActionText),
+    [freeformActionText],
+  );
+  const selectedTurnAction =
+    selectedAction?.actionType === "custom" ? freeformAction : selectedAction;
 
   const submitTurn = async (action: PlayerAction) => {
     if (!campaignId) return;
@@ -406,6 +417,7 @@ export const App = () => {
           setActions(payload.availableActions);
           setSelectedAction(payload.availableActions[0]);
           setLastResolution(payload.lastTurn.resolution);
+          if (action.actionType === "custom") setFreeformActionText("");
           setChronicleTimeline(
             buildChronicleTimeline(await api.chronicle(campaignId)),
           );
@@ -590,10 +602,45 @@ export const App = () => {
               </button>
             ))}
           </div>
+          <section className="freeform-action-composer">
+            <div className="panel-heading compact">
+              <Sparkles size={16} />
+              <h3>自由行动</h3>
+            </div>
+            <textarea
+              aria-label="自由行动"
+              placeholder="伪装成药材车绕开封锁，把病人送到旧哨站。"
+              value={freeformActionText}
+              maxLength={FREEFORM_ACTION_MAX_LENGTH}
+              disabled={loadState === "running"}
+              onChange={(event) => setFreeformActionText(event.target.value)}
+            />
+            <div className="freeform-action-footer">
+              <span>
+                {freeformActionText.trim().length}/{FREEFORM_ACTION_MAX_LENGTH}
+              </span>
+              <button
+                className={
+                  selectedAction?.actionType === "custom"
+                    ? "freeform-action-button selected"
+                    : "freeform-action-button"
+                }
+                disabled={!freeformAction || loadState === "running"}
+                onClick={() =>
+                  freeformAction && setSelectedAction(freeformAction)
+                }
+              >
+                <Play size={15} />
+                选择自由行动
+              </button>
+            </div>
+          </section>
           <button
             className="primary-button full"
-            disabled={!selectedAction || loadState === "running"}
-            onClick={() => selectedAction && void submitTurn(selectedAction)}
+            disabled={!selectedTurnAction || loadState === "running"}
+            onClick={() =>
+              selectedTurnAction && void submitTurn(selectedTurnAction)
+            }
           >
             <Play size={18} />
             {loadState === "running" ? "结算中..." : "执行回合"}
@@ -1025,7 +1072,7 @@ const CampaignProgressionChoicesPanel = ({
       <h3>Campaign Moves</h3>
     </div>
     <div className="campaign-choice-list">
-      {choices.slice(0, 3).map((choice) => (
+      {choices.slice(0, 4).map((choice) => (
         <button
           key={choice.id}
           className={`campaign-choice ${choice.kind}`}
