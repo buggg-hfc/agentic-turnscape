@@ -8,6 +8,7 @@ export type CreatorScenarioDraftInput = {
   startLocationName: string;
   crisisName: string;
   guideName: string;
+  pressureNpcName: string;
   allyFactionName: string;
   pressureFactionName: string;
   primaryActionLabel: string;
@@ -56,6 +57,7 @@ export const defaultCreatorScenarioDraftInput: CreatorScenarioDraftInput = {
   startLocationName: "临时指挥所",
   crisisName: "局势失控",
   guideName: "向导",
+  pressureNpcName: "施压代表",
   allyFactionName: "本地互助会",
   pressureFactionName: "施压者联盟",
   primaryActionLabel: "安抚现场",
@@ -100,6 +102,10 @@ export const buildCreatorScenarioDraft = (
   const guideName = textOr(
     input.guideName,
     defaultCreatorScenarioDraftInput.guideName,
+  );
+  const pressureNpcName = textOr(
+    input.pressureNpcName,
+    defaultCreatorScenarioDraftInput.pressureNpcName,
   );
   const allyFactionName = textOr(
     input.allyFactionName,
@@ -225,7 +231,7 @@ export const buildCreatorScenarioDraft = (
       },
       [pressureNpcId]: {
         id: pressureNpcId,
-        name: `${pressureFactionName}代表`,
+        name: pressureNpcName,
         role: "施压代表",
         factionId: pressureFactionId,
         publicImage: `不断要求立刻处理${crisisName}的人。`,

@@ -11,6 +11,7 @@ describe("creator scenario draft preview", () => {
       startLocationName: "潮汐议事厅",
       crisisName: "灯塔停摆",
       guideName: "林澈",
+      pressureNpcName: "黑帆船长",
       allyFactionName: "码头互助会",
       pressureFactionName: "黑帆承包队",
       primaryActionLabel: "安抚码头",
@@ -32,7 +33,7 @@ describe("creator scenario draft preview", () => {
       {
         title: "NPC",
         count: 2,
-        items: ["林澈", "黑帆承包队代表"],
+        items: ["林澈", "黑帆船长"],
       },
       {
         title: "阵营",

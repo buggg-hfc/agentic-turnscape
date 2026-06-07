@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Creator Editable Pressure NPC
+
+### Scope
+
+- Added TDD coverage proving creator quick drafts can name the opposing NPC explicitly instead of deriving only `${pressureFactionName}代表`.
+- Extended `CreatorScenarioDraftInput` with `pressureNpcName`; generated worlds, preview outlines, and imported creator packages now preserve that authored NPC name.
+- The creator GUI now exposes a Chinese `对手 NPC` field between `关键 NPC` and faction fields, giving the creator a clearer two-NPC cast editor.
+
+### Runtime Screenshot
+
+![Creator editable pressure NPC](screenshots/creator-pressure-npc-runtime-2026-06-08.png)
+
+The screenshot was captured from a local runtime session after opening the scenario selection screen and verifying the creator panel showed `对手 NPC`, default `施压代表`, and the preview NPC list included the authored pressure NPC name.
+
+### Verification
+
+```bash
+npm test -- packages/shared/src/creatorScenarioDraft.test.ts apps/web/src/creatorScenarioPreview.test.ts packages/content/src/creatorScenario.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - Creator Third Action Editor
 
 ### Scope

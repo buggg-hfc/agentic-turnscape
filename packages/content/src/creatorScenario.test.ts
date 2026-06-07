@@ -127,6 +127,7 @@ describe("creator scenario import", () => {
         startLocationName: "临时诊所",
         crisisName: "伤员潮",
         guideName: "米娜",
+        pressureNpcName: "赫然队长",
         allyFactionName: "志愿护理队",
         pressureFactionName: "封锁巡逻队",
         primaryActionLabel: "稳定分诊",
@@ -139,6 +140,7 @@ describe("creator scenario import", () => {
     expect(scenario.id).toBe("clinic-gui-draft");
     expect(scenario.counts).toEqual({ combat: 1, social: 1, endings: 2 });
     expect(world.player.name).toBe("临时镇医");
+    expect(Object.values(world.characters).map((npc) => npc.name)).toContain("赫然队长");
     expect(scenario.getDayPlan(1)?.mainEvent).toContain("封锁线外");
     expect(scenario.getActions(world).map((action) => action.label)).toEqual([
       "稳定分诊",

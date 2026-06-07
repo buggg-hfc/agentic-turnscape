@@ -24,6 +24,7 @@ describe("creator scenario draft builder", () => {
       startLocationName: "长明巷口",
       crisisName: "雨声怨念",
       guideName: "林姐",
+      pressureNpcName: "周队",
       allyFactionName: "街坊互助会",
       pressureFactionName: "拆迁承包队",
       primaryActionLabel: "安抚街坊",
@@ -37,6 +38,9 @@ describe("creator scenario draft builder", () => {
     });
     expect(WorldStateSchema.parse(draft.world).player.name).toBe(
       "临时调查员",
+    );
+    expect(Object.values(draft.world.characters).map((npc) => npc.name)).toEqual(
+      expect.arrayContaining(["林姐", "周队"]),
     );
     expect(draft.days).toEqual(
       expect.arrayContaining([

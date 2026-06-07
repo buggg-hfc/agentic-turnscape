@@ -1061,6 +1061,16 @@ const CreatorScenarioImportPanel = ({
         />
       </label>
       <label className="creator-field">
+        <span>对手 NPC</span>
+        <input
+          value={draft.pressureNpcName}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("pressureNpcName", event.target.value)
+          }
+        />
+      </label>
+      <label className="creator-field">
         <span>支援阵营</span>
         <input
           value={draft.allyFactionName}
