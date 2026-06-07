@@ -1180,6 +1180,16 @@ const CreatorScenarioImportPanel = ({
           }
         />
       </label>
+      <label className="creator-field wide">
+        <span>长期影响</span>
+        <textarea
+          value={draft.mainQuestLongTermImpact}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("mainQuestLongTermImpact", event.target.value)
+          }
+        />
+      </label>
       <label className="creator-field">
         <span>行动一</span>
         <input

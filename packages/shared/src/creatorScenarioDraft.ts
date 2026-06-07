@@ -19,6 +19,7 @@ export type CreatorScenarioDraftInput = {
   mainQuestRealBackground: string;
   mainQuestHiddenGoal: string;
   mainQuestFailureConsequence: string;
+  mainQuestLongTermImpact: string;
   primaryActionLabel: string;
   secondaryActionLabel: string;
   tertiaryActionLabel: string;
@@ -80,6 +81,7 @@ export const defaultCreatorScenarioDraftInput: CreatorScenarioDraftInput = {
   mainQuestRealBackground: "施压阵营正在遮掩一条能改变公众判断的关键证据。",
   mainQuestHiddenGoal: "找出谁在推动危机失控。",
   mainQuestFailureConsequence: "施压阵营将获得危机后的解释权。",
+  mainQuestLongTermImpact: "剧本可以扩展成长线章节、基地项目和阵营战线。",
   primaryActionLabel: "安抚现场",
   secondaryActionLabel: "追查源头",
   tertiaryActionLabel: "争取证人",
@@ -184,6 +186,10 @@ export const buildCreatorScenarioDraft = (
   const mainQuestFailureConsequence = textOr(
     input.mainQuestFailureConsequence,
     defaultCreatorScenarioDraftInput.mainQuestFailureConsequence,
+  );
+  const mainQuestLongTermImpact = textOr(
+    input.mainQuestLongTermImpact,
+    defaultCreatorScenarioDraftInput.mainQuestLongTermImpact,
   );
   const primaryActionLabel = textOr(
     input.primaryActionLabel,
@@ -412,7 +418,7 @@ export const buildCreatorScenarioDraft = (
         factionIds: [allyFactionId, pressureFactionId],
         solutionTypes: ["negotiate", "investigate", "fight"],
         failureConsequence: mainQuestFailureConsequence,
-        longTermImpact: `${title}可以扩展成长线章节、基地项目和阵营战线。`,
+        longTermImpact: mainQuestLongTermImpact,
         status: "active",
       },
     },

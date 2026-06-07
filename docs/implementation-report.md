@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Creator Editable Quest Long-Term Impact
+
+### Scope
+
+- Added TDD coverage proving creator quick drafts can author the main quest's long-term impact instead of relying on a title-based expansion template.
+- Extended `CreatorScenarioDraftInput` with `mainQuestLongTermImpact`; generated worlds and imported creator packages now preserve that authored text in `WorldState.quests[*].longTermImpact`.
+- The creator GUI now exposes a Chinese `长期影响` text area, and the preview task section displays `任务目标；真相：背景；隐线：目标；失败：后果；影响：长期钩子` before import.
+
+### Runtime Screenshot
+
+![Creator editable quest long-term impact](screenshots/creator-quest-long-term-impact-runtime-2026-06-08.png)
+
+The screenshot was captured from a local runtime session after opening the scenario selection screen and verifying the creator panel showed the long-term impact field and the preview task section reflected the authored campaign hook.
+
+### Verification
+
+```bash
+npm test -- packages/shared/src/creatorScenarioDraft.test.ts apps/web/src/creatorScenarioPreview.test.ts packages/content/src/creatorScenario.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - Creator Editable Quest Hidden Goals
 
 ### Scope

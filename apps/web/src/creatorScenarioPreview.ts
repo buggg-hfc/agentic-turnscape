@@ -31,7 +31,7 @@ export const buildCreatorDraftPreview = (
   );
   const quests = Object.values(draft.world.quests).map(
     (quest) =>
-      `${quest.name}：${quest.surfaceGoal}；真相：${quest.realBackground}；隐线：${quest.hiddenGoal}；失败：${quest.failureConsequence}`,
+      `${quest.name}：${quest.surfaceGoal}；真相：${quest.realBackground}；隐线：${quest.hiddenGoal}；失败：${quest.failureConsequence}；影响：${quest.longTermImpact}`,
   );
   const actions = draft.actions.map((action) => action.label);
   const endings = draft.endings.map(

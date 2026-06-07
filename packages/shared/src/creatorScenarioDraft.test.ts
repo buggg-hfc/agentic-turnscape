@@ -37,6 +37,8 @@ describe("creator scenario draft builder", () => {
       mainQuestHiddenGoal: "确认谁替拆迁队改写了雨夜巡逻记录。",
       mainQuestFailureConsequence:
         "拆迁队会把雨声解释成封街理由，旧城住户失去公开辩护机会。",
+      mainQuestLongTermImpact:
+        "雨声真相会成为旧城后续修复和居民自治的证据。",
       primaryActionLabel: "安抚街坊",
       secondaryActionLabel: "追查雨声",
       tertiaryActionLabel: "争取证人",
@@ -92,6 +94,9 @@ describe("creator scenario draft builder", () => {
       ),
     ).toEqual([
       "拆迁队会把雨声解释成封街理由，旧城住户失去公开辩护机会。",
+    ]);
+    expect(Object.values(draft.world.quests).map((quest) => quest.longTermImpact)).toEqual([
+      "雨声真相会成为旧城后续修复和居民自治的证据。",
     ]);
     expect(draft.actions).toHaveLength(3);
     for (const action of draft.actions) {

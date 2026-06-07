@@ -72,6 +72,7 @@ For gameplay work, tests should prove the rule invariant rather than a single lu
 - Creator tooling now supports tested editable main quest failure consequences in the quick-create GUI. The `任务失败后果` field feeds `mainQuestFailureConsequence` into `WorldState.quests[*].failureConsequence`, and the preview task section displays `任务目标；失败：后果` before import.
 - Creator tooling now supports tested editable main quest true background text in the quick-create GUI. The `任务真相` field feeds `mainQuestRealBackground` into `WorldState.quests[*].realBackground`, and the creator preview displays `任务目标；真相：背景；失败：后果` before import while player-visible redaction remains rule-owned elsewhere.
 - Creator tooling now supports tested editable main quest hidden goals in the quick-create GUI. The `隐线目标` field feeds `mainQuestHiddenGoal` into `WorldState.quests[*].hiddenGoal`, and the creator preview displays `任务目标；真相：背景；隐线：目标；失败：后果` before import.
+- Creator tooling now supports tested editable main quest long-term impact text in the quick-create GUI. The `长期影响` field feeds `mainQuestLongTermImpact` into `WorldState.quests[*].longTermImpact`, and the creator preview displays the long-campaign hook before import.
 
 ## MVP Completion Gate
 

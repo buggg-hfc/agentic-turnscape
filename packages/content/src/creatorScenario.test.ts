@@ -140,6 +140,8 @@ describe("creator scenario import", () => {
         mainQuestHiddenGoal: "查清谁命令志愿护理队延后公开伤员名单。",
         mainQuestFailureConsequence:
           "巡逻队会宣布分诊失败，哨卡进入长期封闭。",
+        mainQuestLongTermImpact:
+          "公开分诊线会成为后续医疗据点和通行谈判的基础。",
         primaryActionLabel: "稳定分诊",
         secondaryActionLabel: "谈判放行",
         tertiaryActionLabel: "转移伤员",
@@ -170,6 +172,9 @@ describe("creator scenario import", () => {
     expect(
       Object.values(world.quests).map((quest) => quest.failureConsequence),
     ).toEqual(["巡逻队会宣布分诊失败，哨卡进入长期封闭。"]);
+    expect(Object.values(world.quests).map((quest) => quest.longTermImpact)).toEqual([
+      "公开分诊线会成为后续医疗据点和通行谈判的基础。",
+    ]);
     const importedPressureClock = Object.values(world.clocks).find(
       (clock) => clock.name === "伤员潮",
     );
