@@ -2,6 +2,30 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - LLM Provider Presets
+
+### Scope
+
+- Added TDD coverage proving the web LLM settings layer can apply provider presets without overwriting a locally entered API key.
+- Added OpenAI, DeepSeek, and local OpenAI-compatible presets. The DeepSeek preset fills `https://api.deepseek.com`, `deepseek-v4-pro`, `30000` ms timeout, and `4096` max tokens while keeping secrets in the browser-only settings form.
+- The Chinese LLM settings GUI now exposes `供应商预设` above the existing endpoint/model/API-key controls, so players can switch between remote and local-compatible model providers without editing JSON or changing world state.
+
+### Runtime Screenshot
+
+![LLM provider preset runtime](screenshots/llm-provider-preset-runtime-2026-06-08.png)
+
+The screenshot was captured from a local Border Seven Days runtime session after choosing the DeepSeek preset and verifying the GUI populated the public endpoint, model, timeout, and max-token fields while leaving the API-key control local and secret-only.
+
+### Verification
+
+```bash
+npm test -- apps/web/src/llmSettings.test.ts --reporter=dot
+npm test -- apps/web/src/llmSettings.test.ts apps/web/src/api.test.ts apps/api/src/server.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - Freeform Explicit Custom Targets
 
 ### Scope

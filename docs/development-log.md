@@ -4,6 +4,18 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added tested LLM provider presets for the in-game settings panel. The GUI now offers OpenAI, DeepSeek, and local OpenAI-compatible presets, and applying the DeepSeek preset fills `https://api.deepseek.com`, `deepseek-v4-pro`, `30000`, and `4096` without overwriting the browser-local API key field or writing secrets into world state.
+- Captured a runtime screenshot showing the DeepSeek preset applied in the Chinese LLM settings panel:
+
+![LLM provider preset runtime](screenshots/llm-provider-preset-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- apps/web/src/llmSettings.test.ts --reporter=dot`
+  - `npm test -- apps/web/src/llmSettings.test.ts apps/web/src/api.test.ts apps/api/src/server.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added tested explicit custom targets for freeform player actions. When player prose includes `目标：...` and no visible world entity matches, the builder now creates a stable `custom_target_*`, stores the player-authored target as `freeform:targetText:*`, and the Chinese GUI preview shows it as a normal target chip without letting it directly mutate world state.
 - Captured a runtime screenshot showing an unknown target, `东门水塔`, preserved in the freeform action preview:
 

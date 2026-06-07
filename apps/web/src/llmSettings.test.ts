@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
+  applyLlmProviderPreset,
   clearLlmSettings,
+  llmProviderPresets,
   loadLlmSettings,
   llmConnectionErrorStatus,
   llmConnectionSuccessStatus,
@@ -26,6 +28,33 @@ class MemoryStorage implements StorageLike {
 }
 
 describe("LLM settings persistence", () => {
+  it("applies provider presets without overwriting local API keys", () => {
+    expect(llmProviderPresets.map((preset) => preset.id)).toEqual([
+      "openai",
+      "deepseek",
+      "local",
+    ]);
+
+    expect(
+      applyLlmProviderPreset(
+        {
+          baseUrl: "https://old.example.test/v1",
+          model: "old-model",
+          apiKey: "keep-this-local-key",
+          timeoutMs: 9000,
+          maxTokens: 777,
+        },
+        "deepseek",
+      ),
+    ).toEqual({
+      baseUrl: "https://api.deepseek.com",
+      model: "deepseek-v4-pro",
+      apiKey: "keep-this-local-key",
+      timeoutMs: 30000,
+      maxTokens: 4096,
+    });
+  });
+
   it("saves and loads a sanitized local LLM configuration", () => {
     const storage = new MemoryStorage();
 

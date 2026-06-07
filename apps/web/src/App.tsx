@@ -66,12 +66,15 @@ import {
   buildFreeformPlayerAction,
 } from "./freeformAction.js";
 import {
+  applyLlmProviderPreset,
   clearLlmSettings,
   llmConnectionErrorStatus,
   llmConnectionSuccessStatus,
+  llmProviderPresets,
   loadLlmSettings,
   saveLlmSettings,
   type LlmConnectionStatus,
+  type LlmProviderPresetId,
 } from "./llmSettings.js";
 import { displayPlayerAction } from "./playerActionDisplay.js";
 import {
@@ -2122,6 +2125,28 @@ const LlmSettingsPanel = ({
       <h3>LLM 接口</h3>
     </div>
     <div className="settings-grid">
+      <label>
+        <span>供应商预设</span>
+        <select
+          value=""
+          onChange={(event) => {
+            if (!event.target.value) return;
+            onChange(
+              applyLlmProviderPreset(
+                settings,
+                event.target.value as LlmProviderPresetId,
+              ),
+            );
+          }}
+        >
+          <option value="">选择预设</option>
+          {llmProviderPresets.map((preset) => (
+            <option key={preset.id} value={preset.id}>
+              {preset.label} · {preset.description}
+            </option>
+          ))}
+        </select>
+      </label>
       <label>
         <span>接口地址</span>
         <input
