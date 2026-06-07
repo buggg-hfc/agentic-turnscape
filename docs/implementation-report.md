@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Creator Editable Faction Plans
+
+### Scope
+
+- Added TDD coverage proving creator quick drafts can author each faction's `publicGoal`, `currentPlan`, and `resources` instead of only changing faction names.
+- Extended `CreatorScenarioDraftInput` with `allyFactionPublicGoal`, `allyFactionCurrentPlan`, `allyFactionResources`, `pressureFactionPublicGoal`, `pressureFactionCurrentPlan`, and `pressureFactionResources`; generated drafts and imported creator packages now preserve those values in `WorldState.factions`.
+- The creator GUI now exposes Chinese `支援阵营目标`, `支援阵营计划`, `支援阵营资源`, `施压阵营目标`, `施压阵营计划`, and `施压阵营资源` controls, and the preview faction section displays `阵营名：公开目标；计划：当前计划；资源：资源 数量` before import.
+
+### Runtime Screenshot
+
+![Creator editable faction plans](screenshots/creator-faction-runtime-2026-06-08.png)
+
+The screenshot was captured from a local runtime session after setting both faction plans and resource lists, then verifying the creator preview reflected those authored faction details.
+
+### Verification
+
+```bash
+npm test -- packages/shared/src/creatorScenarioDraft.test.ts apps/web/src/creatorScenarioPreview.test.ts packages/content/src/creatorScenario.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - Creator Editable Action Targets
 
 ### Scope

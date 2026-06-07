@@ -134,6 +134,12 @@ describe("creator scenario import", () => {
         pressureNpcName: "赫然队长",
         allyFactionName: "志愿护理队",
         pressureFactionName: "封锁巡逻队",
+        allyFactionPublicGoal: "公开分诊并保护愿意登记的伤员。",
+        allyFactionCurrentPlan: "先在诊所门口建立临时护理台。",
+        allyFactionResources: "护工:4,药箱:2",
+        pressureFactionPublicGoal: "声称封锁哨卡能阻止伤员潮扩大。",
+        pressureFactionCurrentPlan: "把所有转运申请压到巡逻队手里。",
+        pressureFactionResources: "哨兵:3,封条:2",
         mainQuestGoal: "在哨卡封闭前建立公开分诊线并争取放行窗口。",
         mainQuestRealBackground:
           "巡逻队曾把第一批伤员转移到哨卡后仓，公开分诊会暴露延误。",
@@ -172,6 +178,18 @@ describe("creator scenario import", () => {
     expect(world.player.name).toBe("临时镇医");
     expect(Object.values(world.locations).map((location) => location.name)).toContain("封锁哨卡");
     expect(Object.values(world.characters).map((npc) => npc.name)).toContain("赫然队长");
+    expect(Object.values(world.factions).map((faction) => faction.publicGoal)).toEqual([
+      "公开分诊并保护愿意登记的伤员。",
+      "声称封锁哨卡能阻止伤员潮扩大。",
+    ]);
+    expect(Object.values(world.factions).map((faction) => faction.currentPlan)).toEqual([
+      "先在诊所门口建立临时护理台。",
+      "把所有转运申请压到巡逻队手里。",
+    ]);
+    expect(Object.values(world.factions).map((faction) => faction.resources)).toEqual([
+      { 护工: 4, 药箱: 2 },
+      { 哨兵: 3, 封条: 2 },
+    ]);
     expect(Object.values(world.quests).map((quest) => quest.surfaceGoal)).toEqual([
       "在哨卡封闭前建立公开分诊线并争取放行窗口。",
     ]);

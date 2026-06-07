@@ -1160,6 +1160,37 @@ const CreatorScenarioImportPanel = ({
           }
         />
       </label>
+      <label className="creator-field wide">
+        <span>支援阵营目标</span>
+        <textarea
+          value={draft.allyFactionPublicGoal}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("allyFactionPublicGoal", event.target.value)
+          }
+        />
+      </label>
+      <label className="creator-field wide">
+        <span>支援阵营计划</span>
+        <textarea
+          value={draft.allyFactionCurrentPlan}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("allyFactionCurrentPlan", event.target.value)
+          }
+        />
+      </label>
+      <label className="creator-field">
+        <span>支援阵营资源</span>
+        <input
+          value={draft.allyFactionResources}
+          disabled={disabled}
+          placeholder="人手:2,补给:2"
+          onChange={(event) =>
+            onDraftChange("allyFactionResources", event.target.value)
+          }
+        />
+      </label>
       <label className="creator-field">
         <span>施压阵营</span>
         <input
@@ -1167,6 +1198,37 @@ const CreatorScenarioImportPanel = ({
           disabled={disabled}
           onChange={(event) =>
             onDraftChange("pressureFactionName", event.target.value)
+          }
+        />
+      </label>
+      <label className="creator-field wide">
+        <span>施压阵营目标</span>
+        <textarea
+          value={draft.pressureFactionPublicGoal}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("pressureFactionPublicGoal", event.target.value)
+          }
+        />
+      </label>
+      <label className="creator-field wide">
+        <span>施压阵营计划</span>
+        <textarea
+          value={draft.pressureFactionCurrentPlan}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("pressureFactionCurrentPlan", event.target.value)
+          }
+        />
+      </label>
+      <label className="creator-field">
+        <span>施压阵营资源</span>
+        <input
+          value={draft.pressureFactionResources}
+          disabled={disabled}
+          placeholder="执行者:2,筹码:2"
+          onChange={(event) =>
+            onDraftChange("pressureFactionResources", event.target.value)
           }
         />
       </label>

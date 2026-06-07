@@ -22,6 +22,12 @@ export type CreatorScenarioDraftInput = {
   pressureNpcName: string;
   allyFactionName: string;
   pressureFactionName: string;
+  allyFactionPublicGoal: string;
+  allyFactionCurrentPlan: string;
+  allyFactionResources: string;
+  pressureFactionPublicGoal: string;
+  pressureFactionCurrentPlan: string;
+  pressureFactionResources: string;
   mainQuestGoal: string;
   mainQuestRealBackground: string;
   mainQuestHiddenGoal: string;
@@ -96,6 +102,12 @@ export const defaultCreatorScenarioDraftInput: CreatorScenarioDraftInput = {
   pressureNpcName: "施压代表",
   allyFactionName: "本地互助会",
   pressureFactionName: "施压者联盟",
+  allyFactionPublicGoal: "公开处理危机，让居民看到可执行的办法。",
+  allyFactionCurrentPlan: "先把起始地点变成可信的协商点。",
+  allyFactionResources: "志愿者:2,补给:2",
+  pressureFactionPublicGoal: "要求立刻用强硬方式终止危机。",
+  pressureFactionCurrentPlan: "把危机塑造成只能由自己解决的问题。",
+  pressureFactionResources: "执行者:2,筹码:2",
   mainQuestGoal: "在三天内稳住危机并给出公开解释。",
   mainQuestRealBackground: "施压阵营正在遮掩一条能改变公众判断的关键证据。",
   mainQuestHiddenGoal: "找出谁在推动危机失控。",
@@ -163,6 +175,27 @@ const boundedInt = (
   return max === undefined ? lowerBounded : Math.min(max, lowerBounded);
 };
 
+const parseResourceText = (value: string): Record<string, number> => {
+  const entries = value
+    .split(/[,\n;，；]+/)
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+  const resources: Record<string, number> = {};
+  for (const entry of entries) {
+    const [rawKey, rawAmount] = entry.split(/[:：=]/, 2);
+    const key = rawKey?.trim();
+    const amount = Number.parseInt(rawAmount?.trim() ?? "", 10);
+    if (!key || !Number.isFinite(amount)) continue;
+    resources[key] = Math.max(0, amount);
+  }
+  return resources;
+};
+
+const resourcesOr = (value: string, fallback: string): Record<string, number> => {
+  const resources = parseResourceText(value);
+  return Object.keys(resources).length > 0 ? resources : parseResourceText(fallback);
+};
+
 export const buildCreatorScenarioDraft = (
   input: CreatorScenarioDraftInput,
 ): CreatorScenarioDraft => {
@@ -216,6 +249,30 @@ export const buildCreatorScenarioDraft = (
   const pressureFactionName = textOr(
     input.pressureFactionName,
     defaultCreatorScenarioDraftInput.pressureFactionName,
+  );
+  const allyFactionPublicGoal = textOr(
+    input.allyFactionPublicGoal ?? "",
+    defaultCreatorScenarioDraftInput.allyFactionPublicGoal,
+  );
+  const allyFactionCurrentPlan = textOr(
+    input.allyFactionCurrentPlan ?? "",
+    defaultCreatorScenarioDraftInput.allyFactionCurrentPlan,
+  );
+  const allyFactionResources = resourcesOr(
+    input.allyFactionResources ?? "",
+    defaultCreatorScenarioDraftInput.allyFactionResources,
+  );
+  const pressureFactionPublicGoal = textOr(
+    input.pressureFactionPublicGoal ?? "",
+    defaultCreatorScenarioDraftInput.pressureFactionPublicGoal,
+  );
+  const pressureFactionCurrentPlan = textOr(
+    input.pressureFactionCurrentPlan ?? "",
+    defaultCreatorScenarioDraftInput.pressureFactionCurrentPlan,
+  );
+  const pressureFactionResources = resourcesOr(
+    input.pressureFactionResources ?? "",
+    defaultCreatorScenarioDraftInput.pressureFactionResources,
   );
   const mainQuestGoal = textOr(
     input.mainQuestGoal,
@@ -454,33 +511,33 @@ export const buildCreatorScenarioDraft = (
       [allyFactionId]: {
         id: allyFactionId,
         name: allyFactionName,
-        publicGoal: `公开处理${crisisName}，让居民看到可执行的办法。`,
+        publicGoal: allyFactionPublicGoal,
         hiddenGoal: "保护组织里曾经犯错的人不被立即清算。",
         leader: guideId,
-        resources: { volunteers: 2, supplies: 2 },
+        resources: allyFactionResources,
         baseId: startLocationId,
         allies: [],
         enemies: [pressureFactionId],
         internalConflict: "有人想公开全部真相，有人担心真相会引发二次混乱。",
         style: "稳住现场、收集证据、争取居民信任。",
         bottomLine: "不能让无辜者替危机背锅。",
-        currentPlan: `先把${startLocationName}变成可信的协商点。`,
+        currentPlan: allyFactionCurrentPlan,
         clockIds: [stabilityClockId],
       },
       [pressureFactionId]: {
         id: pressureFactionId,
         name: pressureFactionName,
-        publicGoal: `要求立刻用强硬方式终止${crisisName}。`,
+        publicGoal: pressureFactionPublicGoal,
         hiddenGoal: "借危机后续规则获得长期控制权。",
         leader: pressureNpcId,
-        resources: { enforcers: 2, leverage: 2 },
+        resources: pressureFactionResources,
         baseId: pressureLocationId,
         allies: [],
         enemies: [allyFactionId],
         internalConflict: "强硬派想马上行动，算计派想等玩家犯错。",
         style: "制造时间压力，把复杂问题简化成二选一。",
         bottomLine: "不会放弃通过恐惧扩大影响力的机会。",
-        currentPlan: `把${crisisName}塑造成只能由自己解决的问题。`,
+        currentPlan: pressureFactionCurrentPlan,
         clockIds: [pressureClockId],
       },
     },

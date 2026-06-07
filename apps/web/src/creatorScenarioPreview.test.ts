@@ -18,6 +18,12 @@ describe("creator scenario draft preview", () => {
       pressureNpcName: "黑帆船长",
       allyFactionName: "码头互助会",
       pressureFactionName: "黑帆承包队",
+      allyFactionPublicGoal: "公开修复灯塔并保护船工证词。",
+      allyFactionCurrentPlan: "先组织船工看守潮汐议事厅。",
+      allyFactionResources: "船工:4,油料:2",
+      pressureFactionPublicGoal: "声称只有封航才能避免事故扩大。",
+      pressureFactionCurrentPlan: "用巡逻船封住外海航标。",
+      pressureFactionResources: "巡逻船:3,账本:1",
       mainQuestGoal: "在下一次潮汐前修复灯塔并公开黑帆的封航证据。",
       mainQuestRealBackground:
         "停摆前夜有人把备用灯芯调包，只有潮汐记录能证明黑帆提前进场。",
@@ -67,7 +73,10 @@ describe("creator scenario draft preview", () => {
       {
         title: "阵营",
         count: 2,
-        items: ["码头互助会", "黑帆承包队"],
+        items: [
+          "码头互助会：公开修复灯塔并保护船工证词。；计划：先组织船工看守潮汐议事厅。；资源：船工 4，油料 2",
+          "黑帆承包队：声称只有封航才能避免事故扩大。；计划：用巡逻船封住外海航标。；资源：巡逻船 3，账本 1",
+        ],
       },
       {
         title: "危机钟",

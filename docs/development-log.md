@@ -4,6 +4,17 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added tested editable faction goals, plans, and resources for creator quick drafts. The GUI now shows `支援阵营目标`, `支援阵营计划`, `支援阵营资源`, `施压阵营目标`, `施压阵营计划`, and `施压阵营资源`; generated drafts preserve the authored faction fields; imported creator packages expose them through `WorldState.factions`; and the preview faction section displays `阵营名：公开目标；计划：当前计划；资源：资源 数量`.
+- Captured a runtime screenshot showing the editable faction controls and faction preview:
+
+![Creator editable faction plans](screenshots/creator-faction-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- packages/shared/src/creatorScenarioDraft.test.ts apps/web/src/creatorScenarioPreview.test.ts packages/content/src/creatorScenario.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added tested editable action targets for creator quick drafts. The GUI now shows `行动一目标`, `行动二目标`, and `行动三目标`; generated drafts preserve `primaryActionTarget`, `secondaryActionTarget`, and `tertiaryActionTarget`; imported creator packages expose those values through `PlayerAction.targetId`; and the preview action section displays `行动名：说明（类型：...；目标：...；风险：...）`.
 - Captured a runtime screenshot showing the editable action-target selects and the preview action list:
 
