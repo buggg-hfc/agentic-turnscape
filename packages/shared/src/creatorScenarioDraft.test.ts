@@ -31,6 +31,8 @@ describe("creator scenario draft builder", () => {
       primaryActionLabel: "安抚街坊",
       secondaryActionLabel: "追查雨声",
       tertiaryActionLabel: "争取证人",
+      successEndingTitle: "雨声停歇",
+      pressureEndingTitle: "旧城封门",
     });
 
     expect(draft).toMatchObject({
@@ -60,5 +62,9 @@ describe("creator scenario draft builder", () => {
         /安抚街坊|追查雨声|争取证人/,
       );
     }
+    expect(draft.endings.map((ending) => ending.title)).toEqual([
+      "雨声停歇",
+      "旧城封门",
+    ]);
   });
 });

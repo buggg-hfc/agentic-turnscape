@@ -4,6 +4,17 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added tested editable ending titles for creator quick drafts. The GUI now shows `成功结局` and `压力结局`, generated drafts preserve `successEndingTitle` and `pressureEndingTitle`, and imported creator packages return those titles from `evaluateEnding`.
+- Captured a runtime screenshot showing the editable ending title fields and preview ending list:
+
+![Creator editable ending titles](screenshots/creator-ending-titles-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- packages/shared/src/creatorScenarioDraft.test.ts apps/web/src/creatorScenarioPreview.test.ts packages/content/src/creatorScenario.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added a tested editable pressure location field for creator quick drafts. The GUI now shows `冲突地点`, generated worlds preserve `pressureLocationName`, and imported creator packages expose the authored conflict location in their world state.
 - Captured a runtime screenshot showing the editable conflict location field and preview location list:
 

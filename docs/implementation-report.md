@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Creator Editable Ending Titles
+
+### Scope
+
+- Added TDD coverage proving creator quick drafts can name the success and pressure endings explicitly instead of deriving them only from the scenario title and crisis clock.
+- Extended `CreatorScenarioDraftInput` with `successEndingTitle` and `pressureEndingTitle`; generated drafts, preview outlines, and imported creator packages now preserve those authored ending titles.
+- The creator GUI now exposes Chinese `成功结局` and `压力结局` fields, while ending trigger conditions remain rule-owned through the imported scenario contract.
+
+### Runtime Screenshot
+
+![Creator editable ending titles](screenshots/creator-ending-titles-runtime-2026-06-08.png)
+
+The screenshot was captured from a local runtime session after opening the scenario selection screen and verifying the creator panel showed `成功结局`, `压力结局`, and the preview ending list updated to the authored titles.
+
+### Verification
+
+```bash
+npm test -- packages/shared/src/creatorScenarioDraft.test.ts apps/web/src/creatorScenarioPreview.test.ts packages/content/src/creatorScenario.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - Creator Editable Pressure Location
 
 ### Scope

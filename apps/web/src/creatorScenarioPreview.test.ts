@@ -18,6 +18,8 @@ describe("creator scenario draft preview", () => {
       primaryActionLabel: "安抚码头",
       secondaryActionLabel: "追查灯塔",
       tertiaryActionLabel: "召集船工",
+      successEndingTitle: "灯塔复明",
+      pressureEndingTitle: "黑帆接管",
     });
 
     expect(preview).toMatchObject({
@@ -54,7 +56,7 @@ describe("creator scenario draft preview", () => {
       {
         title: "结局",
         count: 2,
-        items: ["港口试作稳定", "灯塔停摆失控"],
+        items: ["灯塔复明", "黑帆接管"],
       },
     ]);
   });

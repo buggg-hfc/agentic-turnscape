@@ -1130,6 +1130,26 @@ const CreatorScenarioImportPanel = ({
           }
         />
       </label>
+      <label className="creator-field">
+        <span>成功结局</span>
+        <input
+          value={draft.successEndingTitle}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("successEndingTitle", event.target.value)
+          }
+        />
+      </label>
+      <label className="creator-field">
+        <span>压力结局</span>
+        <input
+          value={draft.pressureEndingTitle}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("pressureEndingTitle", event.target.value)
+          }
+        />
+      </label>
     </div>
     <CreatorDraftPreviewPanel preview={buildCreatorDraftPreview(draft)} />
     <div className="creator-draft-actions">

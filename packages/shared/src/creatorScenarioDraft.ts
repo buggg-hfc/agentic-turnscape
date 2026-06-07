@@ -15,6 +15,8 @@ export type CreatorScenarioDraftInput = {
   primaryActionLabel: string;
   secondaryActionLabel: string;
   tertiaryActionLabel: string;
+  successEndingTitle: string;
+  pressureEndingTitle: string;
 };
 
 export type CreatorScenarioDraft = Record<string, unknown> & {
@@ -65,6 +67,8 @@ export const defaultCreatorScenarioDraftInput: CreatorScenarioDraftInput = {
   primaryActionLabel: "安抚现场",
   secondaryActionLabel: "追查源头",
   tertiaryActionLabel: "争取证人",
+  successEndingTitle: "局势稳定",
+  pressureEndingTitle: "危机失控",
 };
 
 export const normalizeCreatorScenarioId = (value: string): string => {
@@ -132,6 +136,14 @@ export const buildCreatorScenarioDraft = (
   const tertiaryActionLabel = textOr(
     input.tertiaryActionLabel,
     defaultCreatorScenarioDraftInput.tertiaryActionLabel,
+  );
+  const successEndingTitle = textOr(
+    input.successEndingTitle,
+    defaultCreatorScenarioDraftInput.successEndingTitle,
+  );
+  const pressureEndingTitle = textOr(
+    input.pressureEndingTitle,
+    defaultCreatorScenarioDraftInput.pressureEndingTitle,
   );
 
   const startLocationId = `${prefix}_start`;
@@ -473,13 +485,13 @@ export const buildCreatorScenarioDraft = (
     endings: [
       {
         id: `${prefix}_stabilized`,
-        title: `${title}稳定`,
+        title: successEndingTitle,
         summary: `玩家让${allyFactionName}和居民看见了可执行的未来，${crisisName}没有吞没整个局势。`,
         when: { momentumAtLeast: 3 },
       },
       {
         id: `${prefix}_pressure_wins`,
-        title: `${crisisName}失控`,
+        title: pressureEndingTitle,
         summary: `${pressureFactionName}借危机取得解释权，玩家只能在新局势里继续周旋。`,
         when: { clockAtMax: pressureClockId },
       },

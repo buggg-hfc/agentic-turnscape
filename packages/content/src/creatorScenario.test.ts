@@ -134,9 +134,13 @@ describe("creator scenario import", () => {
         primaryActionLabel: "稳定分诊",
         secondaryActionLabel: "谈判放行",
         tertiaryActionLabel: "转移伤员",
+        successEndingTitle: "伤员安置",
+        pressureEndingTitle: "哨卡接管",
       }),
     );
     const world = scenario.createWorld();
+    const successWorld = scenario.createWorld();
+    const pressureWorld = scenario.createWorld();
 
     expect(scenario.id).toBe("clinic-gui-draft");
     expect(scenario.counts).toEqual({ combat: 1, social: 1, endings: 2 });
@@ -149,5 +153,13 @@ describe("creator scenario import", () => {
       "谈判放行",
       "转移伤员",
     ]);
+    successWorld.player.momentum = 3;
+    expect(scenario.evaluateEnding(successWorld)?.title).toBe("伤员安置");
+    const pressureClock = Object.values(pressureWorld.clocks).find(
+      (clock) => clock.name === "伤员潮",
+    );
+    expect(pressureClock).toBeDefined();
+    pressureClock!.progress = pressureClock!.max;
+    expect(scenario.evaluateEnding(pressureWorld)?.title).toBe("哨卡接管");
   });
 });
