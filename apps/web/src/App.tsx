@@ -68,6 +68,7 @@ import {
 import {
   applyLlmProviderPreset,
   clearLlmSettings,
+  detectLlmProviderPresetId,
   llmConnectionErrorStatus,
   llmConnectionSuccessStatus,
   llmProviderPresets,
@@ -2118,7 +2119,13 @@ const LlmSettingsPanel = ({
   onSave: () => void;
   onClear: () => void;
   onTest: () => void;
-}) => (
+}) => {
+  const detectedProviderPresetId = detectLlmProviderPresetId(settings);
+  const detectedProviderPreset = llmProviderPresets.find(
+    (preset) => preset.id === detectedProviderPresetId,
+  );
+
+  return (
   <section className="module">
     <div className="panel-heading compact">
       <Settings size={17} />
@@ -2128,7 +2135,7 @@ const LlmSettingsPanel = ({
       <label>
         <span>供应商预设</span>
         <select
-          value=""
+          value={detectedProviderPresetId}
           onChange={(event) => {
             if (!event.target.value) return;
             onChange(
@@ -2139,13 +2146,17 @@ const LlmSettingsPanel = ({
             );
           }}
         >
-          <option value="">选择预设</option>
+          <option value="">自定义配置</option>
           {llmProviderPresets.map((preset) => (
             <option key={preset.id} value={preset.id}>
-              {preset.label} · {preset.description}
+              {preset.label}
             </option>
           ))}
         </select>
+        <small className="settings-hint">
+          {detectedProviderPreset?.description ??
+            "手动配置接口、模型与运行参数"}
+        </small>
       </label>
       <label>
         <span>接口地址</span>
@@ -2229,7 +2240,8 @@ const LlmSettingsPanel = ({
       </div>
     ) : null}
   </section>
-);
+  );
+};
 
 const AgentPanel = ({
   resolution,

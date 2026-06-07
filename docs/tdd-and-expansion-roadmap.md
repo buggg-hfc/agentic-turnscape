@@ -31,6 +31,7 @@ For gameplay work, tests should prove the rule invariant rather than a single lu
 
 ## Verified Slices
 
+- LLM provider presets now stay visible after selection: matching public settings select OpenAI, DeepSeek, or local-compatible automatically, while custom combinations fall back to custom configuration and API keys remain ignored by detection.
 - LLM settings now have tested provider presets in the Chinese GUI: OpenAI, DeepSeek, and local OpenAI-compatible presets populate endpoint/model/runtime fields while preserving the browser-local API key and keeping secrets out of world state.
 - Runtime creator scenarios can be imported, exported, protected from deletion while campaigns reference them, saved locally in the browser, and restored by the API store after server rebuilds.
 - LLM settings can be configured in the web UI, saved locally, checked from the GUI, sent with a turn request, and kept out of world state and status output.

@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - LLM Preset Detection
+
+### Scope
+
+- Added TDD coverage proving the web LLM settings layer can detect a selected provider preset from non-secret settings.
+- The provider selector now reflects the current matching preset instead of returning to the placeholder after applying DeepSeek, while custom endpoint/model/runtime combinations still show as custom configuration.
+- The GUI now keeps the select label short and moves provider details into a compact hint line, making the LLM configuration panel easier to scan in the right-side game UI.
+
+### Runtime Screenshot
+
+![LLM provider detection runtime](screenshots/llm-provider-detected-runtime-2026-06-08.png)
+
+The screenshot was captured from a local Border Seven Days runtime session after applying the DeepSeek preset and verifying the selector showed `DeepSeek`, the hint stayed visible, and the endpoint/model/runtime fields matched the preset without exposing any API key.
+
+### Verification
+
+```bash
+npm test -- apps/web/src/llmSettings.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - LLM Provider Presets
 
 ### Scope

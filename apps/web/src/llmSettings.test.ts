@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   applyLlmProviderPreset,
   clearLlmSettings,
+  detectLlmProviderPresetId,
   llmProviderPresets,
   loadLlmSettings,
   llmConnectionErrorStatus,
@@ -53,6 +54,28 @@ describe("LLM settings persistence", () => {
       timeoutMs: 30000,
       maxTokens: 4096,
     });
+  });
+
+  it("detects the selected provider preset from non-secret settings", () => {
+    expect(
+      detectLlmProviderPresetId({
+        baseUrl: "https://api.deepseek.com/",
+        model: "deepseek-v4-pro",
+        apiKey: "browser-only-secret",
+        timeoutMs: 30000,
+        maxTokens: 4096,
+      }),
+    ).toBe("deepseek");
+
+    expect(
+      detectLlmProviderPresetId({
+        baseUrl: "https://api.deepseek.com",
+        model: "custom-campaign-model",
+        apiKey: "browser-only-secret",
+        timeoutMs: 30000,
+        maxTokens: 4096,
+      }),
+    ).toBe("");
   });
 
   it("saves and loads a sanitized local LLM configuration", () => {

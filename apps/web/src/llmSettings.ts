@@ -88,6 +88,20 @@ export const applyLlmProviderPreset = (
   });
 };
 
+export const detectLlmProviderPresetId = (
+  settings: LlmConfig,
+): LlmProviderPresetId | "" => {
+  const sanitized = sanitizeLlmSettings(settings);
+  const preset = llmProviderPresets.find(
+    (candidate) =>
+      candidate.baseUrl === sanitized.baseUrl &&
+      candidate.model === sanitized.model &&
+      candidate.timeoutMs === sanitized.timeoutMs &&
+      candidate.maxTokens === sanitized.maxTokens,
+  );
+  return preset?.id ?? "";
+};
+
 export const loadLlmSettings = (storage: StorageLike | undefined = getBrowserStorage()): LlmConfig => {
   if (!storage) return defaultLlmSettings();
   const raw = storage.getItem(LLM_SETTINGS_STORAGE_KEY);

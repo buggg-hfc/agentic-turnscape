@@ -4,6 +4,17 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added tested LLM provider preset detection for the in-game settings panel. The DeepSeek preset now remains visibly selected after it populates the public endpoint/model/runtime fields, custom combinations return to `自定义配置`, and provider descriptions sit in a separate hint line so the right-side GUI stays readable.
+- Captured a runtime screenshot showing the DeepSeek preset selected and its hint visible in the Chinese LLM settings panel:
+
+![LLM provider detection runtime](screenshots/llm-provider-detected-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- apps/web/src/llmSettings.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added tested LLM provider presets for the in-game settings panel. The GUI now offers OpenAI, DeepSeek, and local OpenAI-compatible presets, and applying the DeepSeek preset fills `https://api.deepseek.com`, `deepseek-v4-pro`, `30000`, and `4096` without overwriting the browser-local API key field or writing secrets into world state.
 - Captured a runtime screenshot showing the DeepSeek preset applied in the Chinese LLM settings panel:
 

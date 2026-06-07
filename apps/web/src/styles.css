@@ -1119,6 +1119,12 @@ meter {
   font-size: 13px;
 }
 
+.settings-hint {
+  color: #8fa29b;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
 .settings-grid input,
 .settings-grid select {
   width: 100%;
