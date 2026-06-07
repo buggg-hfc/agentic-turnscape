@@ -1,6 +1,11 @@
 import type { PlayerAction, RiskLevel, WorldState } from "./schemas.js";
 
 export type CreatorActionType = Exclude<PlayerAction["actionType"], "custom">;
+export type CreatorActionTarget =
+  | "guide"
+  | "pressureNpc"
+  | "startLocation"
+  | "pressureLocation";
 
 export type CreatorScenarioDraftInput = {
   id: string;
@@ -23,14 +28,17 @@ export type CreatorScenarioDraftInput = {
   mainQuestFailureConsequence: string;
   mainQuestLongTermImpact: string;
   primaryActionType: CreatorActionType;
+  primaryActionTarget: CreatorActionTarget;
   primaryActionLabel: string;
   primaryActionDescription: string;
   primaryActionRiskLevel: RiskLevel;
   secondaryActionType: CreatorActionType;
+  secondaryActionTarget: CreatorActionTarget;
   secondaryActionLabel: string;
   secondaryActionDescription: string;
   secondaryActionRiskLevel: RiskLevel;
   tertiaryActionType: CreatorActionType;
+  tertiaryActionTarget: CreatorActionTarget;
   tertiaryActionLabel: string;
   tertiaryActionDescription: string;
   tertiaryActionRiskLevel: RiskLevel;
@@ -94,14 +102,17 @@ export const defaultCreatorScenarioDraftInput: CreatorScenarioDraftInput = {
   mainQuestFailureConsequence: "施压阵营将获得危机后的解释权。",
   mainQuestLongTermImpact: "剧本可以扩展成长线章节、基地项目和阵营战线。",
   primaryActionType: "negotiate",
+  primaryActionTarget: "guide",
   primaryActionLabel: "安抚现场",
   primaryActionDescription: "稳住现场并推动剧本稳定度。",
   primaryActionRiskLevel: "medium",
   secondaryActionType: "investigate",
+  secondaryActionTarget: "pressureLocation",
   secondaryActionLabel: "追查源头",
   secondaryActionDescription: "追查关键证据并阻止施压阵营独占解释权。",
   secondaryActionRiskLevel: "high",
   tertiaryActionType: "protect",
+  tertiaryActionTarget: "guide",
   tertiaryActionLabel: "争取证人",
   tertiaryActionDescription: "保护愿意开口的证人并转化为公开证词。",
   tertiaryActionRiskLevel: "medium",
@@ -135,6 +146,11 @@ const actionTypeOr = (
   value: CreatorActionType | undefined,
   fallback: CreatorActionType,
 ): CreatorActionType => value ?? fallback;
+
+const actionTargetOr = (
+  value: CreatorActionTarget | undefined,
+  fallback: CreatorActionTarget,
+): CreatorActionTarget => value ?? fallback;
 
 const boundedInt = (
   value: number,
@@ -225,6 +241,10 @@ export const buildCreatorScenarioDraft = (
     input.primaryActionType,
     defaultCreatorScenarioDraftInput.primaryActionType,
   );
+  const primaryActionTarget = actionTargetOr(
+    input.primaryActionTarget,
+    defaultCreatorScenarioDraftInput.primaryActionTarget,
+  );
   const primaryActionLabel = textOr(
     input.primaryActionLabel,
     defaultCreatorScenarioDraftInput.primaryActionLabel,
@@ -241,6 +261,10 @@ export const buildCreatorScenarioDraft = (
     input.secondaryActionType,
     defaultCreatorScenarioDraftInput.secondaryActionType,
   );
+  const secondaryActionTarget = actionTargetOr(
+    input.secondaryActionTarget,
+    defaultCreatorScenarioDraftInput.secondaryActionTarget,
+  );
   const secondaryActionLabel = textOr(
     input.secondaryActionLabel,
     defaultCreatorScenarioDraftInput.secondaryActionLabel,
@@ -256,6 +280,10 @@ export const buildCreatorScenarioDraft = (
   const tertiaryActionType = actionTypeOr(
     input.tertiaryActionType,
     defaultCreatorScenarioDraftInput.tertiaryActionType,
+  );
+  const tertiaryActionTarget = actionTargetOr(
+    input.tertiaryActionTarget,
+    defaultCreatorScenarioDraftInput.tertiaryActionTarget,
   );
   const tertiaryActionLabel = textOr(
     input.tertiaryActionLabel,
@@ -298,6 +326,12 @@ export const buildCreatorScenarioDraft = (
   const socialSceneId = `${prefix}_opening_social`;
   const combatSceneId = `${prefix}_pressure_combat`;
   const finalSceneId = `${prefix}_final_choice`;
+  const actionTargetIds: Record<CreatorActionTarget, string> = {
+    guide: guideId,
+    pressureNpc: pressureNpcId,
+    startLocation: startLocationId,
+    pressureLocation: pressureLocationId,
+  };
 
   const world: WorldState = {
     time: { day: 1, phase: "morning" },
@@ -586,7 +620,7 @@ export const buildCreatorScenarioDraft = (
         actionType: primaryActionType,
         label: primaryActionLabel,
         description: primaryActionDescription,
-        targetId: guideId,
+        targetId: actionTargetIds[primaryActionTarget],
         leverage: [
           `scenario:${id}`,
           `clock:${stabilityClockId}`,
@@ -599,7 +633,7 @@ export const buildCreatorScenarioDraft = (
         actionType: secondaryActionType,
         label: secondaryActionLabel,
         description: secondaryActionDescription,
-        targetId: pressureLocationId,
+        targetId: actionTargetIds[secondaryActionTarget],
         leverage: [
           `scenario:${id}`,
           `clock:${stabilityClockId}`,
@@ -613,7 +647,7 @@ export const buildCreatorScenarioDraft = (
         actionType: tertiaryActionType,
         label: tertiaryActionLabel,
         description: tertiaryActionDescription,
-        targetId: guideId,
+        targetId: actionTargetIds[tertiaryActionTarget],
         leverage: [
           `scenario:${id}`,
           `clock:${stabilityClockId}`,

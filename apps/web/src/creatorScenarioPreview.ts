@@ -37,6 +37,18 @@ const actionTypeLabel = {
   custom: "自定义",
 } as const;
 
+const actionTargetName = (
+  draft: ReturnType<typeof buildCreatorScenarioDraft>,
+  targetId: string | undefined,
+) => {
+  if (!targetId) return "未指定";
+  return (
+    draft.world.characters[targetId]?.name ??
+    draft.world.locations[targetId]?.name ??
+    targetId
+  );
+};
+
 export const buildCreatorDraftPreview = (
   input: CreatorScenarioDraftInput,
 ): CreatorDraftPreview => {
@@ -53,7 +65,7 @@ export const buildCreatorDraftPreview = (
   );
   const actions = draft.actions.map(
     (action) =>
-      `${action.label}：${action.description}（类型：${actionTypeLabel[action.actionType]}；风险：${riskLabel[action.riskLevel]}）`,
+      `${action.label}：${action.description}（类型：${actionTypeLabel[action.actionType]}；目标：${actionTargetName(draft, action.targetId)}；风险：${riskLabel[action.riskLevel]}）`,
   );
   const endings = draft.endings.map(
     (ending) => `${ending.title}：${ending.summary}`,

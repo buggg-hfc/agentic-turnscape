@@ -143,14 +143,17 @@ describe("creator scenario import", () => {
         mainQuestLongTermImpact:
           "公开分诊线会成为后续医疗据点和通行谈判的基础。",
         primaryActionType: "protect",
+        primaryActionTarget: "pressureNpc",
         primaryActionLabel: "稳定分诊",
         primaryActionDescription: "把伤员按公开标准分流，争取镇民先稳住现场。",
         primaryActionRiskLevel: "low",
         secondaryActionType: "negotiate",
+        secondaryActionTarget: "startLocation",
         secondaryActionLabel: "谈判放行",
         secondaryActionDescription: "带着护理记录去哨卡争取临时通行窗口。",
         secondaryActionRiskLevel: "medium",
         tertiaryActionType: "travel",
+        tertiaryActionTarget: "pressureLocation",
         tertiaryActionLabel: "转移伤员",
         tertiaryActionDescription: "保护重伤者离开封锁线并留下可验证名单。",
         tertiaryActionRiskLevel: "high",
@@ -201,6 +204,11 @@ describe("creator scenario import", () => {
       "protect",
       "negotiate",
       "travel",
+    ]);
+    expect(scenario.getActions(world).map((action) => action.targetId)).toEqual([
+      "clinic_gui_draft_pressure_lead",
+      "clinic_gui_draft_start",
+      "clinic_gui_draft_pressure_site",
     ]);
     expect(scenario.getActions(world).map((action) => action.description)).toEqual([
       "把伤员按公开标准分流，争取镇民先稳住现场。",

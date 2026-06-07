@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Creator Editable Action Targets
+
+### Scope
+
+- Added TDD coverage proving creator quick drafts can author each playable action's `targetId` instead of being locked to fixed guide, pressure location, and guide targets.
+- Extended `CreatorScenarioDraftInput` with `primaryActionTarget`, `secondaryActionTarget`, and `tertiaryActionTarget`; valid target classes are `guide`, `pressureNpc`, `startLocation`, and `pressureLocation`, and generated drafts plus imported creator packages now preserve those choices in `PlayerAction.targetId`.
+- The creator GUI now exposes Chinese `行动一目标`, `行动二目标`, and `行动三目标` select controls, and the preview action section displays `行动名：说明（类型：...；目标：...；风险：...）` before import.
+
+### Runtime Screenshot
+
+![Creator editable action targets](screenshots/creator-action-target-runtime-2026-06-08.png)
+
+The screenshot was captured from a local runtime session after setting three different action targets and verifying the creator preview reflected all three authored target labels.
+
+### Verification
+
+```bash
+npm test -- packages/shared/src/creatorScenarioDraft.test.ts apps/web/src/creatorScenarioPreview.test.ts packages/content/src/creatorScenario.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - Creator Editable Action Types
 
 ### Scope

@@ -77,6 +77,7 @@ For gameplay work, tests should prove the rule invariant rather than a single lu
 - Creator tooling now supports tested editable action descriptions in the quick-create GUI. The `行动一说明`, `行动二说明`, and `行动三说明` fields feed `primaryActionDescription`, `secondaryActionDescription`, and `tertiaryActionDescription` into `PlayerAction.description`, and the creator preview displays each entry as `行动名：说明` before import.
 - Creator tooling now supports tested editable action risks in the quick-create GUI. The `行动一风险`, `行动二风险`, and `行动三风险` select controls feed `primaryActionRiskLevel`, `secondaryActionRiskLevel`, and `tertiaryActionRiskLevel` into `PlayerAction.riskLevel`, and the creator preview displays each entry as `行动名：说明（风险：低/中/高）` before import.
 - Creator tooling now supports tested editable action types in the quick-create GUI. The `行动一类型`, `行动二类型`, and `行动三类型` select controls feed `primaryActionType`, `secondaryActionType`, and `tertiaryActionType` into `PlayerAction.actionType`, and the creator preview displays each entry as `行动名：说明（类型：调查/谈判/战斗/保护/交易/休整/旅行/放弃；风险：低/中/高）` before import.
+- Creator tooling now supports tested editable action targets in the quick-create GUI. The `行动一目标`, `行动二目标`, and `行动三目标` select controls feed `primaryActionTarget`, `secondaryActionTarget`, and `tertiaryActionTarget` into `PlayerAction.targetId`, and the creator preview displays each entry as `行动名：说明（类型：...；目标：...；风险：...）` before import.
 
 ## MVP Completion Gate
 

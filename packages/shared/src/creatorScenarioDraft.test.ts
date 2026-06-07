@@ -40,14 +40,17 @@ describe("creator scenario draft builder", () => {
       mainQuestLongTermImpact:
         "雨声真相会成为旧城后续修复和居民自治的证据。",
       primaryActionType: "trade",
+      primaryActionTarget: "startLocation",
       primaryActionLabel: "安抚街坊",
       primaryActionDescription: "组织街坊在巷口建立公开证词桌。",
       primaryActionRiskLevel: "low",
       secondaryActionType: "fight",
+      secondaryActionTarget: "pressureNpc",
       secondaryActionLabel: "追查雨声",
       secondaryActionDescription: "沿雨棚水痕追查旧仓库的隐藏监控。",
       secondaryActionRiskLevel: "high",
       tertiaryActionType: "travel",
+      tertiaryActionTarget: "pressureLocation",
       tertiaryActionLabel: "争取证人",
       tertiaryActionDescription: "保护愿意开口的住户并安排安全转移。",
       tertiaryActionRiskLevel: "medium",
@@ -112,6 +115,11 @@ describe("creator scenario draft builder", () => {
       "trade",
       "fight",
       "travel",
+    ]);
+    expect(draft.actions.map((action) => action.targetId)).toEqual([
+      "rain_alley_test_start",
+      "rain_alley_test_pressure_lead",
+      "rain_alley_test_pressure_site",
     ]);
     expect(draft.actions.map((action) => action.description)).toEqual([
       "组织街坊在巷口建立公开证词桌。",
