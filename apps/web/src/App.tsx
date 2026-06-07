@@ -476,12 +476,13 @@ export const App = () => {
     [scenarioStatus],
   );
   const freeformAction = useMemo(
-    () => buildFreeformPlayerAction(freeformActionText),
-    [freeformActionText],
+    () => buildFreeformPlayerAction(freeformActionText, state),
+    [freeformActionText, state],
   );
   const freeformActionPreview = useMemo(
-    () => (freeformAction ? buildFreeformActionPreview(freeformAction) : []),
-    [freeformAction],
+    () =>
+      freeformAction ? buildFreeformActionPreview(freeformAction, state) : [],
+    [freeformAction, state],
   );
   const freeformComposerState = useMemo(
     () =>

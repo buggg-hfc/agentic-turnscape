@@ -1,8 +1,39 @@
-import type { PlayerAction } from "@agentic-turnscape/shared";
+import type {
+  CharacterState,
+  ClockState,
+  FactionState,
+  LocationState,
+  PlayerAction,
+} from "@agentic-turnscape/shared";
 import { displayLabel } from "./displayLabels.js";
 
 export const FREEFORM_ACTION_MAX_LENGTH = 500;
 type FreeformIntent = Exclude<PlayerAction["actionType"], "custom">;
+export type FreeformTargetContext = {
+  locations?: Record<
+    string,
+    Pick<LocationState, "id" | "name" | "description" | "publicInfo" | "tags">
+  >;
+  characters?: Record<
+    string,
+    Pick<CharacterState, "id" | "name" | "role" | "publicImage" | "knownFacts">
+  >;
+  factions?: Record<
+    string,
+    Pick<FactionState, "id" | "name" | "publicGoal" | "currentPlan">
+  >;
+  clocks?: Record<
+    string,
+    Pick<ClockState, "id" | "name" | "consequence" | "visible">
+  >;
+};
+
+type FreeformTargetCandidate = {
+  id: string;
+  label: string;
+  keywords: string[];
+  dynamic: boolean;
+};
 
 export type FreeformActionAnalysis = {
   intent: FreeformIntent;
@@ -131,14 +162,139 @@ const lowRiskKeywords = ["quietly", "carefully", "observe", "rest", "wait", "\u6
 const containsAny = (value: string, keywords: string[]): boolean =>
   keywords.some((keyword) => value.includes(keyword));
 
-export const analyzeFreeformAction = (value: string): FreeformActionAnalysis | undefined => {
+const cleanKeyword = (value: string | undefined): string | undefined => {
+  const keyword = value?.trim().toLocaleLowerCase();
+  return keyword && keyword.length >= 2 ? keyword : undefined;
+};
+
+const keywordList = (values: Array<string | undefined>): string[] => [
+  ...new Set(values.flatMap((value) => cleanKeyword(value) ?? [])),
+];
+
+const staticTargetCandidates: FreeformTargetCandidate[] = targetKeywords.map(
+  (target) => ({
+    ...target,
+    dynamic: false,
+    keywords: keywordList([target.id, target.label, ...target.keywords]),
+  }),
+);
+
+export const buildFreeformTargetCandidates = (
+  context?: FreeformTargetContext,
+): FreeformTargetCandidate[] => {
+  if (!context) return staticTargetCandidates;
+
+  const locations = Object.values(context.locations ?? {}).map((location) => ({
+    id: location.id,
+    label: location.name,
+    dynamic: true,
+    keywords: keywordList([
+      location.id,
+      location.name,
+      location.description,
+      ...location.publicInfo,
+      ...location.tags,
+    ]),
+  }));
+  const characters = Object.values(context.characters ?? {}).map(
+    (character) => ({
+      id: character.id,
+      label: character.name,
+      dynamic: true,
+      keywords: keywordList([
+        character.id,
+        character.name,
+        character.role,
+        character.publicImage,
+        ...character.knownFacts,
+      ]),
+    }),
+  );
+  const factions = Object.values(context.factions ?? {}).map((faction) => ({
+    id: faction.id,
+    label: faction.name,
+    dynamic: true,
+    keywords: keywordList([
+      faction.id,
+      faction.name,
+      faction.publicGoal,
+      faction.currentPlan,
+    ]),
+  }));
+  const clocks = Object.values(context.clocks ?? {})
+    .filter((clock) => clock.visible)
+    .map((clock) => ({
+      id: clock.id,
+      label: clock.name,
+      dynamic: true,
+      keywords: keywordList([clock.id, clock.name, clock.consequence]),
+    }));
+
+  const byId = new Map<string, FreeformTargetCandidate>();
+  for (const candidate of [
+    ...staticTargetCandidates,
+    ...locations,
+    ...characters,
+    ...factions,
+    ...clocks,
+  ]) {
+    const existing = byId.get(candidate.id);
+    byId.set(candidate.id, {
+      ...candidate,
+      keywords: keywordList([
+        ...(existing?.keywords ?? []),
+        ...candidate.keywords,
+      ]),
+      dynamic: existing?.dynamic || candidate.dynamic,
+    });
+  }
+  return [...byId.values()];
+};
+
+const targetScore = (
+  normalizedText: string,
+  candidate: FreeformTargetCandidate,
+): number => {
+  const matchedLengths = candidate.keywords
+    .filter((keyword) => normalizedText.includes(keyword))
+    .map((keyword) => keyword.length);
+  if (matchedLengths.length === 0) return -1;
+  return Math.max(...matchedLengths) + (candidate.dynamic ? 1000 : 0);
+};
+
+const findTarget = (
+  normalizedText: string,
+  context?: FreeformTargetContext,
+): FreeformTargetCandidate | undefined =>
+  buildFreeformTargetCandidates(context)
+    .map((candidate) => ({
+      candidate,
+      score: targetScore(normalizedText, candidate),
+    }))
+    .filter((result) => result.score >= 0)
+    .sort((left, right) => right.score - left.score)[0]?.candidate;
+
+const targetById = (
+  targetId: string | undefined,
+  context?: FreeformTargetContext,
+): FreeformTargetCandidate | undefined =>
+  targetId
+    ? buildFreeformTargetCandidates(context).find(
+        (candidate) => candidate.id === targetId,
+      )
+    : undefined;
+
+export const analyzeFreeformAction = (
+  value: string,
+  context?: FreeformTargetContext,
+): FreeformActionAnalysis | undefined => {
   const description = normalizeFreeformText(value);
   if (!description) return undefined;
 
   const normalized = description.toLocaleLowerCase();
   const intent =
     intentKeywords.find((candidate) => containsAny(normalized, candidate.keywords))?.intent ?? "investigate";
-  const target = targetKeywords.find((candidate) => containsAny(normalized, candidate.keywords));
+  const target = findTarget(normalized, context);
   const riskLevel: PlayerAction["riskLevel"] = containsAny(normalized, highRiskKeywords)
     ? "high"
     : containsAny(normalized, lowRiskKeywords)
@@ -158,18 +314,21 @@ export const analyzeFreeformAction = (value: string): FreeformActionAnalysis | u
   };
 };
 
-export const buildFreeformActionPreview = (action: PlayerAction): string[] => {
+export const buildFreeformActionPreview = (
+  action: PlayerAction,
+  context?: FreeformTargetContext,
+): string[] => {
   const intent = action.leverage
     .find((item) => item.startsWith("freeform:intent:"))
     ?.slice("freeform:intent:".length) as FreeformIntent | undefined;
   const risk = action.leverage.find((item) => item.startsWith("freeform:risk:"))?.slice("freeform:risk:".length) as
     | PlayerAction["riskLevel"]
     | undefined;
-  const target = targetKeywords.find((candidate) => candidate.id === action.targetId);
+  const target = targetById(action.targetId, context);
   return [
     `意图：${intent ? intentLabels[intent] : "开放"}`,
     `风险：${risk ? riskLabels[risk] : "中"}`,
-    ...(target ? [`目标：${displayLabel(target.id)}`] : [])
+    ...(target ? [`目标：${displayLabel(target.id, target.label)}`] : [])
   ];
 };
 
@@ -200,10 +359,13 @@ export const buildFreeformComposerState = (
   };
 };
 
-export const buildFreeformPlayerAction = (value: string): PlayerAction | undefined => {
+export const buildFreeformPlayerAction = (
+  value: string,
+  context?: FreeformTargetContext,
+): PlayerAction | undefined => {
   const description = normalizeFreeformText(value);
   if (!description) return undefined;
-  const analysis = analyzeFreeformAction(description);
+  const analysis = analyzeFreeformAction(description, context);
 
   return {
     id: stableId(description),

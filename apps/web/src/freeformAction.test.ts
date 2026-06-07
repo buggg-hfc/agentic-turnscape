@@ -48,6 +48,39 @@ describe("freeform action builder", () => {
     ]);
   });
 
+  it("infers freeform targets from the current visible world entities", () => {
+    const visibleWorldTargets = {
+      locations: {},
+      characters: {},
+      factions: {
+        blackstone_consortium: {
+          id: "blackstone_consortium",
+          name: "黑石商会",
+          publicGoal: "控制矿区合同",
+          currentPlan: "让居民相信收购已经不可逆。",
+        },
+      },
+      clocks: {},
+    };
+    const action = buildFreeformPlayerAction(
+      "调查黑石商会最近买下矿区的账簿。",
+      visibleWorldTargets,
+    );
+
+    expect(action).toMatchObject({
+      actionType: "custom",
+      targetId: "blackstone_consortium",
+      leverage: expect.arrayContaining([
+        "freeform:target:blackstone_consortium",
+      ]),
+    });
+    expect(buildFreeformActionPreview(action!, visibleWorldTargets)).toEqual([
+      "意图：调查",
+      "风险：中",
+      "目标：黑石商会",
+    ]);
+  });
+
   it("keeps direct freeform submission available without preselecting the action", () => {
     const action = buildFreeformPlayerAction("护送病人穿过封锁线。");
 

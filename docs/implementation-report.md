@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Freeform Dynamic World Targets
+
+### Scope
+
+- Added TDD coverage proving freeform player text can target current visible world entities, not only fixed built-in keyword targets.
+- `buildFreeformPlayerAction` and `buildFreeformActionPreview` now accept visible world context and infer targets from public locations, characters, factions, and visible crisis clocks, while keeping fixed targets as a fallback.
+- The web GUI passes current `WorldState` into the freeform composer, so arbitrary player prose such as `调查黑石商会最近买下矿区的账簿。` previews as `意图：调查`, `风险：中`, and `目标：黑石商会` before entering the referee-owned turn pipeline.
+
+### Runtime Screenshot
+
+![Freeform dynamic world target](screenshots/freeform-dynamic-target-runtime-2026-06-08.png)
+
+The screenshot was captured from a local runtime session after starting Border Seven Days, typing a freeform action that mentions the visible faction `黑石商会`, and verifying the GUI target chip preferred that explicit world entity over the fixed `矿区` fallback.
+
+### Verification
+
+```bash
+npm test -- apps/web/src/freeformAction.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - Creator Editable NPC Profiles
 
 ### Scope

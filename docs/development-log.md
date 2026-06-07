@@ -4,6 +4,17 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added tested dynamic target inference for freeform player actions. The freeform builder now uses the current visible world context to match public locations, characters, factions, and visible clocks before falling back to fixed built-in targets; the GUI passes current `WorldState` into the composer, so player prose like `调查黑石商会最近买下矿区的账簿。` previews `意图：调查`, `风险：中`, and `目标：黑石商会`.
+- Captured a runtime screenshot showing the dynamic world-target preview in the Chinese GUI:
+
+![Freeform dynamic world target](screenshots/freeform-dynamic-target-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- apps/web/src/freeformAction.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added tested editable NPC profile fields for creator quick drafts. The GUI now shows `关键 NPC 身份`, `关键 NPC 公开形象`, `关键 NPC 目标`, `关键 NPC 秘密`, `对手 NPC 身份`, `对手 NPC 公开形象`, `对手 NPC 目标`, and `对手 NPC 秘密`; generated drafts preserve those values in `WorldState.characters`; imported creator packages keep them; and the preview NPC section displays `NPC 名：身份；公开：形象；目标：目标；秘密：秘密`.
 - Captured a runtime screenshot showing the editable NPC profile controls and NPC preview:
 
