@@ -24,6 +24,7 @@ A multi-agent turn-based narrative simulation game. The current implementation i
 - Faction-plan rules now cover advance, blocked, and redirected outcomes for all 3 Border Seven Days factions through referee-owned state patches.
 - First-wave expansion scenario packs for cultivation, science fiction, historical, urban supernatural, and realistic profession play, all using the same tested `ScenarioPackage` contract.
 - The web scenario picker localizes built-in expansion packs and campaign chapter labels into Chinese while preserving internal scenario ids and custom creator titles.
+- First-wave expansion scenario packages now provide Chinese player-facing content at the source/API level, including scenario titles, day events, locations, factions, NPC text, quests, clocks, fixed actions, and endings for `霜灯试炼`, `轨道隔离`, `盐港协定`, `雨巷异闻`, and `急诊夜班`.
 - The web action panel and chronicle timeline localize built-in player action cards, replay turn titles, snapshot metadata, and common location ids into Chinese while preserving original action payloads for the referee.
 - Deterministic expansion playthrough tests for all first-wave packs, covering both success and pressure endings with generic scenario clock progression and replayable state patches.
 - Long campaign progression rules for post-MVP expansion: chapter transitions, base facilities, character growth, and faction-war fronts all enter world state through referee-owned patches.

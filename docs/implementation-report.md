@@ -2,6 +2,30 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-07 - Localized Expansion Content Text
+
+### Scope
+
+- Added a TDD content-localization acceptance test that walks every first-wave expansion package and rejects player-facing English prose in scenario titles, day plans, campaign arc text, locations, factions, NPCs, quests, clocks, actions, public events, and endings.
+- Localized the cultivation package `霜灯试炼` at source level, including its day events, chapter arc, locations, factions, characters, quest, clocks, starting chronicle, fixed actions, and success/failure endings.
+- Localized the generic expansion package factory and the science fiction, historical, urban supernatural, and realistic profession packages: `轨道隔离`, `盐港协定`, `雨巷异闻`, and `急诊夜班`.
+- Updated API, content registry, and web campaign-arc tests so the scenario catalog and active campaign state expect Chinese text directly from content packages instead of relying only on display translation.
+
+### Runtime Screenshot
+
+![Localized expansion content](screenshots/expansion-content-cn-runtime-2026-06-07.png)
+
+The screenshot was captured from a local runtime session after creating a fresh `霜灯试炼` campaign and verifying the campaign title, current location, scene/event copy, and fixed action cards were Chinese source content.
+
+### Verification
+
+```bash
+npm test -- packages/content/src/expansionLocalization.test.ts packages/content/src/scenarioRegistry.test.ts apps/api/src/server.test.ts apps/web/src/campaignArcStatus.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-07 - Localized Action Cards and Chronicle Shell
 
 ### Scope

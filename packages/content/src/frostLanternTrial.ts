@@ -23,35 +23,35 @@ const relationship = (overrides: Partial<RelationshipState> = {}): RelationshipS
 
 const character = (input: Pick<CharacterState, "id" | "name" | "role" | "factionId" | "publicImage" | "desire" | "fear" | "shortTermGoal" | "longTermGoal" | "secret">): CharacterState => ({
   ...input,
-  truePersonality: "Careful, proud, and bound by old sect etiquette.",
-  bottomLine: "Will not knowingly open the frost seal for an unready disciple.",
-  weakness: "Treats formal vows as stronger evidence than lived character.",
+  truePersonality: "谨慎、自尊，并受旧宗门礼法约束。",
+  bottomLine: "不会明知弟子尚未准备好，却仍打开霜封。",
+  weakness: "过分相信正式誓约，常把它看得比真实品格更可靠。",
   attributes,
   skills: { insight: 2, defense: 2, melee: 2, social: 1, survival: 2 },
   resources: { qi: 2, talismans: 1 },
   conditions: [],
-  knownFacts: ["Public: the frost lantern burns only for disciples who can hold a vow under pressure."],
-  memorySummary: "The trial has just begun."
+  knownFacts: ["公开事实：霜灯只会为能在压力下守住誓约的弟子燃烧。"],
+  memorySummary: "试炼刚刚开始。"
 });
 
 export const frostLanternTrialDays: ScenarioDayPlan[] = [
   {
     day: 1,
-    mainEvent: "The frost lantern is lit in the outer courtyard.",
+    mainEvent: "霜灯在外门庭院点燃。",
     defaultLocationId: "lantern_courtyard",
     sceneIds: ["lantern_oath"],
     clockPressure: ["shadow_debt"]
   },
   {
     day: 2,
-    mainEvent: "Mist spirits circle the lower gate before dawn.",
+    mainEvent: "破晓前，雾灵围绕下层山门游走。",
     defaultLocationId: "mist_gate",
     sceneIds: ["mist_gate_duel"],
     clockPressure: ["inner_fire"]
   },
   {
     day: 3,
-    mainEvent: "The inner gate judges whether the disciple's vow holds.",
+    mainEvent: "内门判断弟子的誓约是否真正稳固。",
     defaultLocationId: "inner_gate",
     sceneIds: ["inner_gate_choice"],
     clockPressure: ["inner_fire", "shadow_debt"]
@@ -62,20 +62,20 @@ const frostLanternCampaignArc: ScenarioCampaignArc = {
   chapters: [
     {
       id: "frost-lantern-trial_outer_trial",
-      title: "Outer Trial",
-      focus: "Survive the three-day vow test and decide whether the inner gate opens cleanly.",
+      title: "外门试炼",
+      focus: "撑过三日誓约考验，决定内门是否能无债开启。",
       unlocks: ["lantern_oath", "lantern_courtyard", "mist_gate"]
     },
     {
       id: "frost-lantern-trial_sect_seat",
-      title: "Sect Seat",
-      focus: "Use the trial result to build a cultivation base, repair the lantern, or hide ash debt.",
+      title: "宗门席位",
+      focus: "把试炼结果转化为修行根基、霜灯修复方案，或灰债隐患。",
       unlocks: ["training_hall", "archive", "infirmary"]
     },
     {
       id: "frost-lantern-trial_ash_front",
-      title: "Ash Front",
-      focus: "Carry the vow, cabal pressure, and elder politics into a broader sect campaign.",
+      title: "灰烬战线",
+      focus: "把誓约、结社压力和长老政治带入更广阔的宗门战役。",
       unlocks: ["frost_lantern_sect", "gray_ash_cabal"]
     }
   ],
@@ -86,28 +86,28 @@ const frostLanternCampaignArc: ScenarioCampaignArc = {
 const locations: Record<string, LocationState> = {
   lantern_courtyard: {
     id: "lantern_courtyard",
-    name: "Lantern Courtyard",
-    description: "A stone courtyard where a blue-white lantern flame hangs without oil or wick.",
-    publicInfo: ["The flame dims when a disciple lies.", "Outer disciples gather here before entering the mist gate."],
-    hiddenInfo: ["The lantern is fed by old vows broken under fear."],
+    name: "灯庭",
+    description: "石砌庭院中央悬着一盏蓝白霜灯，无油无芯却仍在燃烧。",
+    publicInfo: ["弟子说谎时，灯焰会明显黯淡。", "外门弟子进入雾门前都会在这里集合。"],
+    hiddenInfo: ["霜灯靠旧日誓约的破碎残响维持。"],
     tags: ["sect", "trial"],
     dangerLevel: 1
   },
   mist_gate: {
     id: "mist_gate",
-    name: "Mist Gate",
-    description: "A narrow gate cut into cold cedar fog, guarded by trial spirits and senior disciples.",
-    publicInfo: ["Crossing the mist gate costs stamina.", "Combat is permitted but not required."],
-    hiddenInfo: ["The mist repeats the strongest fear carried by the entrant."],
+    name: "雾门",
+    description: "冷杉雾气里开出一道狭门，由试炼灵和高阶弟子共同看守。",
+    publicInfo: ["穿过雾门会消耗体力。", "这里允许交手，但并非必须用战斗通过。"],
+    hiddenInfo: ["雾会反复映出入门者心中最强的恐惧。"],
     tags: ["gate", "combat"],
     dangerLevel: 3
   },
   inner_gate: {
     id: "inner_gate",
-    name: "Inner Gate",
-    description: "A silent hall where the frost lantern's reflection decides who may continue cultivation.",
-    publicInfo: ["Only a stable vow opens the inner gate."],
-    hiddenInfo: ["The gate can be forced, but the debt follows the disciple."],
+    name: "内门",
+    description: "寂静大殿里，霜灯倒影会裁定谁有资格继续修行。",
+    publicInfo: ["只有稳定誓约才能打开内门。"],
+    hiddenInfo: ["内门可以被强行冲开，但债会跟随弟子。"],
     tags: ["sect", "ending"],
     dangerLevel: 2
   }
@@ -116,34 +116,34 @@ const locations: Record<string, LocationState> = {
 const factions: Record<string, FactionState> = {
   frost_lantern_sect: {
     id: "frost_lantern_sect",
-    name: "Frost Lantern Sect",
-    publicGoal: "Find disciples who can keep vows under pressure.",
-    hiddenGoal: "Bind unstable talents before rival sects notice them.",
+    name: "霜灯宗",
+    publicGoal: "找出能在压力下守住誓约的弟子。",
+    hiddenGoal: "在敌对宗门注意到不稳定天才前，先把他们绑定在宗门内。",
     leader: "npc_adele",
     resources: { elders: 2, talismans: 4 },
     baseId: "inner_gate",
     allies: [],
     enemies: ["gray_ash_cabal"],
-    internalConflict: "Some elders prefer obedient disciples; others want resilient ones.",
-    style: "Ritual discipline and quiet tests.",
-    bottomLine: "The sect will not admit a disciple who endangers the lantern.",
-    currentPlan: "Run the three-day outer trial.",
+    internalConflict: "部分长老偏爱顺从弟子，另一些长老更看重韧性。",
+    style: "以礼法约束和静默试炼推进局势。",
+    bottomLine: "宗门不会接纳会危及霜灯的弟子。",
+    currentPlan: "执行三日外门试炼。",
     clockIds: ["inner_fire"]
   },
   gray_ash_cabal: {
     id: "gray_ash_cabal",
-    name: "Gray Ash Cabal",
-    publicGoal: "Offer shortcuts to failed disciples.",
-    hiddenGoal: "Turn the frost lantern's debt into a recruitment chain.",
+    name: "灰烬结社",
+    publicGoal: "向失败弟子提供捷径。",
+    hiddenGoal: "把霜灯债转化为招募链条。",
     leader: "npc_manlo",
     resources: { spies: 2, ash_charms: 3 },
     baseId: "mist_gate",
     allies: [],
     enemies: ["frost_lantern_sect"],
-    internalConflict: "The cabal argues over whether to corrupt or simply harvest the trial.",
-    style: "Quiet bargains at the edge of failure.",
-    bottomLine: "Never let a promising disciple leave without a debt.",
-    currentPlan: "Whisper shortcuts during the mist gate duel.",
+    internalConflict: "结社内部争论该腐化试炼，还是只收割失败者。",
+    style: "在失败边缘低声交易。",
+    bottomLine: "绝不让有潜力的弟子无债离开。",
+    currentPlan: "在雾门对决中暗示捷径。",
     clockIds: ["shadow_debt"]
   }
 };
@@ -151,57 +151,57 @@ const factions: Record<string, FactionState> = {
 const characters: Record<string, CharacterState> = {
   npc_zhou_jin: character({
     id: "npc_zhou_jin",
-    name: "Senior Zhou",
-    role: "Outer sect guide",
+    name: "周师兄",
+    role: "外门引路人",
     factionId: "frost_lantern_sect",
-    publicImage: "A patient guide who explains trial etiquette.",
-    desire: "Keep new disciples alive long enough to learn.",
-    fear: "Watching another trial become a public execution.",
-    shortTermGoal: "Steer the player toward a stable vow.",
-    longTermGoal: "Reform the outer trial into a fairer test.",
-    secret: "Senior Zhou once failed the mist gate and was admitted only by mercy."
+    publicImage: "耐心讲解试炼礼法的引路人。",
+    desire: "让新弟子活到真正学会东西。",
+    fear: "再次看见试炼变成公开处刑。",
+    shortTermGoal: "引导玩家建立稳定誓约。",
+    longTermGoal: "把外门试炼改成更公平的考验。",
+    secret: "周师兄当年曾在雾门失败，只因长老开恩才被收入门墙。"
   }),
   npc_adele: character({
     id: "npc_adele",
-    name: "Elder Adele",
-    role: "Lantern hall elder",
+    name: "阿黛尔长老",
+    role: "霜灯殿长老",
     factionId: "frost_lantern_sect",
-    publicImage: "A precise elder who treats ritual law as mercy.",
-    desire: "Protect the lantern from unstable ambition.",
-    fear: "A forced gate opening that stains the sect for a generation.",
-    shortTermGoal: "Measure whether the player can endure a vow.",
-    longTermGoal: "Choose one disciple who can inherit the lantern method.",
-    secret: "She is hiding how weak the lantern has become."
+    publicImage: "行事精确、把礼法视作慈悲的长老。",
+    desire: "保护霜灯不被不稳定的野心污染。",
+    fear: "有人强开内门，让宗门蒙羞一代人。",
+    shortTermGoal: "衡量玩家能否承受誓约。",
+    longTermGoal: "选出能继承霜灯法门的弟子。",
+    secret: "她隐瞒了霜灯已经变得多么虚弱。"
   }),
   npc_manlo: character({
     id: "npc_manlo",
-    name: "Ash Steward Manlo",
-    role: "Cabal broker",
+    name: "灰烬执事曼洛",
+    role: "结社掮客",
     factionId: "gray_ash_cabal",
-    publicImage: "A smiling steward who offers practical help.",
-    desire: "Put a debt charm on the most promising disciple.",
-    fear: "The player succeeding cleanly and exposing the cabal.",
-    shortTermGoal: "Offer a shortcut before the mist gate closes.",
-    longTermGoal: "Turn the outer trial into a cabal recruitment funnel.",
-    secret: "He planted ash charms beneath the courtyard stones."
+    publicImage: "总是微笑、愿意提供实用帮助的执事。",
+    desire: "给最有前途的弟子种下债符。",
+    fear: "玩家干净通过试炼并暴露结社。",
+    shortTermGoal: "在雾门关闭前递出捷径。",
+    longTermGoal: "把外门试炼变成结社的招募漏斗。",
+    secret: "他在庭院石缝下埋了灰烬符。"
   })
 };
 
 const quests: Record<string, QuestState> = {
   lantern_oath: {
     id: "lantern_oath",
-    name: "Hold the Frost Oath",
-    trigger: "The player enters the outer trial.",
+    name: "守住霜誓",
+    trigger: "玩家踏入外门试炼。",
     patron: "npc_zhou_jin",
-    realBackground: "The oath filters disciples who chase power without discipline.",
-    surfaceGoal: "Reach the inner gate.",
-    hiddenGoal: "Learn whether the lantern is failing.",
+    realBackground: "誓约会筛掉只追求力量却缺乏自律的弟子。",
+    surfaceGoal: "抵达内门。",
+    hiddenGoal: "查明霜灯是否正在衰败。",
     locationIds: ["lantern_courtyard", "mist_gate", "inner_gate"],
     npcIds: ["npc_zhou_jin", "npc_adele", "npc_manlo"],
     factionIds: ["frost_lantern_sect", "gray_ash_cabal"],
     solutionTypes: ["travel", "fight", "negotiate"],
-    failureConsequence: "The player keeps power but carries ash debt.",
-    longTermImpact: "This trial defines how future cultivation scenarios judge vows.",
+    failureConsequence: "玩家保住力量，却背上灰债。",
+    longTermImpact: "这场试炼会决定未来修仙篇章如何评判誓约。",
     status: "active"
   }
 };
@@ -211,7 +211,7 @@ export const createFrostLanternTrialWorld = (): WorldState => ({
   currentLocationId: "lantern_courtyard",
   player: {
     id: "player",
-    name: "Outer Disciple",
+    name: "外门弟子",
     attributes: { ...attributes, will: 3 },
     skills: { survival: 2, melee: 1, defense: 1, social: 1, investigation: 1, insight: 1 },
     resources: { health: 5, stamina: 3, pressure: 0, money: 0, intel: 0 },
@@ -231,26 +231,26 @@ export const createFrostLanternTrialWorld = (): WorldState => ({
   clocks: {
     inner_fire: {
       id: "inner_fire",
-      name: "Inner Fire Stability",
+      name: "心火稳定",
       progress: 0,
       max: 4,
-      consequence: "A stable inner fire opens the gate without debt.",
+      consequence: "稳定心火能让内门无债开启。",
       visible: true
     },
     shadow_debt: {
       id: "shadow_debt",
-      name: "Shadow Debt",
+      name: "灰影债",
       progress: 0,
       max: 4,
-      consequence: "Debt charms bind the disciple to the gray ash cabal.",
+      consequence: "债符会把弟子绑向灰烬结社。",
       visible: true
     },
     martial_lockdown: {
       id: "martial_lockdown",
-      name: "Trial Discipline",
+      name: "试炼戒律",
       progress: 0,
       max: 5,
-      consequence: "Too much open violence ends the trial.",
+      consequence: "公开暴力过多会提前终止试炼。",
       visible: false
     }
   },
@@ -260,8 +260,8 @@ export const createFrostLanternTrialWorld = (): WorldState => ({
       turnId: "setup",
       day: 1,
       phase: "morning",
-      title: "The frost lantern is lit",
-      body: "Outer disciples gather as the lantern flame turns blue-white.",
+      title: "霜灯点燃",
+      body: "外门弟子聚集时，灯焰转为蓝白。",
       tags: ["trial", "sect"],
       createdAt: "2026-06-02T00:00:00.000Z"
     }
@@ -275,8 +275,8 @@ export const getFrostLanternTrialActions = (state: WorldState): PlayerAction[] =
   {
     id: `frost_travel_${state.time.day}_${state.time.phase}`,
     actionType: "travel",
-    label: "Cross the mist gate",
-    description: "Spend stamina to move deeper into the trial without forcing a duel.",
+    label: "穿过雾门",
+    description: "消耗体力深入试炼，不强行挑起决斗。",
     targetId: "mist_gate",
     leverage: ["scenario:frost-lantern-trial", "clock:inner_fire", "pressureClock:shadow_debt", "sect_trial"],
     riskLevel: "medium"
@@ -284,8 +284,8 @@ export const getFrostLanternTrialActions = (state: WorldState): PlayerAction[] =
   {
     id: `frost_duel_${state.time.day}_${state.time.phase}`,
     actionType: "fight",
-    label: "Face the trial spirit",
-    description: "Use force and discipline to prove your inner fire can hold.",
+    label: "直面试炼灵",
+    description: "用力量和自律证明自己的心火能够稳定燃烧。",
     targetId: "mist_gate",
     leverage: ["scenario:frost-lantern-trial", "clock:inner_fire", "pressureClock:shadow_debt", "inner_fire"],
     riskLevel: "high"
@@ -297,20 +297,20 @@ export const evaluateFrostLanternTrialEnding = (state: WorldState) => {
   if (state.player.momentum >= 3 || (state.clocks.inner_fire?.progress ?? 0) >= 3) {
     return {
       id: "inner_gate_opened",
-      title: "Inner Gate Opened",
-      summary: "The disciple enters cleanly, carrying a stable vow instead of a hidden debt."
+      title: "内门开启",
+      summary: "弟子干净入门，带走的是稳定誓约，而不是暗藏债务。"
     };
   }
   return {
     id: "ash_debt_bound",
-    title: "Ash Debt Bound",
-    summary: "The disciple survives the trial, but a gray ash debt follows every future breakthrough."
+    title: "灰债缠身",
+    summary: "弟子撑过试炼，但灰烬债会跟随之后每一次突破。"
   };
 };
 
 export const frostLanternTrialPackage: ScenarioPackage = {
   id: "frost-lantern-trial",
-  title: "Frost Lantern Trial",
+  title: "霜灯试炼",
   counts: { combat: 1, social: 1, endings: 2 },
   campaignArc: frostLanternCampaignArc,
   createWorld: createFrostLanternTrialWorld,

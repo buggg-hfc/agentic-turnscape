@@ -4,6 +4,11 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-07
 
+- Added tested source/API-level Chinese text for the first-wave expansion scenario packages. Scenario titles, player-facing day plans, chapter focus text, location/faction/NPC/quest/clock text, fixed action labels, and success/failure endings now come from Chinese content instead of only being translated in the web display layer.
+- Captured a runtime screenshot showing a fresh `霜灯试炼` campaign with Chinese source content in the campaign title, current location, scene/event text, and fixed action cards:
+
+![Localized expansion content](screenshots/expansion-content-cn-runtime-2026-06-07.png)
+
 - Added a tested player-action display layer. Built-in action cards and replay titles now render Chinese labels/descriptions in the web GUI and chronicle timeline while the original `PlayerAction` payload still goes to the referee unchanged.
 - Captured a runtime screenshot showing localized fixed action cards in an expansion campaign while the freeform composer remains available:
 
@@ -48,6 +53,7 @@ This log records tested implementation slices as the project moves from the Bord
   - `npm test -- apps/web/src/freeformAction.test.ts --reporter=dot`
   - `npm test -- apps/web/src/displayLabels.test.ts apps/web/src/scenarioSelection.test.ts apps/web/src/campaignArcStatus.test.ts --reporter=dot`
   - `npm test -- apps/web/src/playerActionDisplay.test.ts apps/web/src/chronicle.test.ts apps/web/src/displayLabels.test.ts --reporter=dot`
+  - `npm test -- packages/content/src/expansionLocalization.test.ts packages/content/src/scenarioRegistry.test.ts apps/api/src/server.test.ts apps/web/src/campaignArcStatus.test.ts --reporter=dot`
   - `npm run typecheck`
   - `npm test -- --reporter=dot`
   - `npm run build`

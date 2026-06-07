@@ -26,8 +26,8 @@ describe("campaign arc status view model", () => {
         chapterNumber: 1,
         currentChapter: {
           id: "orbital-quarantine_opening_arc",
-          title: "Orbital Quarantine: Opening Crisis",
-          focus: "Contain the station signal before quarantine hardens.",
+          title: "轨道隔离：开局危机",
+          focus: "在隔离硬化前稳住空间站信号。",
           unlocks: ["orbital-quarantine_signal", "orbital_medbay"],
         },
         baseFacilities: ["medbay", "engineering_bay"],
@@ -41,7 +41,7 @@ describe("campaign arc status view model", () => {
     expect(buildCampaignArcStatusSummary(status)).toEqual({
       available: true,
       chapterLabel: "第 1/3 章 · 轨道隔离：开局危机",
-      focus: "Contain the station signal before quarantine hardens.",
+      focus: "在隔离硬化前稳住空间站信号。",
       unlocks: ["orbital-quarantine_signal", "orbital_medbay"],
       baseFacilities: ["medbay", "engineering_bay"],
       factionFronts: [

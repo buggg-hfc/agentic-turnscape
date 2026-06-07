@@ -24,7 +24,7 @@ describe("scenario package registry", () => {
       }),
       expect.objectContaining({
         id: "frost-lantern-trial",
-        title: "Frost Lantern Trial",
+        title: "霜灯试炼",
         counts: { combat: 1, social: 1, endings: 2 }
       })
     ]));
@@ -38,7 +38,7 @@ describe("scenario package registry", () => {
 
     expect(world.currentLocationId).toBe("lantern_courtyard");
     expect(Object.keys(world.factions)).toHaveLength(2);
-    expect(scenario.getDayPlan(1)?.mainEvent).toContain("lantern");
+    expect(scenario.getDayPlan(1)?.mainEvent).toContain("霜灯");
     expect(scenario.getActions(world).map((action) => action.actionType)).toEqual(["travel", "fight"]);
     expect(scenario.evaluateEnding(world)).toBeUndefined();
 
@@ -49,11 +49,11 @@ describe("scenario package registry", () => {
 
   it("exposes the full first wave of genre expansion packs through the same tested contract", () => {
     const expectedPacks = [
-      { id: "frost-lantern-trial", title: "Frost Lantern Trial" },
-      { id: "orbital-quarantine", title: "Orbital Quarantine" },
-      { id: "salt-harbor-accord", title: "Salt Harbor Accord" },
-      { id: "rain-alley-haunting", title: "Rain Alley Haunting" },
-      { id: "emergency-ward-night", title: "Emergency Ward Night" }
+      { id: "frost-lantern-trial", title: "霜灯试炼" },
+      { id: "orbital-quarantine", title: "轨道隔离" },
+      { id: "salt-harbor-accord", title: "盐港协定" },
+      { id: "rain-alley-haunting", title: "雨巷异闻" },
+      { id: "emergency-ward-night", title: "急诊夜班" }
     ];
 
     expect(listScenarioPackages()).toEqual(

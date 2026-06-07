@@ -563,7 +563,7 @@ describe("campaign turn API", () => {
         }),
         expect.objectContaining({
           id: second.campaignId,
-          title: "Frost Lantern Trial",
+          title: "霜灯试炼",
           scenario: "frost-lantern-trial",
           day: 1,
           phase: "morning",
@@ -592,12 +592,12 @@ describe("campaign turn API", () => {
         }),
         expect.objectContaining({
           id: "frost-lantern-trial",
-          title: "Frost Lantern Trial",
+          title: "霜灯试炼",
           counts: { combat: 1, social: 1, endings: 2 },
         }),
         expect.objectContaining({
           id: "orbital-quarantine",
-          title: "Orbital Quarantine",
+          title: "轨道隔离",
           counts: { combat: 1, social: 1, endings: 2 },
           campaignArc: {
             chapterCount: 3,
@@ -613,17 +613,17 @@ describe("campaign turn API", () => {
         }),
         expect.objectContaining({
           id: "salt-harbor-accord",
-          title: "Salt Harbor Accord",
+          title: "盐港协定",
           counts: { combat: 1, social: 1, endings: 2 },
         }),
         expect.objectContaining({
           id: "rain-alley-haunting",
-          title: "Rain Alley Haunting",
+          title: "雨巷异闻",
           counts: { combat: 1, social: 1, endings: 2 },
         }),
         expect.objectContaining({
           id: "emergency-ward-night",
-          title: "Emergency Ward Night",
+          title: "急诊夜班",
           counts: { combat: 1, social: 1, endings: 2 },
         }),
       ]),
@@ -653,7 +653,7 @@ describe("campaign turn API", () => {
     expect(expansionResponse.statusCode).toBe(200);
     expect(expansionResponse.json()).toMatchObject({
       scenario: "frost-lantern-trial",
-      title: "Frost Lantern Trial",
+      title: "霜灯试炼",
       scenarioStatus: {
         dayPlan: { day: 1 },
         sceneCounts: { combat: 1, social: 1, endings: 2 },
@@ -669,7 +669,7 @@ describe("campaign turn API", () => {
     expect(scienceFictionResponse.statusCode).toBe(200);
     expect(scienceFictionResponse.json()).toMatchObject({
       scenario: "orbital-quarantine",
-      title: "Orbital Quarantine",
+      title: "轨道隔离",
       scenarioStatus: {
         dayPlan: { day: 1, defaultLocationId: "orbital_medbay" },
         sceneCounts: { combat: 1, social: 1, endings: 2 },
@@ -678,7 +678,7 @@ describe("campaign turn API", () => {
           chapterNumber: 1,
           currentChapter: {
             id: "orbital-quarantine_opening_arc",
-            title: "Orbital Quarantine: Opening Crisis",
+            title: "轨道隔离：开局危机",
             unlocks: expect.arrayContaining([
               "station_quarantine",
               "orbital_medbay",
