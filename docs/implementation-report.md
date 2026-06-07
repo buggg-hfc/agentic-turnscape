@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Freeform Draft Persistence
+
+### Scope
+
+- Added TDD coverage proving the freeform composer can persist a browser-local draft, clamp it to the same 500 character limit as player actions, recover safely from invalid stored data, and clear the draft on demand.
+- The web GUI now restores an unfinished freeform action when the campaign screen opens, auto-saves edits to local storage, and clears the draft after a successful custom action submission.
+- The Chinese freeform panel now displays `自由行动草稿已本地保存` plus a `清空草稿` control, making long open-ended player intent less fragile without allowing prose to bypass referee adjudication.
+
+### Runtime Screenshot
+
+![Freeform draft persistence](screenshots/freeform-draft-runtime-2026-06-08.png)
+
+The screenshot was captured from a local Border Seven Days runtime session after preloading a browser-local freeform draft, starting the campaign, and verifying the textarea restored the player-authored text, rebuilt intent/risk/target chips, and showed the saved-draft status plus clear control.
+
+### Verification
+
+```bash
+npm test -- apps/web/src/freeformAction.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - LLM Runtime Summary
 
 ### Scope

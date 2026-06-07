@@ -11,6 +11,8 @@ export const FREEFORM_ACTION_MAX_LENGTH = 500;
 export const FREEFORM_ACTION_HISTORY_LIMIT = 5;
 export const FREEFORM_ACTION_HISTORY_STORAGE_KEY =
   "agentic-turnscape.freeformActionHistory.v1";
+export const FREEFORM_ACTION_DRAFT_STORAGE_KEY =
+  "agentic-turnscape.freeformActionDraft.v1";
 type FreeformIntent = Exclude<PlayerAction["actionType"], "custom">;
 export type FreeformActionHistoryStorage = Pick<
   Storage,
@@ -109,6 +111,47 @@ export const saveFreeformActionHistory = (
     JSON.stringify(sanitized),
   );
   return sanitized;
+};
+
+export const sanitizeFreeformActionDraft = (value: unknown): string =>
+  typeof value === "string"
+    ? value.slice(0, FREEFORM_ACTION_MAX_LENGTH)
+    : "";
+
+export const loadFreeformActionDraft = (
+  storage: FreeformActionHistoryStorage | undefined = getBrowserStorage(),
+): string => {
+  if (!storage) return "";
+  const raw = storage.getItem(FREEFORM_ACTION_DRAFT_STORAGE_KEY);
+  if (!raw) return "";
+  try {
+    return sanitizeFreeformActionDraft(JSON.parse(raw));
+  } catch {
+    return "";
+  }
+};
+
+export const saveFreeformActionDraft = (
+  value: string,
+  storage: FreeformActionHistoryStorage | undefined = getBrowserStorage(),
+): string => {
+  const sanitized = sanitizeFreeformActionDraft(value);
+  if (sanitized) {
+    storage?.setItem(
+      FREEFORM_ACTION_DRAFT_STORAGE_KEY,
+      JSON.stringify(sanitized),
+    );
+  } else {
+    storage?.removeItem(FREEFORM_ACTION_DRAFT_STORAGE_KEY);
+  }
+  return sanitized;
+};
+
+export const clearFreeformActionDraft = (
+  storage: FreeformActionHistoryStorage | undefined = getBrowserStorage(),
+): string => {
+  storage?.removeItem(FREEFORM_ACTION_DRAFT_STORAGE_KEY);
+  return "";
 };
 
 const shortLabel = (value: string): string => {

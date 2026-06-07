@@ -4,6 +4,17 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added tested local draft persistence for freeform player actions. The composer now restores unfinished open-ended text from browser storage, auto-saves edits under the same 500-character limit, clears the draft after a successful custom turn, and exposes a Chinese `清空草稿` control.
+- Captured a runtime screenshot showing a restored freeform draft, local-save status, clear control, and rebuilt intent/risk/target preview:
+
+![Freeform draft persistence](screenshots/freeform-draft-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- apps/web/src/freeformAction.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added a tested non-secret LLM runtime summary for the in-game settings panel. The GUI now shows the active provider, model, endpoint, timeout/token budget, save state, and whether a local API key is configured without ever rendering the key value.
 - Captured a runtime screenshot showing the DeepSeek-compatible configuration summary in the Chinese game UI:
 

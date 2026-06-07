@@ -31,6 +31,7 @@ For gameplay work, tests should prove the rule invariant rather than a single lu
 
 ## Verified Slices
 
+- Freeform player actions now have tested local draft persistence: unfinished open-ended text is restored from browser storage, auto-saved under the action length limit, clearable from the Chinese GUI, and removed after a successful referee-owned custom action.
 - LLM settings now show a tested non-secret runtime summary in the Chinese GUI: provider, model, endpoint, timeout/token budget, save state, and local-key presence are visible before a turn runs, while the key value stays out of rendered text and game state.
 - Freeform player actions now keep tested local history: recent custom submissions are normalized, deduplicated, browser-persisted, visible as refill chips in the GUI, and still adjudicated only through the referee pipeline.
 - LLM provider presets now stay visible after selection: matching public settings select OpenAI, DeepSeek, or local-compatible automatically, while custom combinations fall back to custom configuration and API keys remain ignored by detection.

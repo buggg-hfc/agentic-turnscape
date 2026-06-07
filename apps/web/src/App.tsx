@@ -65,7 +65,10 @@ import {
   buildFreeformActionPreview,
   buildFreeformComposerState,
   buildFreeformPlayerAction,
+  clearFreeformActionDraft,
+  loadFreeformActionDraft,
   loadFreeformActionHistory,
+  saveFreeformActionDraft,
   saveFreeformActionHistory,
 } from "./freeformAction.js";
 import {
@@ -190,7 +193,9 @@ export const App = () => {
   const [transparency, setTransparency] =
     useState<TransparencyMode>("inference");
   const [selectedAction, setSelectedAction] = useState<PlayerAction>();
-  const [freeformActionText, setFreeformActionText] = useState("");
+  const [freeformActionText, setFreeformActionText] = useState(() =>
+    loadFreeformActionDraft(),
+  );
   const [freeformActionHistory, setFreeformActionHistory] = useState<string[]>(
     () => loadFreeformActionHistory(),
   );
@@ -437,6 +442,10 @@ export const App = () => {
     void loadScenarios();
   }, []);
 
+  useEffect(() => {
+    saveFreeformActionDraft(freeformActionText);
+  }, [freeformActionText]);
+
   const location = state ? state.locations[state.currentLocationId] : undefined;
   const visibleClocks = useMemo(
     () =>
@@ -551,6 +560,7 @@ export const App = () => {
           setLastResolution(payload.lastTurn.resolution);
           if (action.actionType === "custom") {
             rememberFreeformAction(action.description);
+            clearFreeformActionDraft();
             setFreeformActionText("");
           }
           setChronicleTimeline(
@@ -803,6 +813,28 @@ export const App = () => {
                   {freeformComposerState.directSubmitLabel}
                 </button>
               </div>
+            </div>
+            <div className="freeform-draft-status">
+              <span>
+                {freeformActionText.trim()
+                  ? "自由行动草稿已本地保存"
+                  : "输入会自动保存为本地草稿"}
+              </span>
+              {freeformActionText.trim() ? (
+                <button
+                  className="freeform-draft-clear"
+                  disabled={loadState === "running"}
+                  title="清空自由行动草稿"
+                  onClick={() => {
+                    clearFreeformActionDraft();
+                    setFreeformActionText("");
+                    setSelectedAction(undefined);
+                  }}
+                >
+                  <Trash2 size={13} />
+                  清空草稿
+                </button>
+              ) : null}
             </div>
             {freeformActionPreview.length > 0 ? (
               <div className="freeform-action-preview">

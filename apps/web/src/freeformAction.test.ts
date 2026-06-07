@@ -1,10 +1,14 @@
 import { describe, expect, it } from "vitest";
 import {
+  FREEFORM_ACTION_MAX_LENGTH,
   addFreeformActionHistoryEntry,
   buildFreeformActionPreview,
   buildFreeformComposerState,
   buildFreeformPlayerAction,
+  clearFreeformActionDraft,
+  loadFreeformActionDraft,
   loadFreeformActionHistory,
+  saveFreeformActionDraft,
   saveFreeformActionHistory,
   type FreeformActionHistoryStorage,
 } from "./freeformAction.js";
@@ -194,5 +198,25 @@ describe("freeform action builder", () => {
 
     storage.setItem("agentic-turnscape.freeformActionHistory.v1", "{bad json");
     expect(loadFreeformActionHistory(storage)).toEqual([]);
+  });
+
+  it("persists a local freeform draft without exceeding the action limit", () => {
+    const storage = new MemoryStorage();
+    const longDraft = "Scout the eastern water tower. ".repeat(40);
+
+    expect(saveFreeformActionDraft(longDraft, storage)).toHaveLength(
+      FREEFORM_ACTION_MAX_LENGTH,
+    );
+    expect(loadFreeformActionDraft(storage)).toBe(
+      longDraft.slice(0, FREEFORM_ACTION_MAX_LENGTH),
+    );
+
+    storage.setItem("agentic-turnscape.freeformActionDraft.v1", "{bad json");
+    expect(loadFreeformActionDraft(storage)).toBe("");
+
+    saveFreeformActionDraft("Watch the clinic gate.", storage);
+    expect(loadFreeformActionDraft(storage)).toBe("Watch the clinic gate.");
+    expect(clearFreeformActionDraft(storage)).toBe("");
+    expect(loadFreeformActionDraft(storage)).toBe("");
   });
 });
