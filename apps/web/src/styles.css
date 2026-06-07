@@ -1007,9 +1007,42 @@ meter {
 .settings-actions {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  flex-wrap: wrap;
   gap: 8px;
   margin-top: 10px;
+}
+
+.settings-actions .icon-button {
+  margin-left: auto;
+}
+
+.llm-test-status {
+  margin-top: 9px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  padding: 8px 9px;
+  color: #c8d6ce;
+  font-size: 13px;
+  line-height: 1.42;
+  overflow-wrap: anywhere;
+}
+
+.llm-test-status.running {
+  border-color: rgba(227, 193, 111, 0.34);
+  background: rgba(227, 193, 111, 0.1);
+  color: #fff1c5;
+}
+
+.llm-test-status.success {
+  border-color: rgba(102, 198, 163, 0.34);
+  background: rgba(102, 198, 163, 0.1);
+  color: #cde8df;
+}
+
+.llm-test-status.error {
+  border-color: rgba(227, 106, 90, 0.36);
+  background: rgba(227, 106, 90, 0.1);
+  color: #ffd7cf;
 }
 
 @media (max-width: 1160px) {

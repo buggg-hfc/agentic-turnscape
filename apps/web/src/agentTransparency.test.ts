@@ -42,8 +42,8 @@ describe("Agent transparency view model", () => {
     expect(buildAgentTransparencyRows(resolution, "debug")).toEqual([
       {
         id: "npc_adele-protect patients",
-        headline: "npc_adele: protect patients",
-        detail: "negotiate -> npc_rowan · resources: medical · risk: medium",
+        headline: "阿黛尔：protect patients",
+        detail: "谈判 -> 罗文 · 资源：医疗 · 风险：中",
         hiddenDetail: "The illness points back to mine pollution.",
       },
     ]);

@@ -51,9 +51,9 @@ describe("campaign progression view model", () => {
       available: true,
       chapterLabel: "第 2 章",
       experienceLabel: "5 XP",
-      baseLabel: "Border House Lv.2",
-      facilities: ["infirmary Lv.2", "archive Lv.1"],
-      assets: ["militia_oath x2", "public_case_archive x1"],
+      baseLabel: "Border House 2 级",
+      facilities: ["医务室 2 级", "档案室 1 级"],
+      assets: ["民兵誓约 x2", "公开案卷档案 x1"],
       fronts: [
         {
           id: "blackstone_consortium",
@@ -87,8 +87,8 @@ describe("campaign progression view model", () => {
       {
         id: "base:infirmary",
         kind: "base",
-        label: "Build infirmary",
-        description: "Spend 1 supplies and 1 money to improve the campaign base.",
+        label: "建设医务室",
+        description: "消耗 1 补给和 1 金钱，提升长期战役基地。",
         request: {
           baseInvestments: [{ facilityId: "infirmary", supplies: 1, money: 1 }],
         },
@@ -128,8 +128,8 @@ describe("campaign progression view model", () => {
       {
         id: "base:archive",
         kind: "base",
-        label: "Build archive",
-        description: "Spend 1 supplies and 1 money to improve the campaign base.",
+        label: "建设档案室",
+        description: "消耗 1 补给和 1 金钱，提升长期战役基地。",
         request: {
           baseInvestments: [{ facilityId: "archive", supplies: 1, money: 1 }],
         },
@@ -137,15 +137,15 @@ describe("campaign progression view model", () => {
       {
         id: "training:engineering",
         kind: "training",
-        label: "Train engineering",
-        description: "Spend 3 XP to raise a player skill for future chapters.",
+        label: "训练工程",
+        description: "消耗 3 XP，提升后续篇章中的玩家技能。",
         request: { training: { skill: "engineering", experience: 3 } },
       },
       {
         id: "front:blackstone_consortium",
         kind: "front",
-        label: "Stabilize 黑石商会",
-        description: "Reduce the highest-pressure faction front by 2.",
+        label: "稳定黑石商会",
+        description: "将压力最高的阵营战线降低 2 点。",
         request: {
           factionFronts: [
             { factionId: "blackstone_consortium", pressureDelta: -2 },
@@ -186,8 +186,8 @@ describe("campaign progression view model", () => {
         {
           id: "asset:public_case_archive",
           kind: "asset",
-          label: "Mobilize public case archive",
-          description: "Use this inherited ending asset to pressure Blackstone's front.",
+          label: "动员公开案卷档案",
+          description: "消耗继承资产，压制黑石商会战线。",
           request: {
             assetProjects: [{ assetId: "public_case_archive" }],
           },

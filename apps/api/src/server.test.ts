@@ -1091,6 +1091,103 @@ describe("campaign turn API", () => {
     await app.close();
   });
 
+  it("checks a request-level LLM connection without returning secrets", async () => {
+    const seenConfigs: OpenAICompatibleOptions[] = [];
+    const fakeClient: LLMClient = {
+      completeJson: async ({ schema }) =>
+        schema.parse({ ok: true, message: "ready" }),
+      completeText: async ({ fallback }) => fallback(),
+    };
+    const app = buildServer({
+      createLlmClient: (config) => {
+        seenConfigs.push(config);
+        return fakeClient;
+      },
+    });
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/llm/test",
+      headers: { "content-type": "application/json" },
+      payload: {
+        baseUrl: "https://llm.example.test/v1",
+        model: "story-model",
+        apiKey: "local-secret",
+        timeoutMs: 6000,
+        maxTokens: 128,
+      },
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toMatchObject({
+      ok: true,
+      baseUrl: "https://llm.example.test/v1",
+      model: "story-model",
+      message: "ready",
+      latencyMs: expect.any(Number),
+    });
+    expect(JSON.stringify(response.json())).not.toContain("local-secret");
+    expect(seenConfigs.at(-1)).toMatchObject({
+      baseUrl: "https://llm.example.test/v1",
+      model: "story-model",
+      apiKey: "local-secret",
+      timeoutMs: 6000,
+      maxTokens: 128,
+    });
+
+    await app.close();
+  });
+
+  it("rejects LLM connection checks that cannot reach a real provider", async () => {
+    const app = buildServer({
+      createLlmClient: () => ({
+        completeJson: async ({ fallback }) => fallback(),
+        completeText: async ({ fallback }) => fallback(),
+      }),
+    });
+
+    const missingKeyResponse = await app.inject({
+      method: "POST",
+      url: "/llm/test",
+      headers: { "content-type": "application/json" },
+      payload: {
+        baseUrl: "https://llm.example.test/v1",
+        model: "story-model",
+        apiKey: "",
+      },
+    });
+    expect(missingKeyResponse.statusCode).toBe(400);
+    expect(missingKeyResponse.json()).toMatchObject({
+      ok: false,
+      error: "missing_api_key",
+      model: "story-model",
+      message: "请输入 API Key 后再测试连接。",
+    });
+
+    const fallbackResponse = await app.inject({
+      method: "POST",
+      url: "/llm/test",
+      headers: { "content-type": "application/json" },
+      payload: {
+        baseUrl: "https://llm.example.test/v1",
+        model: "story-model",
+        apiKey: "local-secret",
+      },
+    });
+    expect(fallbackResponse.statusCode).toBe(502);
+    expect(fallbackResponse.json()).toMatchObject({
+      ok: false,
+      error: "llm_connection_failed",
+      model: "story-model",
+      message: "模型未返回预期的结构化 JSON。",
+    });
+    expect(JSON.stringify(fallbackResponse.json())).not.toContain(
+      "local-secret",
+    );
+
+    await app.close();
+  });
+
   it("accepts per-turn LLM config without persisting secrets into state", async () => {
     const seenConfigs: OpenAICompatibleOptions[] = [];
     const fakeClient: LLMClient = {

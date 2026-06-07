@@ -19,7 +19,7 @@ export const formatCampaignArcSummary = (
   campaignArc: NonNullable<ScenarioOption["campaignArc"]> | undefined
 ) =>
   campaignArc
-    ? `Long ${campaignArc.chapterCount} chapters · Base ${campaignArc.baseFacilities.length} · Fronts ${campaignArc.factionFronts.length}`
+    ? `长期 ${campaignArc.chapterCount} 章 · 基地 ${campaignArc.baseFacilities.length} · 战线 ${campaignArc.factionFronts.length}`
     : undefined;
 
 export const buildScenarioSelection = (

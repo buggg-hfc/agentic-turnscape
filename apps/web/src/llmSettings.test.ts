@@ -2,6 +2,9 @@ import { describe, expect, it } from "vitest";
 import {
   clearLlmSettings,
   loadLlmSettings,
+  llmConnectionErrorStatus,
+  llmConnectionSuccessStatus,
+  redactLlmSecrets,
   saveLlmSettings,
   type StorageLike,
 } from "./llmSettings.js";
@@ -76,5 +79,30 @@ describe("LLM settings persistence", () => {
     expect(loadLlmSettings(storage).apiKey).toBe("");
     expect(loadLlmSettings(storage).baseUrl).toBe("https://api.openai.com/v1");
     expect(loadLlmSettings(storage).maxTokens).toBe(1024);
+  });
+
+  it("formats connection check status without exposing API key patterns", () => {
+    expect(
+      llmConnectionSuccessStatus({
+        ok: true,
+        baseUrl: "https://llm.example.test/v1",
+        model: "story-model",
+        latencyMs: 42.4,
+        message: "ready",
+      }),
+    ).toEqual({
+      kind: "success",
+      message: "LLM 连接通过：story-model（42 ms）",
+    });
+
+    const secret = ["sk", "testSecret123"].join("-");
+    const status = llmConnectionErrorStatus(
+      new Error(`upstream rejected ${secret}`),
+    );
+    expect(status.kind).toBe("error");
+    expect(status.message).toContain("LLM 连接失败");
+    expect(status.message).toContain("[API_KEY_REDACTED]");
+    expect(status.message).not.toContain(secret);
+    expect(redactLlmSecrets("safe")).toBe("safe");
   });
 });

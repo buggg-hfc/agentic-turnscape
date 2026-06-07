@@ -87,6 +87,14 @@ export type ScenarioExportPayload = {
   definition: Record<string, unknown>;
 };
 
+export type LlmConnectionTestPayload = {
+  ok: true;
+  baseUrl: string;
+  model: string;
+  latencyMs: number;
+  message: string;
+};
+
 export type CampaignSummary = {
   id: string;
   title: string;
@@ -166,6 +174,24 @@ export type TurnProgressEvent = {
   data: unknown;
 };
 
+export const parseApiErrorMessage = (raw: string): string => {
+  try {
+    const parsed = JSON.parse(raw) as {
+      error?: unknown;
+      message?: unknown;
+    };
+    if (typeof parsed.message === "string" && parsed.message.length > 0) {
+      return parsed.message;
+    }
+    if (typeof parsed.error === "string" && parsed.error.length > 0) {
+      return parsed.error;
+    }
+  } catch {
+    // Fall through to the raw response text.
+  }
+  return raw;
+};
+
 const json = async <T>(url: string, init?: RequestInit): Promise<T> => {
   const response = await fetch(`${API_BASE}${url}`, {
     ...init,
@@ -175,7 +201,7 @@ const json = async <T>(url: string, init?: RequestInit): Promise<T> => {
     },
   });
   if (!response.ok) {
-    throw new Error(await response.text());
+    throw new Error(parseApiErrorMessage(await response.text()));
   }
   return (await response.json()) as T;
 };
@@ -183,7 +209,7 @@ const json = async <T>(url: string, init?: RequestInit): Promise<T> => {
 const text = async (url: string, init?: RequestInit): Promise<string> => {
   const response = await fetch(`${API_BASE}${url}`, init);
   if (!response.ok) {
-    throw new Error(await response.text());
+    throw new Error(parseApiErrorMessage(await response.text()));
   }
   return response.text();
 };
@@ -234,6 +260,11 @@ export const api = {
     json<ScenarioExportPayload>(
       `/scenarios/${encodeURIComponent(scenarioId)}/export`,
     ),
+  testLlmConnection: (settings: LlmConfig) =>
+    json<LlmConnectionTestPayload>("/llm/test", {
+      method: "POST",
+      body: JSON.stringify(settings),
+    }),
   campaigns: (limit = 10) =>
     json<CampaignListPayload>(`/campaigns?limit=${limit}`),
   createCampaign: (scenarioId = "border-seven-days") =>

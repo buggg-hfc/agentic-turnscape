@@ -16,7 +16,7 @@ export const buildCampaignArcStatusSummary = (
   if (!campaignArc) {
     return {
       available: false,
-      chapterLabel: "No campaign arc",
+      chapterLabel: "无长期篇章",
       focus: "",
       unlocks: [],
       baseFacilities: [],
@@ -31,7 +31,7 @@ export const buildCampaignArcStatusSummary = (
 
   return {
     available: true,
-    chapterLabel: `Chapter ${chapterNumber}/${campaignArc.chapterCount} - ${campaignArc.currentChapter.title}`,
+    chapterLabel: `第 ${chapterNumber}/${campaignArc.chapterCount} 章 · ${campaignArc.currentChapter.title}`,
     focus: campaignArc.currentChapter.focus,
     unlocks: [...campaignArc.currentChapter.unlocks],
     baseFacilities: [...campaignArc.baseFacilities],

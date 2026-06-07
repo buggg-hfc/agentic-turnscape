@@ -16,7 +16,7 @@ A multi-agent turn-based narrative simulation game. The current implementation i
 - All 5 combat scenes and 8 social scenes in Border Seven Days have executable scene action fixtures covered by the turn/referee pipeline.
 - All 6 Border Seven Days MVP endings are covered through public API full-campaign playthroughs with replay and snapshot records.
 - OpenAI-compatible LLM client with structured JSON parsing and deterministic scripted fallback for local development.
-- In-game LLM configuration for base URL, model, API key, timeout, and max token budget, with browser-local saved settings.
+- In-game LLM configuration for base URL, model, API key, timeout, max token budget, and provider connection checks, with browser-local saved settings.
 - Three Agent transparency modes with server-side redaction so hidden reasons, hidden summaries, and hidden patches only appear in debug views.
 - Player-visible world state redacts location hidden info, character secrets, faction hidden goals, quest true backgrounds, unrevealed hidden events, and quest hidden goals.
 - Seed content for 3 factions, 10 NPCs, 6 locations, 3 visible crisis clocks, quests, and starting chronicle.
@@ -45,7 +45,7 @@ npm run dev
 
 Open the web app at `http://localhost:5173`. The API runs at `http://localhost:8787`.
 
-To use a real LLM, copy `.env.example` to `.env` and set `LLM_API_KEY`, `LLM_BASE_URL`, `LLM_MODEL`, and optionally `LLM_TIMEOUT_MS`/`LLM_MAX_TOKENS`. OpenAI-compatible providers such as DeepSeek can also be configured in the in-game LLM panel and saved locally in the browser. Without a key, the game uses scripted Agent fallbacks so the vertical slice remains playable.
+To use a real LLM, copy `.env.example` to `.env` and set `LLM_API_KEY`, `LLM_BASE_URL`, `LLM_MODEL`, and optionally `LLM_TIMEOUT_MS`/`LLM_MAX_TOKENS`. OpenAI-compatible providers such as DeepSeek can also be configured in the in-game LLM panel, tested with the panel's `测试` button, and saved locally in the browser. Without a key, the game uses scripted Agent fallbacks so the vertical slice remains playable.
 
 To run an opt-in provider smoke test, set `RUN_REAL_LLM_SMOKE=1` plus the same `LLM_*` environment variables and run:
 

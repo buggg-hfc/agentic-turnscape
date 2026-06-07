@@ -32,7 +32,7 @@ describe("scenario selection", () => {
 
     expect(selection.options[0]).toMatchObject({
       id: "frost-lantern-trial",
-      arcSummary: "Long 3 chapters · Base 2 · Fronts 2"
+      arcSummary: "长期 3 章 · 基地 2 · 战线 2"
     });
   });
 

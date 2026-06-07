@@ -24,7 +24,7 @@ describe("faction plan view model", () => {
         leaderName: "无面司祭",
         plan: "收集感染者并准备仪式",
         clockLabel: "教团仪式 0/6",
-        resourceBadges: ["believers 8", "relics 3"],
+        resourceBadges: ["信众 8", "圣物 3"],
       }),
       expect.objectContaining({
         id: "frontier_guild",
@@ -32,7 +32,7 @@ describe("faction plan view model", () => {
         leaderName: "罗文",
         plan: "控制感染者并调查失踪商队",
         clockLabel: "瘟疫扩散 0/8",
-        resourceBadges: ["legitimacy 7", "guards 6"],
+        resourceBadges: ["合法性 7", "守卫 6"],
       }),
       expect.objectContaining({
         id: "blackstone_consortium",
@@ -40,7 +40,7 @@ describe("faction plan view model", () => {
         leaderName: "曼洛",
         plan: "完成矿区收购并转移瘟疫责任",
         clockLabel: "商会控制矿区 0/5",
-        resourceBadges: ["money 9", "contracts 6"],
+        resourceBadges: ["金钱 9", "合约 6"],
       }),
     ]));
   });

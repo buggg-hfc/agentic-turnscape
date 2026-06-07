@@ -10,7 +10,7 @@ describe("campaign arc status view model", () => {
       }),
     ).toEqual({
       available: false,
-      chapterLabel: "No campaign arc",
+      chapterLabel: "无长期篇章",
       focus: "",
       unlocks: [],
       baseFacilities: [],
@@ -40,7 +40,7 @@ describe("campaign arc status view model", () => {
 
     expect(buildCampaignArcStatusSummary(status)).toEqual({
       available: true,
-      chapterLabel: "Chapter 1/3 - Orbital Quarantine: Opening Crisis",
+      chapterLabel: "第 1/3 章 · Orbital Quarantine: Opening Crisis",
       focus: "Contain the station signal before quarantine hardens.",
       unlocks: ["orbital-quarantine_signal", "orbital_medbay"],
       baseFacilities: ["medbay", "engineering_bay"],

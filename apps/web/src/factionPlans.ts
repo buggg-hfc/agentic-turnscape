@@ -1,4 +1,5 @@
 import type { ClockState, FactionState, WorldState } from "@agentic-turnscape/shared";
+import { formatResourceBadge } from "./displayLabels.js";
 
 export type FactionPlanSummary = {
   id: string;
@@ -31,7 +32,7 @@ const strongestResources = (faction: FactionState): string[] =>
         rightValue - leftValue || leftId.localeCompare(rightId),
     )
     .slice(0, 2)
-    .map(([id, value]) => `${id} ${value}`);
+    .map(([id, value]) => formatResourceBadge(id, value));
 
 export const buildFactionPlanSummaries = (
   state: WorldState,

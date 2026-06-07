@@ -52,6 +52,7 @@ import {
   buildFactionPlanSummaries,
   type FactionPlanSummary,
 } from "./factionPlans.js";
+import { displayLabel } from "./displayLabels.js";
 import {
   FREEFORM_ACTION_MAX_LENGTH,
   buildFreeformActionPreview,
@@ -59,8 +60,11 @@ import {
 } from "./freeformAction.js";
 import {
   clearLlmSettings,
+  llmConnectionErrorStatus,
+  llmConnectionSuccessStatus,
   loadLlmSettings,
   saveLlmSettings,
+  type LlmConnectionStatus,
 } from "./llmSettings.js";
 import {
   formatCreatorScenarioDefinition,
@@ -141,6 +145,8 @@ export const App = () => {
     loadLlmSettings(),
   );
   const [llmSettingsSaved, setLlmSettingsSaved] = useState(true);
+  const [llmConnectionStatus, setLlmConnectionStatus] =
+    useState<LlmConnectionStatus>();
   const [turnProgress, setTurnProgress] = useState<TurnProgressEvent[]>([]);
   const [chronicleTimeline, setChronicleTimeline] = useState<
     ChronicleTimelineItem[]
@@ -444,6 +450,22 @@ export const App = () => {
     }
   };
 
+  const testLlmConnection = async () => {
+    setLlmConnectionStatus({
+      kind: "running",
+      message: "正在测试 LLM 连接...",
+    });
+    try {
+      setLlmConnectionStatus(
+        llmConnectionSuccessStatus(
+          await api.testLlmConnection(llmSettings),
+        ),
+      );
+    } catch (caught) {
+      setLlmConnectionStatus(llmConnectionErrorStatus(caught));
+    }
+  };
+
   const submitCampaignProgression = async (
     choice: CampaignProgressionChoice,
   ) => {
@@ -475,7 +497,7 @@ export const App = () => {
       );
       setLoadState("ready");
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "闀挎湡鎴樺焦鎺ㄨ繘澶辫触");
+      setError(caught instanceof Error ? caught.message : "长期战役推进失败");
       setLoadState("error");
     }
   };
@@ -688,9 +710,11 @@ export const App = () => {
           <LlmSettingsPanel
             settings={llmSettings}
             saved={llmSettingsSaved}
+            connectionStatus={llmConnectionStatus}
             onChange={(settings) => {
               setLlmSettings(settings);
               setLlmSettingsSaved(false);
+              setLlmConnectionStatus(undefined);
             }}
             onSave={() => {
               setLlmSettings(saveLlmSettings(llmSettings));
@@ -699,7 +723,9 @@ export const App = () => {
             onClear={() => {
               setLlmSettings(clearLlmSettings());
               setLlmSettingsSaved(true);
+              setLlmConnectionStatus(undefined);
             }}
+            onTest={() => void testLlmConnection()}
           />
           <AgentPanel resolution={lastResolution} transparency={transparency} />
         </aside>
@@ -711,8 +737,8 @@ export const App = () => {
 const progressTitle: Record<string, string> = {
   turn: "回合任务",
   pending: "队列等待",
-  campaign_progress: "Campaign Progress",
-  agent_proposals: "Agent 提案",
+  campaign_progress: "战役推进",
+  agent_proposals: "智能体提案",
   referee: "规则裁判",
   narration: "叙事输出",
   done: "完成",
@@ -984,7 +1010,7 @@ const StatusPanel = ({ state }: { state: WorldState }) => (
     </div>
     <div className="tag-row">
       {state.player.reputationTags.map((tag) => (
-        <span key={tag}>{tag}</span>
+        <span key={tag}>{displayLabel(tag)}</span>
       ))}
     </div>
   </section>
@@ -998,23 +1024,23 @@ const CampaignArcPanel = ({
   <section className="module campaign-arc-status">
     <div className="panel-heading compact">
       <GitBranch size={17} />
-      <h3>Campaign Arc</h3>
+      <h3>战役篇章</h3>
     </div>
     <div className="arc-current">
       <strong>{summary.chapterLabel}</strong>
       <span>{summary.focus}</span>
     </div>
     <div className="arc-section">
-      <small>Unlocks</small>
+      <small>解锁内容</small>
       <div className="tag-row compact">
         {summary.unlocks.slice(0, 4).map((unlock) => (
-          <span key={unlock}>{unlock}</span>
+          <span key={unlock}>{displayLabel(unlock)}</span>
         ))}
       </div>
     </div>
     <div className="arc-meta-grid">
-      <Metric label="Base" valueLabel={String(summary.baseFacilities.length)} />
-      <Metric label="Fronts" valueLabel={String(summary.factionFronts.length)} />
+      <Metric label="基地" valueLabel={String(summary.baseFacilities.length)} />
+      <Metric label="战线" valueLabel={String(summary.factionFronts.length)} />
     </div>
   </section>
 );
@@ -1081,7 +1107,7 @@ const CampaignProgressionChoicesPanel = ({
   <section className="module campaign-choices">
     <div className="panel-heading compact">
       <GitBranch size={17} />
-      <h3>Campaign Moves</h3>
+      <h3>战役行动</h3>
     </div>
     <div className="campaign-choice-list">
       {choices.slice(0, 4).map((choice) => (
@@ -1201,15 +1227,19 @@ const FactionPlanPanel = ({
 const LlmSettingsPanel = ({
   settings,
   saved,
+  connectionStatus,
   onChange,
   onSave,
   onClear,
+  onTest,
 }: {
   settings: LlmConfig;
   saved: boolean;
+  connectionStatus: LlmConnectionStatus | undefined;
   onChange: (settings: LlmConfig) => void;
   onSave: () => void;
   onClear: () => void;
+  onTest: () => void;
 }) => (
   <section className="module">
     <div className="panel-heading compact">
@@ -1218,7 +1248,7 @@ const LlmSettingsPanel = ({
     </div>
     <div className="settings-grid">
       <label>
-        <span>Base URL</span>
+        <span>接口地址</span>
         <input
           value={settings.baseUrl}
           onChange={(event) =>
@@ -1227,7 +1257,7 @@ const LlmSettingsPanel = ({
         />
       </label>
       <label>
-        <span>Model</span>
+        <span>模型</span>
         <input
           value={settings.model}
           onChange={(event) =>
@@ -1236,7 +1266,7 @@ const LlmSettingsPanel = ({
         />
       </label>
       <label>
-        <span>API Key</span>
+        <span>API 密钥</span>
         <div className="secret-input">
           <KeyRound size={15} />
           <input
@@ -1250,7 +1280,7 @@ const LlmSettingsPanel = ({
         </div>
       </label>
       <label>
-        <span>Timeout</span>
+        <span>超时时间</span>
         <input
           type="number"
           min={1000}
@@ -1263,7 +1293,7 @@ const LlmSettingsPanel = ({
         />
       </label>
       <label>
-        <span>Max tokens</span>
+        <span>最大 Token</span>
         <input
           type="number"
           min={1}
@@ -1281,10 +1311,23 @@ const LlmSettingsPanel = ({
         <Save size={15} />
         {saved ? "已保存" : "保存"}
       </button>
+      <button
+        className="secondary-button"
+        disabled={connectionStatus?.kind === "running"}
+        onClick={onTest}
+      >
+          <Activity size={15} />
+          {connectionStatus?.kind === "running" ? "测试中" : "测试"}
+        </button>
       <button className="icon-button" title="清除 LLM 设置" onClick={onClear}>
         <Trash2 size={16} />
       </button>
     </div>
+    {connectionStatus ? (
+      <div className={`llm-test-status ${connectionStatus.kind}`}>
+        {connectionStatus.message}
+      </div>
+    ) : null}
   </section>
 );
 
@@ -1300,7 +1343,7 @@ const AgentPanel = ({
     <section className="module">
       <div className="panel-heading compact">
         <Brain size={17} />
-        <h3>Agent</h3>
+        <h3>智能体</h3>
       </div>
       {transparency === "immersive" ? (
         <p className="muted">角色的动机隐藏在行为里。</p>

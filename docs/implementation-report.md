@@ -2,6 +2,31 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-07 - In-game LLM Connection Check
+
+### Scope
+
+- Added `POST /llm/test` so the web client can validate a locally configured OpenAI-compatible provider before spending a turn.
+- The endpoint creates a temporary LLM client from request-level settings, asks for a compact structured JSON response, and returns only non-secret metadata such as model, base URL, latency, and status message.
+- The LLM settings panel now includes a Chinese `测试` button, `测试中` running state, and Chinese success/error feedback. API keys remain masked in the input and are not echoed in the response or status text.
+- Structured API errors are parsed into readable UI messages instead of raw JSON blobs.
+- Added a shared display-label layer for dynamic campaign ids and resources, so long-campaign choices, scenario arc summaries, faction plans, inherited assets, reputation tags, and Agent transparency details render in Chinese instead of leaking internal ids such as `missing_caravan`, `old_outpost`, or `public_case_archive`.
+
+### Runtime Screenshot
+
+![LLM connection check](screenshots/llm-connection-check-runtime-2026-06-07.png)
+
+The screenshot was captured from a local runtime session after creating a fresh `border-seven-days` campaign, opening the LLM settings panel, pressing `测试` with no API key configured, and verifying the GUI displayed `LLM 连接失败：请输入 API Key 后再测试连接。` without exposing any secret.
+
+### Verification
+
+```bash
+npm test -- apps/api/src/server.test.ts apps/web/src/api.test.ts apps/web/src/llmSettings.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-07 - Campaign Asset Project Moves
 
 ### Scope

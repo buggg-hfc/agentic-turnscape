@@ -191,6 +191,71 @@ describe("web API client", () => {
     expect(JSON.parse(String(init.body))).toEqual(scenarioDefinition);
   });
 
+  it("posts LLM connection checks without storing settings elsewhere", async () => {
+    const fetchMock = vi.fn(async () => ({
+      ok: true,
+      json: async () => ({
+        ok: true,
+        baseUrl: "https://llm.example.test/v1",
+        model: "story-model",
+        latencyMs: 42,
+        message: "ready",
+      }),
+    }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(
+      api.testLlmConnection({
+        baseUrl: "https://llm.example.test/v1",
+        model: "story-model",
+        apiKey: "local-secret",
+        timeoutMs: 6000,
+        maxTokens: 128,
+      }),
+    ).resolves.toEqual({
+      ok: true,
+      baseUrl: "https://llm.example.test/v1",
+      model: "story-model",
+      latencyMs: 42,
+      message: "ready",
+    });
+    const [url, init] = fetchMock.mock.calls[0] as unknown as [
+      string,
+      RequestInit,
+    ];
+    expect(url).toBe("/api/llm/test");
+    expect(JSON.parse(String(init.body))).toEqual({
+      baseUrl: "https://llm.example.test/v1",
+      model: "story-model",
+      apiKey: "local-secret",
+      timeoutMs: 6000,
+      maxTokens: 128,
+    });
+  });
+
+  it("turns structured API errors into readable connection messages", async () => {
+    const fetchMock = vi.fn(async () => ({
+      ok: false,
+      text: async () =>
+        JSON.stringify({
+          ok: false,
+          error: "missing_api_key",
+          message: "请输入 API Key 后再测试连接。",
+        }),
+    }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(
+      api.testLlmConnection({
+        baseUrl: "https://llm.example.test/v1",
+        model: "story-model",
+        apiKey: "",
+        timeoutMs: 6000,
+        maxTokens: 128,
+      }),
+    ).rejects.toThrow("请输入 API Key 后再测试连接。");
+  });
+
   it("deletes runtime creator scenario packages by id", async () => {
     const fetchMock = vi.fn(async () => ({
       ok: true,

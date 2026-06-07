@@ -1,8 +1,14 @@
 import { DEFAULT_LLM_CONFIG, LlmConfigSchema, type LlmConfig } from "@agentic-turnscape/shared";
+import type { LlmConnectionTestPayload } from "./api.js";
 
 export const LLM_SETTINGS_STORAGE_KEY = "agentic-turnscape.llmSettings.v1";
+const SECRET_PATTERN = /sk-[A-Za-z0-9]+/g;
 
 export type StorageLike = Pick<Storage, "getItem" | "setItem" | "removeItem">;
+export type LlmConnectionStatus = {
+  kind: "running" | "success" | "error";
+  message: string;
+};
 
 export const defaultLlmSettings = (): LlmConfig => ({ ...DEFAULT_LLM_CONFIG });
 
@@ -38,3 +44,25 @@ export const clearLlmSettings = (storage: StorageLike | undefined = getBrowserSt
   storage?.removeItem(LLM_SETTINGS_STORAGE_KEY);
   return defaultLlmSettings();
 };
+
+export const redactLlmSecrets = (value: string): string =>
+  value.replace(SECRET_PATTERN, "[API_KEY_REDACTED]");
+
+export const llmConnectionSuccessStatus = (
+  result: LlmConnectionTestPayload,
+): LlmConnectionStatus => ({
+  kind: "success",
+  message: `LLM 连接通过：${result.model}（${Math.max(
+    0,
+    Math.round(result.latencyMs),
+  )} ms）`,
+});
+
+export const llmConnectionErrorStatus = (
+  error: unknown,
+): LlmConnectionStatus => ({
+  kind: "error",
+  message: `LLM 连接失败：${redactLlmSecrets(
+    error instanceof Error ? error.message : "unknown error",
+  )}`,
+});

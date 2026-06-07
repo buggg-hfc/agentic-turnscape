@@ -96,6 +96,11 @@ type VisibleTurnResolution = Omit<TurnResolution, "hiddenSummary"> & {
   hiddenSummary?: string;
 };
 
+const LlmConnectionProbeSchema = z.object({
+  ok: z.boolean(),
+  message: z.string().min(1).max(160),
+});
+
 const isHiddenPatchChange = (change: StatePatch["changes"][number]) =>
   change.path === "hiddenEvents" || change.path.startsWith("hiddenEvents.");
 
@@ -316,16 +321,17 @@ export const buildServer = (options: ServerOptions = {}) => {
       : undefined,
   };
   const envLlm = createLlmClient(envLlmConfig);
+  const llmOptionsForConfig = (
+    config: NonNullable<TurnJobPayload["llmConfig"]>,
+  ): OpenAICompatibleOptions => ({
+    baseUrl: config.baseUrl,
+    model: config.model,
+    apiKey: config.apiKey || undefined,
+    timeoutMs: config.timeoutMs,
+    maxTokens: config.maxTokens,
+  });
   const llmForConfig = (config: TurnJobPayload["llmConfig"]): LLMClient =>
-    config
-      ? createLlmClient({
-          baseUrl: config.baseUrl,
-          model: config.model,
-          apiKey: config.apiKey || undefined,
-          timeoutMs: config.timeoutMs,
-          maxTokens: config.maxTokens,
-        })
-      : envLlm;
+    config ? createLlmClient(llmOptionsForConfig(config)) : envLlm;
 
   const settleTurnJob = async (job: TurnJobPayload) => {
     try {
@@ -369,6 +375,76 @@ export const buildServer = (options: ServerOptions = {}) => {
     ok: true,
     service: "agentic-turnscape-api",
   }));
+
+  app.post("/llm/test", async (request, reply) => {
+    const config = LlmConfigSchema.parse(request.body ?? {});
+    const startedAt = Date.now();
+    const basePayload = {
+      baseUrl: config.baseUrl,
+      model: config.model,
+    };
+    const latencyMs = () => Date.now() - startedAt;
+
+    if (!config.apiKey) {
+      return reply.code(400).send({
+        ok: false,
+        error: "missing_api_key",
+        ...basePayload,
+        latencyMs: latencyMs(),
+        message: "请输入 API Key 后再测试连接。",
+      });
+    }
+
+    try {
+      const result = await createLlmClient(
+        llmOptionsForConfig(config),
+      ).completeJson({
+        schema: LlmConnectionProbeSchema,
+        temperature: 0,
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are a connection probe. Return only compact JSON matching the requested schema.",
+          },
+          {
+            role: "user",
+            content:
+              'Return {"ok":true,"message":"ready"} if you can answer with structured JSON.',
+          },
+        ],
+        fallback: () => ({
+          ok: false,
+          message: "fallback",
+        }),
+      });
+
+      if (!result.ok) {
+        return reply.code(502).send({
+          ok: false,
+          error: "llm_connection_failed",
+          ...basePayload,
+          latencyMs: latencyMs(),
+          message: "模型未返回预期的结构化 JSON。",
+        });
+      }
+
+      return {
+        ok: true,
+        ...basePayload,
+        latencyMs: latencyMs(),
+        message: result.message,
+      };
+    } catch {
+      return reply.code(502).send({
+        ok: false,
+        error: "llm_connection_failed",
+        ...basePayload,
+        latencyMs: latencyMs(),
+        message: "LLM 连接测试失败。",
+      });
+    }
+  });
 
   app.get("/scenarios", async () => ({
     scenarios: await listAvailableScenarios(),

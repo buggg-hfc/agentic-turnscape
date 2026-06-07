@@ -19,7 +19,14 @@ This log records tested implementation slices as the project moves from the Bord
 
 ![Freeform intent preview](screenshots/freeform-intent-preview-runtime-2026-06-07.png)
 
+- Added a tested in-game LLM connection check. The LLM settings panel now has a Chinese `测试` button that posts the locally configured OpenAI-compatible provider settings to `POST /llm/test`, returns only non-secret status metadata, and shows a clear Chinese success/error status in the GUI.
+- Localized dynamic dashboard labels used by the long-campaign GUI, including campaign action names, scenario arc summaries, inherited resources, faction resources, location ids, character ids, and Agent transparency details.
+- Captured a runtime screenshot showing the LLM connection check panel and missing-key feedback without exposing any API key:
+
+![LLM connection check](screenshots/llm-connection-check-runtime-2026-06-07.png)
+
 - Verification used for this slice:
+  - `npm test -- apps/api/src/server.test.ts apps/web/src/api.test.ts apps/web/src/llmSettings.test.ts --reporter=dot`
   - `npm test -- packages/core/src/campaignProgression.test.ts apps/api/src/server.test.ts apps/web/src/campaignProgression.test.ts --reporter=dot`
   - `npm test -- packages/shared/src/schemas.test.ts packages/core/src/core.test.ts apps/api/src/server.test.ts apps/web/src/freeformAction.test.ts --reporter=dot`
   - `npm test -- apps/web/src/freeformAction.test.ts packages/core/src/core.test.ts apps/api/src/server.test.ts --reporter=dot`

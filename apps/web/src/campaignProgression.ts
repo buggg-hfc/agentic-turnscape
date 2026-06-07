@@ -1,5 +1,6 @@
 import type { CampaignFrontState, WorldState } from "@agentic-turnscape/shared";
 import type { LongCampaignProgressionRequest } from "./api.js";
+import { displayLabel } from "./displayLabels.js";
 
 export type CampaignFrontSummary = {
   id: string;
@@ -61,11 +62,11 @@ export const buildCampaignProgressionSummary = (
   const facilities = Object.entries(state.campaign.base.facilities)
     .filter(([, level]) => level > 0)
     .sort(([leftId, leftLevel], [rightId, rightLevel]) => rightLevel - leftLevel || leftId.localeCompare(rightId))
-    .map(([id, level]) => `${id} Lv.${level}`);
+    .map(([id, level]) => `${displayLabel(id)} ${level} 级`);
   const assets = Object.entries(state.campaign.base.assets)
     .filter(([, count]) => count > 0)
     .sort(([leftId, leftCount], [rightId, rightCount]) => rightCount - leftCount || leftId.localeCompare(rightId))
-    .map(([id, count]) => `${id} x${count}`);
+    .map(([id, count]) => `${displayLabel(id)} x${count}`);
   const fronts = Object.values(state.campaign.fronts)
     .sort((left, right) => right.pressure - left.pressure)
     .map((front) => ({
@@ -84,7 +85,7 @@ export const buildCampaignProgressionSummary = (
     available: true,
     chapterLabel: `第 ${state.campaign.chapter} 章`,
     experienceLabel: `${state.campaign.experience} XP`,
-    baseLabel: `${state.campaign.base.name} Lv.${state.campaign.base.level}`,
+    baseLabel: `${state.campaign.base.name} ${state.campaign.base.level} 级`,
     facilities,
     assets,
     fronts,
@@ -96,28 +97,28 @@ const defaultBaseFacilities = ["infirmary", "workshop", "archive"];
 
 const assetProjectLabels: Record<string, { label: string; description: string }> = {
   sealed_ritual_site: {
-    label: "Mobilize sealed ritual site",
-    description: "Use this inherited ending asset to disrupt the cult front.",
+    label: "动员封印仪式遗址",
+    description: "消耗继承资产，扰乱教团战线。",
   },
   public_case_archive: {
-    label: "Mobilize public case archive",
-    description: "Use this inherited ending asset to pressure Blackstone's front.",
+    label: "动员公开案卷档案",
+    description: "消耗继承资产，压制黑石商会战线。",
   },
   exile_clinic_network: {
-    label: "Mobilize exile clinic network",
-    description: "Use this inherited ending asset to move patients and calm rift pressure.",
+    label: "动员流亡诊所网络",
+    description: "消耗继承资产，转移病患并缓和裂隙压力。",
   },
   quarantine_relief_route: {
-    label: "Mobilize quarantine relief route",
-    description: "Use this inherited ending asset to stabilize relief work.",
+    label: "动员隔离救援路线",
+    description: "消耗继承资产，稳定救援工作。",
   },
   blackstone_credit_line: {
-    label: "Mobilize Blackstone credit line",
-    description: "Use this inherited ending asset to buy down consortium pressure.",
+    label: "动员黑石信用额度",
+    description: "消耗继承资产，买低商会压力。",
   },
   rift_scar_map: {
-    label: "Mobilize rift scar map",
-    description: "Use this inherited ending asset to turn breach knowledge into action.",
+    label: "动员裂隙伤痕地图",
+    description: "消耗继承资产，把裂隙知识转化为行动。",
   },
 };
 
@@ -171,8 +172,8 @@ export const buildCampaignProgressionChoices = (
     choices.push({
       id: `base:${facilityId}`,
       kind: "base",
-      label: `Build ${facilityId}`,
-      description: "Spend 1 supplies and 1 money to improve the campaign base.",
+      label: `建设${displayLabel(facilityId)}`,
+      description: "消耗 1 补给和 1 金钱，提升长期战役基地。",
       request: {
         baseInvestments: [{ facilityId, supplies: 1, money: 1 }],
       },
@@ -184,8 +185,8 @@ export const buildCampaignProgressionChoices = (
     choices.push({
       id: `training:${trainingSkill}`,
       kind: "training",
-      label: `Train ${trainingSkill}`,
-      description: "Spend 3 XP to raise a player skill for future chapters.",
+      label: `训练${displayLabel(trainingSkill)}`,
+      description: "消耗 3 XP，提升后续篇章中的玩家技能。",
       request: { training: { skill: trainingSkill, experience: 3 } },
     });
   }
@@ -195,8 +196,8 @@ export const buildCampaignProgressionChoices = (
     choices.push({
       id: `front:${front.factionId}`,
       kind: "front",
-      label: `Stabilize ${factionName(state, front.factionId)}`,
-      description: "Reduce the highest-pressure faction front by 2.",
+      label: `稳定${factionName(state, front.factionId)}`,
+      description: "将压力最高的阵营战线降低 2 点。",
       request: {
         factionFronts: [{ factionId: front.factionId, pressureDelta: -2 }],
       },
