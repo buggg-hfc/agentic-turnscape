@@ -1,4 +1,5 @@
 import type { PlayerAction } from "@agentic-turnscape/shared";
+import { displayLabel } from "./displayLabels.js";
 
 export const FREEFORM_ACTION_MAX_LENGTH = 500;
 type FreeformIntent = Exclude<PlayerAction["actionType"], "custom">;
@@ -29,14 +30,20 @@ const stableId = (value: string): string => {
 };
 
 const intentLabels: Record<FreeformIntent, string> = {
-  investigate: "Investigate",
-  negotiate: "Negotiate",
-  fight: "Fight",
-  protect: "Protect",
-  trade: "Trade",
-  rest: "Rest",
-  travel: "Travel",
-  ignore: "Observe"
+  investigate: "调查",
+  negotiate: "谈判",
+  fight: "战斗",
+  protect: "保护",
+  trade: "交易",
+  rest: "休整",
+  travel: "移动",
+  ignore: "观望"
+};
+
+const riskLabels: Record<PlayerAction["riskLevel"], string> = {
+  low: "低",
+  medium: "中",
+  high: "高",
 };
 
 const intentKeywords: Array<{ intent: FreeformIntent; keywords: string[] }> = [
@@ -99,12 +106,12 @@ const intentKeywords: Array<{ intent: FreeformIntent; keywords: string[] }> = [
 ];
 
 const targetKeywords: Array<{ id: string; label: string; keywords: string[] }> = [
-  { id: "old_outpost", label: "Old outpost", keywords: ["old outpost", "outpost", "\u65e7\u54e8\u7ad9", "\u54e8\u7ad9"] },
-  { id: "clinic", label: "Clinic", keywords: ["clinic", "adele", "patient", "\u8bca\u6240", "\u963f\u9edb\u5c14", "\u75c5\u4eba"] },
-  { id: "black_market", label: "Black market", keywords: ["black market", "crow", "market", "\u9ed1\u5e02", "\u4e4c\u9e26"] },
-  { id: "mine", label: "Mine", keywords: ["mine", "blackstone", "manlo", "\u77ff\u533a", "\u9ed1\u77f3", "\u66fc\u6d1b"] },
-  { id: "chapel", label: "Chapel", keywords: ["chapel", "cult", "rift", "\u793c\u62dc\u5802", "\u6559\u56e2", "\u88c2\u9699"] },
-  { id: "npc_rowan", label: "Rowan", keywords: ["rowan", "captain", "\u7f57\u6587", "\u961f\u957f"] }
+  { id: "old_outpost", label: "旧哨站", keywords: ["old outpost", "outpost", "\u65e7\u54e8\u7ad9", "\u54e8\u7ad9"] },
+  { id: "clinic", label: "诊所", keywords: ["clinic", "adele", "patient", "\u8bca\u6240", "\u963f\u9edb\u5c14", "\u75c5\u4eba"] },
+  { id: "black_market", label: "黑市", keywords: ["black market", "crow", "market", "\u9ed1\u5e02", "\u4e4c\u9e26"] },
+  { id: "mine", label: "矿区", keywords: ["mine", "blackstone", "manlo", "\u77ff\u533a", "\u9ed1\u77f3", "\u66fc\u6d1b"] },
+  { id: "chapel", label: "礼拜堂", keywords: ["chapel", "cult", "rift", "\u793c\u62dc\u5802", "\u6559\u56e2", "\u88c2\u9699"] },
+  { id: "npc_rowan", label: "罗文", keywords: ["rowan", "captain", "\u7f57\u6587", "\u961f\u957f"] }
 ];
 
 const highRiskKeywords = [
@@ -155,14 +162,42 @@ export const buildFreeformActionPreview = (action: PlayerAction): string[] => {
   const intent = action.leverage
     .find((item) => item.startsWith("freeform:intent:"))
     ?.slice("freeform:intent:".length) as FreeformIntent | undefined;
-  const risk = action.leverage.find((item) => item.startsWith("freeform:risk:"))?.slice("freeform:risk:".length);
-  const riskLabel = risk ? `${risk[0]?.toUpperCase() ?? ""}${risk.slice(1)}` : "Medium";
+  const risk = action.leverage.find((item) => item.startsWith("freeform:risk:"))?.slice("freeform:risk:".length) as
+    | PlayerAction["riskLevel"]
+    | undefined;
   const target = targetKeywords.find((candidate) => candidate.id === action.targetId);
   return [
-    `Intent: ${intent ? intentLabels[intent] : "Open"}`,
-    `Risk: ${riskLabel}`,
-    ...(target ? [`Target: ${target.label}`] : [])
+    `意图：${intent ? intentLabels[intent] : "开放"}`,
+    `风险：${risk ? riskLabels[risk] : "中"}`,
+    ...(target ? [`目标：${displayLabel(target.id)}`] : [])
   ];
+};
+
+export type FreeformComposerState = {
+  selected: boolean;
+  selectDisabled: boolean;
+  directSubmitDisabled: boolean;
+  selectLabel: string;
+  directSubmitLabel: string;
+};
+
+export const buildFreeformComposerState = (
+  action: PlayerAction | undefined,
+  selectedAction: PlayerAction | undefined,
+  running: boolean,
+): FreeformComposerState => {
+  const selected =
+    Boolean(action) &&
+    selectedAction?.actionType === "custom" &&
+    selectedAction.id === action?.id;
+
+  return {
+    selected,
+    selectDisabled: !action || running,
+    directSubmitDisabled: !action || running,
+    selectLabel: selected ? "已加入本回合" : "加入本回合",
+    directSubmitLabel: running ? "结算中..." : "直接执行",
+  };
 };
 
 export const buildFreeformPlayerAction = (value: string): PlayerAction | undefined => {

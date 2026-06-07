@@ -2,6 +2,30 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-07 - Direct Freeform Submission
+
+### Scope
+
+- Added a tested freeform composer state helper so the GUI can distinguish blank text, selected custom text, and running turns.
+- The freeform panel now shows Chinese `意图` / `风险` / `目标` chips instead of English `Intent` / `Risk` / `Target` labels.
+- Added a `直接执行` button that submits the typed freeform `custom` action through the same `submitTurn` path as fixed actions, preserving the invariant that the referee owns all state changes.
+- Kept the existing `加入本回合` path for players who want to stage the freeform action before using the main `执行回合` button.
+
+### Runtime Screenshot
+
+![Freeform direct submit](screenshots/freeform-direct-submit-runtime-2026-06-07.png)
+
+The screenshot was captured from a local runtime session after creating a fresh `border-seven-days` campaign, typing a Chinese freeform action, and verifying the action panel displayed Chinese preview chips plus the `直接执行` button without showing the previous English preview labels.
+
+### Verification
+
+```bash
+npm test -- apps/web/src/freeformAction.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-07 - In-game LLM Connection Check
 
 ### Scope
@@ -68,7 +92,7 @@ The screenshot was captured from a local runtime session after creating a fresh 
 
 ![Freeform intent preview](screenshots/freeform-intent-preview-runtime-2026-06-07.png)
 
-The screenshot was captured from a local runtime session after typing `Escort patients through the blockade to the old outpost.` and verifying the GUI displayed `Intent: Protect`, `Risk: High`, and `Target: Old outpost` before execution.
+The screenshot was captured from a local runtime session after typing an open-ended escort action and verifying the GUI displayed inferred intent, risk, and target chips before execution. The current direct-submit slice above localizes those preview chips into Chinese.
 
 ### Verification
 

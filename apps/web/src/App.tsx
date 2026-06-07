@@ -56,6 +56,7 @@ import { displayLabel } from "./displayLabels.js";
 import {
   FREEFORM_ACTION_MAX_LENGTH,
   buildFreeformActionPreview,
+  buildFreeformComposerState,
   buildFreeformPlayerAction,
 } from "./freeformAction.js";
 import {
@@ -391,6 +392,15 @@ export const App = () => {
     () => (freeformAction ? buildFreeformActionPreview(freeformAction) : []),
     [freeformAction],
   );
+  const freeformComposerState = useMemo(
+    () =>
+      buildFreeformComposerState(
+        freeformAction,
+        selectedAction,
+        loadState === "running",
+      ),
+    [freeformAction, selectedAction, loadState],
+  );
   const selectedTurnAction =
     selectedAction?.actionType === "custom" ? freeformAction : selectedAction;
 
@@ -646,20 +656,32 @@ export const App = () => {
               <span>
                 {freeformActionText.trim().length}/{FREEFORM_ACTION_MAX_LENGTH}
               </span>
-              <button
-                className={
-                  selectedAction?.actionType === "custom"
-                    ? "freeform-action-button selected"
-                    : "freeform-action-button"
-                }
-                disabled={!freeformAction || loadState === "running"}
-                onClick={() =>
-                  freeformAction && setSelectedAction(freeformAction)
-                }
-              >
-                <Play size={15} />
-                选择自由行动
-              </button>
+              <div className="freeform-action-buttons">
+                <button
+                  className={
+                    freeformComposerState.selected
+                      ? "freeform-action-button selected"
+                      : "freeform-action-button"
+                  }
+                  disabled={freeformComposerState.selectDisabled}
+                  onClick={() =>
+                    freeformAction && setSelectedAction(freeformAction)
+                  }
+                >
+                  <Play size={15} />
+                  {freeformComposerState.selectLabel}
+                </button>
+                <button
+                  className="secondary-button"
+                  disabled={freeformComposerState.directSubmitDisabled}
+                  onClick={() =>
+                    freeformAction && void submitTurn(freeformAction)
+                  }
+                >
+                  <Play size={15} />
+                  {freeformComposerState.directSubmitLabel}
+                </button>
+              </div>
             </div>
             {freeformActionPreview.length > 0 ? (
               <div className="freeform-action-preview">

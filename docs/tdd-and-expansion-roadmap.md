@@ -53,7 +53,7 @@ For gameplay work, tests should prove the rule invariant rather than a single lu
 - Terminal MVP endings now feed the long campaign expansion path: the server derives the finished ending, records an ending legacy flag and campaign XP, and opens the next chapter through referee-owned patches.
 - Terminal MVP endings now also unlock tested long-campaign consequences: each of the 6 endings grants a distinct base asset, shifts faction-war fronts through referee-owned patches, and can be surfaced in the web dashboard.
 - Ending-inherited base assets now become tested long-campaign Campaign Moves. The API rejects unknown or unowned asset projects, and valid projects consume assets, shift campaign fronts, and record replayable public history through referee-owned patches.
-- Player freedom now has a tested freeform action path. The web GUI converts arbitrary player text into a `custom` action, previews inferred intent/risk/target, the API accepts those tokens, and the referee adjudicates them through deterministic rules without allowing prose to directly mutate state.
+- Player freedom now has a tested freeform action path. The web GUI converts arbitrary player text into a `custom` action, previews inferred Chinese intent/risk/target chips, can submit the typed action directly, the API accepts those tokens, and the referee adjudicates them through deterministic rules without allowing prose to directly mutate state.
 
 ## MVP Completion Gate
 
@@ -69,7 +69,7 @@ The "Border Seven Days" MVP is complete only when tests and smoke checks prove a
 - Deterministic full-campaign playthrough tests must run from day 1 morning to day 7 night and prove each MVP ending is reachable.
 - Player failure creates a new branch instead of immediate game over.
 - LLM settings can be configured in-game, saved locally, tested from the Chinese GUI, sent per turn, and kept out of world state.
-- The turn UI includes a freeform action composer so the player is not limited to scenario-provided fixed action cards.
+- The turn UI includes a freeform action composer with direct submission, so the player is not limited to scenario-provided fixed action cards.
 - Player-facing UI text should remain Chinese, including settings, connection checks, action composition, and turn feedback.
 
 ## Expansion Gate After MVP
