@@ -81,6 +81,31 @@ describe("freeform action builder", () => {
     ]);
   });
 
+  it("keeps an explicit custom target when no world entity matches", () => {
+    const action = buildFreeformPlayerAction(
+      "调查目标：东门水塔，寻找能看见哨卡的瞭望记录。",
+      {
+        locations: {},
+        characters: {},
+        factions: {},
+        clocks: {},
+      },
+    );
+
+    expect(action).toMatchObject({
+      actionType: "custom",
+      targetId: expect.stringMatching(/^custom_target_/),
+      leverage: expect.arrayContaining([
+        "freeform:targetText:东门水塔",
+      ]),
+    });
+    expect(buildFreeformActionPreview(action!)).toEqual([
+      "意图：调查",
+      "风险：中",
+      "目标：东门水塔",
+    ]);
+  });
+
   it("keeps direct freeform submission available without preselecting the action", () => {
     const action = buildFreeformPlayerAction("护送病人穿过封锁线。");
 

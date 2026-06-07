@@ -60,6 +60,9 @@ const stableId = (value: string): string => {
   return `custom_${(hash >>> 0).toString(36)}`;
 };
 
+const customTargetId = (value: string): string =>
+  `custom_target_${stableId(value).slice("custom_".length)}`;
+
 const intentLabels: Record<FreeformIntent, string> = {
   investigate: "调查",
   negotiate: "谈判",
@@ -161,6 +164,8 @@ const lowRiskKeywords = ["quietly", "carefully", "observe", "rest", "wait", "\u6
 
 const containsAny = (value: string, keywords: string[]): boolean =>
   keywords.some((keyword) => value.includes(keyword));
+
+const targetTextTokenPrefix = "freeform:targetText:";
 
 const cleanKeyword = (value: string | undefined): string | undefined => {
   const keyword = value?.trim().toLocaleLowerCase();
@@ -284,6 +289,38 @@ const targetById = (
       )
     : undefined;
 
+const explicitTargetTextOf = (description: string): string | undefined => {
+  const match =
+    description.match(/目标[:：]\s*([^，。；;,.!?！？\n]{2,24})/u) ??
+    description.match(/target\s*:\s*([^,.;!?\n]{2,40})/iu);
+  return match?.[1]?.trim();
+};
+
+const targetTextOf = (action: PlayerAction): string | undefined =>
+  action.leverage
+    .find((item) => item.startsWith(targetTextTokenPrefix))
+    ?.slice(targetTextTokenPrefix.length)
+    .trim();
+
+const freeformTargetOf = (
+  description: string,
+  normalized: string,
+  context?: FreeformTargetContext,
+): FreeformTargetCandidate | undefined => {
+  const explicitTargetText = explicitTargetTextOf(description);
+  if (!explicitTargetText) return findTarget(normalized, context);
+
+  const explicitTarget = findTarget(explicitTargetText.toLocaleLowerCase(), context);
+  if (explicitTarget) return explicitTarget;
+
+  return {
+    id: customTargetId(explicitTargetText),
+    label: explicitTargetText,
+    keywords: keywordList([explicitTargetText]),
+    dynamic: true,
+  };
+};
+
 export const analyzeFreeformAction = (
   value: string,
   context?: FreeformTargetContext,
@@ -294,7 +331,7 @@ export const analyzeFreeformAction = (
   const normalized = description.toLocaleLowerCase();
   const intent =
     intentKeywords.find((candidate) => containsAny(normalized, candidate.keywords))?.intent ?? "investigate";
-  const target = findTarget(normalized, context);
+  const target = freeformTargetOf(description, normalized, context);
   const riskLevel: PlayerAction["riskLevel"] = containsAny(normalized, highRiskKeywords)
     ? "high"
     : containsAny(normalized, lowRiskKeywords)
@@ -303,7 +340,12 @@ export const analyzeFreeformAction = (
         ? "high"
         : "medium";
   const leverage = ["freeform", `freeform:intent:${intent}`, `freeform:risk:${riskLevel}`];
-  if (target) leverage.push(`freeform:target:${target.id}`);
+  if (target) {
+    leverage.push(`freeform:target:${target.id}`);
+    if (target.id.startsWith("custom_target_")) {
+      leverage.push(`${targetTextTokenPrefix}${target.label}`);
+    }
+  }
 
   return {
     intent,
@@ -325,10 +367,13 @@ export const buildFreeformActionPreview = (
     | PlayerAction["riskLevel"]
     | undefined;
   const target = targetById(action.targetId, context);
+  const targetText = targetTextOf(action);
   return [
     `意图：${intent ? intentLabels[intent] : "开放"}`,
     `风险：${risk ? riskLabels[risk] : "中"}`,
-    ...(target ? [`目标：${displayLabel(target.id, target.label)}`] : [])
+    ...(target || targetText
+      ? [`目标：${target ? displayLabel(target.id, target.label) : targetText}`]
+      : [])
   ];
 };
 

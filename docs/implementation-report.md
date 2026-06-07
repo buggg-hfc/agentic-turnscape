@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Freeform Explicit Custom Targets
+
+### Scope
+
+- Added TDD coverage proving freeform player text can keep an explicit `目标：...` target even when that target is not a known world entity.
+- The freeform builder now creates a stable `custom_target_*` id and stores the player-authored target text in a `freeform:targetText:*` leverage token, preserving the target as intent without allowing prose to mutate world state directly.
+- The Chinese GUI placeholder now demonstrates the `目标：东门水塔` pattern, and the freeform preview displays `目标：东门水塔` alongside inferred intent and risk.
+
+### Runtime Screenshot
+
+![Freeform explicit custom target](screenshots/freeform-custom-target-runtime-2026-06-08.png)
+
+The screenshot was captured from a local runtime session after typing `调查目标：东门水塔，寻找能看见哨卡的瞭望记录。` and verifying the GUI showed `意图：调查`, `风险：中`, and `目标：东门水塔`.
+
+### Verification
+
+```bash
+npm test -- apps/web/src/freeformAction.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - Freeform Dynamic World Targets
 
 ### Scope

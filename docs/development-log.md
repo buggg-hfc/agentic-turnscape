@@ -4,6 +4,17 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added tested explicit custom targets for freeform player actions. When player prose includes `目标：...` and no visible world entity matches, the builder now creates a stable `custom_target_*`, stores the player-authored target as `freeform:targetText:*`, and the Chinese GUI preview shows it as a normal target chip without letting it directly mutate world state.
+- Captured a runtime screenshot showing an unknown target, `东门水塔`, preserved in the freeform action preview:
+
+![Freeform explicit custom target](screenshots/freeform-custom-target-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- apps/web/src/freeformAction.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added tested dynamic target inference for freeform player actions. The freeform builder now uses the current visible world context to match public locations, characters, factions, and visible clocks before falling back to fixed built-in targets; the GUI passes current `WorldState` into the composer, so player prose like `调查黑石商会最近买下矿区的账簿。` previews `意图：调查`, `风险：中`, and `目标：黑石商会`.
 - Captured a runtime screenshot showing the dynamic world-target preview in the Chinese GUI:
 
