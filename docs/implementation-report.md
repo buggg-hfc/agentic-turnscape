@@ -33,6 +33,7 @@ npm run build
 - Added `custom` to the shared `PlayerActionSchema` so arbitrary player intent can be submitted through the same turn endpoint as fixed actions.
 - Added a web freeform action composer beside fixed action cards. The player can type any action, select it, and execute the turn through the normal GUI flow.
 - The core referee adjudicates custom actions with the same deterministic 2d6 path, emits legal `StatePatch` changes, and records public freeform outcomes without treating player prose as direct state mutation.
+- Added deterministic intent inference for freeform text. The helper emits `freeform:intent:*`, `freeform:risk:*`, and `freeform:target:*` tokens, the GUI previews them as chips, and the referee uses those tokens to pick the matching rule channel.
 
 ### Runtime Screenshot
 
@@ -40,10 +41,15 @@ npm run build
 
 The screenshot was captured from a local runtime session after creating a fresh `border-seven-days` campaign, typing a freeform Chinese action into the GUI composer, selecting it, and verifying the unified execute button stayed available.
 
+![Freeform intent preview](screenshots/freeform-intent-preview-runtime-2026-06-07.png)
+
+The screenshot was captured from a local runtime session after typing `Escort patients through the blockade to the old outpost.` and verifying the GUI displayed `Intent: Protect`, `Risk: High`, and `Target: Old outpost` before execution.
+
 ### Verification
 
 ```bash
 npm test -- packages/shared/src/schemas.test.ts packages/core/src/core.test.ts apps/api/src/server.test.ts apps/web/src/freeformAction.test.ts --reporter=dot
+npm test -- apps/web/src/freeformAction.test.ts packages/core/src/core.test.ts apps/api/src/server.test.ts --reporter=dot
 npm run typecheck
 npm test -- --reporter=dot
 npm run build

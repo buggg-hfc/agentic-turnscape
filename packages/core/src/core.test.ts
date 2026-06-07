@@ -132,6 +132,40 @@ describe("dice and adjudication", () => {
     expect(next.player.momentum).toBeGreaterThan(state.player.momentum);
     expect(next).not.toHaveProperty("伪装成药材车绕开封锁，把病人送到旧哨站。");
   });
+  it("uses inferred freeform intent tokens to pick the matching rule channel", () => {
+    const state = createBorderSevenDaysWorld();
+    state.clocks.plague_spread!.progress = 3;
+    state.player.attributes.will = 5;
+    state.player.skills.defense = 5;
+    const action: PlayerAction = {
+      actionType: "custom",
+      label: "Free action: escort patients",
+      description: "Escort patients through the blockade to the old outpost.",
+      targetId: "old_outpost",
+      leverage: [
+        "freeform",
+        "freeform:intent:protect",
+        "freeform:target:old_outpost",
+        "freeform:risk:high"
+      ],
+      riskLevel: "high"
+    };
+
+    const resolution = adjudicateTurn({
+      state,
+      playerAction: action,
+      proposals: [],
+      turnId: "turn-freeform-protect",
+      seed: "freeform-protect-success"
+    });
+    const next = applyStatePatch(state, resolution.patch);
+    const freeformEvent = next.publicEvents.find((item) => item.tags.includes("freeform"));
+
+    expect(resolution.roll.attribute).toBe("will");
+    expect(resolution.roll.skill).toBe("defense");
+    expect(next.clocks.plague_spread?.progress).toBeLessThan(state.clocks.plague_spread!.progress);
+    expect(freeformEvent?.tags).toContain("protect");
+  });
 });
 
 describe("state patches", () => {

@@ -54,6 +54,7 @@ import {
 } from "./factionPlans.js";
 import {
   FREEFORM_ACTION_MAX_LENGTH,
+  buildFreeformActionPreview,
   buildFreeformPlayerAction,
 } from "./freeformAction.js";
 import {
@@ -380,6 +381,10 @@ export const App = () => {
     () => buildFreeformPlayerAction(freeformActionText),
     [freeformActionText],
   );
+  const freeformActionPreview = useMemo(
+    () => (freeformAction ? buildFreeformActionPreview(freeformAction) : []),
+    [freeformAction],
+  );
   const selectedTurnAction =
     selectedAction?.actionType === "custom" ? freeformAction : selectedAction;
 
@@ -634,6 +639,13 @@ export const App = () => {
                 选择自由行动
               </button>
             </div>
+            {freeformActionPreview.length > 0 ? (
+              <div className="freeform-action-preview">
+                {freeformActionPreview.map((item) => (
+                  <span key={item}>{item}</span>
+                ))}
+              </div>
+            ) : null}
           </section>
           <button
             className="primary-button full"

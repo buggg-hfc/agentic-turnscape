@@ -14,9 +14,15 @@ This log records tested implementation slices as the project moves from the Bord
 
 ![Freeform action composer](screenshots/freeform-action-runtime-2026-06-07.png)
 
+- Extended freeform actions with tested intent inference. The GUI now previews inferred intent, risk, and target chips, and the referee uses `freeform:intent:*` tokens to choose the matching rule channel such as protect using `will/defense` and reducing plague pressure on success.
+- Captured a runtime screenshot showing the inferred freeform preview chips:
+
+![Freeform intent preview](screenshots/freeform-intent-preview-runtime-2026-06-07.png)
+
 - Verification used for this slice:
   - `npm test -- packages/core/src/campaignProgression.test.ts apps/api/src/server.test.ts apps/web/src/campaignProgression.test.ts --reporter=dot`
   - `npm test -- packages/shared/src/schemas.test.ts packages/core/src/core.test.ts apps/api/src/server.test.ts apps/web/src/freeformAction.test.ts --reporter=dot`
+  - `npm test -- apps/web/src/freeformAction.test.ts packages/core/src/core.test.ts apps/api/src/server.test.ts --reporter=dot`
   - `npm run typecheck`
   - `npm test -- --reporter=dot`
   - `npm run build`
