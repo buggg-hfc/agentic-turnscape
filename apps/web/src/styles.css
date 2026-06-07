@@ -106,6 +106,7 @@ button {
 }
 
 .creator-field input,
+.creator-field select,
 .creator-field textarea,
 .creator-import-panel > textarea {
   width: 100%;
@@ -129,6 +130,7 @@ button {
 }
 
 .creator-field input:disabled,
+.creator-field select:disabled,
 .creator-field textarea:disabled,
 .creator-import-panel > textarea:disabled {
   cursor: wait;

@@ -1,4 +1,4 @@
-import type { PlayerAction, WorldState } from "./schemas.js";
+import type { PlayerAction, RiskLevel, WorldState } from "./schemas.js";
 
 export type CreatorScenarioDraftInput = {
   id: string;
@@ -22,10 +22,13 @@ export type CreatorScenarioDraftInput = {
   mainQuestLongTermImpact: string;
   primaryActionLabel: string;
   primaryActionDescription: string;
+  primaryActionRiskLevel: RiskLevel;
   secondaryActionLabel: string;
   secondaryActionDescription: string;
+  secondaryActionRiskLevel: RiskLevel;
   tertiaryActionLabel: string;
   tertiaryActionDescription: string;
+  tertiaryActionRiskLevel: RiskLevel;
   successEndingTitle: string;
   successEndingSummary: string;
   pressureEndingTitle: string;
@@ -87,10 +90,13 @@ export const defaultCreatorScenarioDraftInput: CreatorScenarioDraftInput = {
   mainQuestLongTermImpact: "剧本可以扩展成长线章节、基地项目和阵营战线。",
   primaryActionLabel: "安抚现场",
   primaryActionDescription: "稳住现场并推动剧本稳定度。",
+  primaryActionRiskLevel: "medium",
   secondaryActionLabel: "追查源头",
   secondaryActionDescription: "追查关键证据并阻止施压阵营独占解释权。",
+  secondaryActionRiskLevel: "high",
   tertiaryActionLabel: "争取证人",
   tertiaryActionDescription: "保护愿意开口的证人并转化为公开证词。",
+  tertiaryActionRiskLevel: "medium",
   successEndingTitle: "局势稳定",
   successEndingSummary: "居民看见了可执行的未来，危机被转化为长期优势。",
   pressureEndingTitle: "危机失控",
@@ -111,6 +117,11 @@ const textOr = (value: string, fallback: string) => {
   const trimmed = value.trim();
   return trimmed.length > 0 ? trimmed : fallback;
 };
+
+const riskOr = (
+  value: RiskLevel | undefined,
+  fallback: RiskLevel,
+): RiskLevel => value ?? fallback;
 
 const boundedInt = (
   value: number,
@@ -205,6 +216,10 @@ export const buildCreatorScenarioDraft = (
     input.primaryActionDescription,
     defaultCreatorScenarioDraftInput.primaryActionDescription,
   );
+  const primaryActionRiskLevel = riskOr(
+    input.primaryActionRiskLevel,
+    defaultCreatorScenarioDraftInput.primaryActionRiskLevel,
+  );
   const secondaryActionLabel = textOr(
     input.secondaryActionLabel,
     defaultCreatorScenarioDraftInput.secondaryActionLabel,
@@ -213,6 +228,10 @@ export const buildCreatorScenarioDraft = (
     input.secondaryActionDescription,
     defaultCreatorScenarioDraftInput.secondaryActionDescription,
   );
+  const secondaryActionRiskLevel = riskOr(
+    input.secondaryActionRiskLevel,
+    defaultCreatorScenarioDraftInput.secondaryActionRiskLevel,
+  );
   const tertiaryActionLabel = textOr(
     input.tertiaryActionLabel,
     defaultCreatorScenarioDraftInput.tertiaryActionLabel,
@@ -220,6 +239,10 @@ export const buildCreatorScenarioDraft = (
   const tertiaryActionDescription = textOr(
     input.tertiaryActionDescription,
     defaultCreatorScenarioDraftInput.tertiaryActionDescription,
+  );
+  const tertiaryActionRiskLevel = riskOr(
+    input.tertiaryActionRiskLevel,
+    defaultCreatorScenarioDraftInput.tertiaryActionRiskLevel,
   );
   const successEndingTitle = textOr(
     input.successEndingTitle,
@@ -544,7 +567,7 @@ export const buildCreatorScenarioDraft = (
           `clock:${stabilityClockId}`,
           "creator_draft",
         ],
-        riskLevel: "medium",
+        riskLevel: primaryActionRiskLevel,
       },
       {
         id: `${prefix}_secondary_action`,
@@ -558,7 +581,7 @@ export const buildCreatorScenarioDraft = (
           `pressureClock:${pressureClockId}`,
           "creator_draft",
         ],
-        riskLevel: "high",
+        riskLevel: secondaryActionRiskLevel,
       },
       {
         id: `${prefix}_tertiary_action`,
@@ -571,7 +594,7 @@ export const buildCreatorScenarioDraft = (
           `clock:${stabilityClockId}`,
           "creator_draft",
         ],
-        riskLevel: "medium",
+        riskLevel: tertiaryActionRiskLevel,
       },
     ],
     endings: [

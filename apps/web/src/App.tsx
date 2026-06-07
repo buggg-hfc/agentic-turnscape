@@ -6,6 +6,7 @@ import {
   type CreatorScenarioDraftInput,
   type LlmConfig,
   type PlayerAction,
+  type RiskLevel,
   type TransparencyMode,
   type TurnResolution,
   type WorldState,
@@ -97,6 +98,7 @@ import type {
 
 type LoadState = "booting" | "selecting" | "ready" | "running" | "error";
 type ScenarioImportStatus = { kind: "success" | "error"; message: string };
+type CreatorRiskOption = { value: RiskLevel; label: string };
 
 type RelationshipEntry = {
   id: string;
@@ -116,6 +118,12 @@ const transparencyLabels: Record<TransparencyMode, string> = {
   inference: "推理",
   debug: "调试",
 };
+
+const creatorRiskOptions: CreatorRiskOption[] = [
+  { value: "low", label: "低" },
+  { value: "medium", label: "中" },
+  { value: "high", label: "高" },
+];
 
 const clockTone = (clock: ClockState) => {
   const ratio = clock.progress / clock.max;
@@ -1211,6 +1219,25 @@ const CreatorScenarioImportPanel = ({
         />
       </label>
       <label className="creator-field">
+        <span>行动一风险</span>
+        <select
+          value={draft.primaryActionRiskLevel}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange(
+              "primaryActionRiskLevel",
+              event.target.value as RiskLevel,
+            )
+          }
+        >
+          {creatorRiskOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label className="creator-field">
         <span>行动二</span>
         <input
           value={draft.secondaryActionLabel}
@@ -1231,6 +1258,25 @@ const CreatorScenarioImportPanel = ({
         />
       </label>
       <label className="creator-field">
+        <span>行动二风险</span>
+        <select
+          value={draft.secondaryActionRiskLevel}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange(
+              "secondaryActionRiskLevel",
+              event.target.value as RiskLevel,
+            )
+          }
+        >
+          {creatorRiskOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label className="creator-field">
         <span>行动三</span>
         <input
           value={draft.tertiaryActionLabel}
@@ -1249,6 +1295,25 @@ const CreatorScenarioImportPanel = ({
             onDraftChange("tertiaryActionDescription", event.target.value)
           }
         />
+      </label>
+      <label className="creator-field">
+        <span>行动三风险</span>
+        <select
+          value={draft.tertiaryActionRiskLevel}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange(
+              "tertiaryActionRiskLevel",
+              event.target.value as RiskLevel,
+            )
+          }
+        >
+          {creatorRiskOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
       </label>
       <label className="creator-field">
         <span>成功结局</span>

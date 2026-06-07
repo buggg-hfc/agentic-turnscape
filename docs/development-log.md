@@ -4,6 +4,17 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added tested editable action risk levels for creator quick drafts. The GUI now shows `行动一风险`, `行动二风险`, and `行动三风险`; generated drafts preserve `primaryActionRiskLevel`, `secondaryActionRiskLevel`, and `tertiaryActionRiskLevel`; imported creator packages expose those values through `PlayerAction.riskLevel`; and the preview action section displays `行动名：说明（风险：低/中/高）`.
+- Captured a runtime screenshot showing the editable action-risk selects and the preview action list:
+
+![Creator editable action risks](screenshots/creator-action-risk-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- packages/shared/src/creatorScenarioDraft.test.ts apps/web/src/creatorScenarioPreview.test.ts packages/content/src/creatorScenario.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added tested editable action descriptions for creator quick drafts. The GUI now shows `行动一说明`, `行动二说明`, and `行动三说明`; generated drafts preserve `primaryActionDescription`, `secondaryActionDescription`, and `tertiaryActionDescription`; imported creator packages expose those strings through `PlayerAction.description`; and the preview action section displays `行动名：说明`.
 - Captured a runtime screenshot showing the editable action-description fields and the preview action list:
 

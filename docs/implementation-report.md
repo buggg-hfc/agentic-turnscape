@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Creator Editable Action Risks
+
+### Scope
+
+- Added TDD coverage proving creator quick drafts can author each playable action's risk level instead of accepting the built-in action templates.
+- Extended `CreatorScenarioDraftInput` with `primaryActionRiskLevel`, `secondaryActionRiskLevel`, and `tertiaryActionRiskLevel`; generated drafts and imported creator packages now preserve those values in `PlayerAction.riskLevel`.
+- The creator GUI now exposes Chinese `行动一风险`, `行动二风险`, and `行动三风险` select controls, and the preview action section displays `行动名：说明（风险：低/中/高）` before import.
+
+### Runtime Screenshot
+
+![Creator editable action risks](screenshots/creator-action-risk-runtime-2026-06-08.png)
+
+The screenshot was captured from a local runtime session after setting three different action risk levels and verifying the creator preview reflected all three authored risk labels.
+
+### Verification
+
+```bash
+npm test -- packages/shared/src/creatorScenarioDraft.test.ts apps/web/src/creatorScenarioPreview.test.ts packages/content/src/creatorScenario.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - Creator Editable Action Descriptions
 
 ### Scope

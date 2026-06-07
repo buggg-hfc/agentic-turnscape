@@ -75,6 +75,7 @@ For gameplay work, tests should prove the rule invariant rather than a single lu
 - Creator tooling now supports tested editable main quest long-term impact text in the quick-create GUI. The `长期影响` field feeds `mainQuestLongTermImpact` into `WorldState.quests[*].longTermImpact`, and the creator preview displays the long-campaign hook before import.
 
 - Creator tooling now supports tested editable action descriptions in the quick-create GUI. The `行动一说明`, `行动二说明`, and `行动三说明` fields feed `primaryActionDescription`, `secondaryActionDescription`, and `tertiaryActionDescription` into `PlayerAction.description`, and the creator preview displays each entry as `行动名：说明` before import.
+- Creator tooling now supports tested editable action risks in the quick-create GUI. The `行动一风险`, `行动二风险`, and `行动三风险` select controls feed `primaryActionRiskLevel`, `secondaryActionRiskLevel`, and `tertiaryActionRiskLevel` into `PlayerAction.riskLevel`, and the creator preview displays each entry as `行动名：说明（风险：低/中/高）` before import.
 
 ## MVP Completion Gate
 

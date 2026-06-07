@@ -19,6 +19,12 @@ export type CreatorDraftPreview = {
 const namedValues = <T extends { name: string }>(values: Record<string, T>) =>
   Object.values(values).map((value) => value.name);
 
+const riskLabel = {
+  low: "低",
+  medium: "中",
+  high: "高",
+} as const;
+
 export const buildCreatorDraftPreview = (
   input: CreatorScenarioDraftInput,
 ): CreatorDraftPreview => {
@@ -34,7 +40,8 @@ export const buildCreatorDraftPreview = (
       `${quest.name}：${quest.surfaceGoal}；真相：${quest.realBackground}；隐线：${quest.hiddenGoal}；失败：${quest.failureConsequence}；影响：${quest.longTermImpact}`,
   );
   const actions = draft.actions.map(
-    (action) => `${action.label}：${action.description}`,
+    (action) =>
+      `${action.label}：${action.description}（风险：${riskLabel[action.riskLevel]}）`,
   );
   const endings = draft.endings.map(
     (ending) => `${ending.title}：${ending.summary}`,
