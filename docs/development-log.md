@@ -4,6 +4,17 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added tested editable action types for creator quick drafts. The GUI now shows `行动一类型`, `行动二类型`, and `行动三类型`; generated drafts preserve `primaryActionType`, `secondaryActionType`, and `tertiaryActionType`; imported creator packages expose those values through `PlayerAction.actionType`; and the preview action section displays `行动名：说明（类型：调查/谈判/战斗/保护/交易/休整/旅行/放弃；风险：低/中/高）`.
+- Captured a runtime screenshot showing the editable action-type selects and the preview action list:
+
+![Creator editable action types](screenshots/creator-action-type-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- packages/shared/src/creatorScenarioDraft.test.ts apps/web/src/creatorScenarioPreview.test.ts packages/content/src/creatorScenario.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added tested editable action risk levels for creator quick drafts. The GUI now shows `行动一风险`, `行动二风险`, and `行动三风险`; generated drafts preserve `primaryActionRiskLevel`, `secondaryActionRiskLevel`, and `tertiaryActionRiskLevel`; imported creator packages expose those values through `PlayerAction.riskLevel`; and the preview action section displays `行动名：说明（风险：低/中/高）`.
 - Captured a runtime screenshot showing the editable action-risk selects and the preview action list:
 

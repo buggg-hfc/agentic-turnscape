@@ -3,6 +3,7 @@ import {
   defaultCreatorScenarioDraftInput,
   type CharacterState,
   type ClockState,
+  type CreatorActionType,
   type CreatorScenarioDraftInput,
   type LlmConfig,
   type PlayerAction,
@@ -98,6 +99,7 @@ import type {
 
 type LoadState = "booting" | "selecting" | "ready" | "running" | "error";
 type ScenarioImportStatus = { kind: "success" | "error"; message: string };
+type CreatorActionTypeOption = { value: CreatorActionType; label: string };
 type CreatorRiskOption = { value: RiskLevel; label: string };
 
 type RelationshipEntry = {
@@ -118,6 +120,17 @@ const transparencyLabels: Record<TransparencyMode, string> = {
   inference: "推理",
   debug: "调试",
 };
+
+const creatorActionTypeOptions: CreatorActionTypeOption[] = [
+  { value: "investigate", label: "调查" },
+  { value: "negotiate", label: "谈判" },
+  { value: "fight", label: "战斗" },
+  { value: "protect", label: "保护" },
+  { value: "trade", label: "交易" },
+  { value: "rest", label: "休整" },
+  { value: "travel", label: "旅行" },
+  { value: "ignore", label: "放弃" },
+];
 
 const creatorRiskOptions: CreatorRiskOption[] = [
   { value: "low", label: "低" },
@@ -1208,6 +1221,25 @@ const CreatorScenarioImportPanel = ({
           }
         />
       </label>
+      <label className="creator-field">
+        <span>行动一类型</span>
+        <select
+          value={draft.primaryActionType}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange(
+              "primaryActionType",
+              event.target.value as CreatorActionType,
+            )
+          }
+        >
+          {creatorActionTypeOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </label>
       <label className="creator-field wide">
         <span>行动一说明</span>
         <textarea
@@ -1247,6 +1279,25 @@ const CreatorScenarioImportPanel = ({
           }
         />
       </label>
+      <label className="creator-field">
+        <span>行动二类型</span>
+        <select
+          value={draft.secondaryActionType}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange(
+              "secondaryActionType",
+              event.target.value as CreatorActionType,
+            )
+          }
+        >
+          {creatorActionTypeOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </label>
       <label className="creator-field wide">
         <span>行动二说明</span>
         <textarea
@@ -1285,6 +1336,25 @@ const CreatorScenarioImportPanel = ({
             onDraftChange("tertiaryActionLabel", event.target.value)
           }
         />
+      </label>
+      <label className="creator-field">
+        <span>行动三类型</span>
+        <select
+          value={draft.tertiaryActionType}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange(
+              "tertiaryActionType",
+              event.target.value as CreatorActionType,
+            )
+          }
+        >
+          {creatorActionTypeOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
       </label>
       <label className="creator-field wide">
         <span>行动三说明</span>

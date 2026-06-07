@@ -26,12 +26,15 @@ describe("creator scenario draft preview", () => {
         "黑帆会把灯塔停摆解释成封航理由，码头失去谈判窗口。",
       mainQuestLongTermImpact:
         "灯塔复明会开启码头自治线和下一章航路谈判。",
+      primaryActionType: "trade",
       primaryActionLabel: "安抚码头",
       primaryActionDescription: "让船工和家属先承认同一份灯塔维修时间表。",
       primaryActionRiskLevel: "low",
+      secondaryActionType: "fight",
       secondaryActionLabel: "追查灯塔",
       secondaryActionDescription: "进入旧灯塔机房检查被调包的备用灯芯。",
       secondaryActionRiskLevel: "high",
+      tertiaryActionType: "travel",
       tertiaryActionLabel: "召集船工",
       tertiaryActionDescription: "保护愿意作证的船工并把证词带回议事厅。",
       tertiaryActionRiskLevel: "medium",
@@ -82,9 +85,9 @@ describe("creator scenario draft preview", () => {
         title: "行动",
         count: 3,
         items: [
-          "安抚码头：让船工和家属先承认同一份灯塔维修时间表。（风险：低）",
-          "追查灯塔：进入旧灯塔机房检查被调包的备用灯芯。（风险：高）",
-          "召集船工：保护愿意作证的船工并把证词带回议事厅。（风险：中）",
+          "安抚码头：让船工和家属先承认同一份灯塔维修时间表。（类型：交易；风险：低）",
+          "追查灯塔：进入旧灯塔机房检查被调包的备用灯芯。（类型：战斗；风险：高）",
+          "召集船工：保护愿意作证的船工并把证词带回议事厅。（类型：旅行；风险：中）",
         ],
       },
       {

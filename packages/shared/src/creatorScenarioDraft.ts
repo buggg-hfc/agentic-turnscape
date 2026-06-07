@@ -1,5 +1,7 @@
 import type { PlayerAction, RiskLevel, WorldState } from "./schemas.js";
 
+export type CreatorActionType = Exclude<PlayerAction["actionType"], "custom">;
+
 export type CreatorScenarioDraftInput = {
   id: string;
   title: string;
@@ -20,12 +22,15 @@ export type CreatorScenarioDraftInput = {
   mainQuestHiddenGoal: string;
   mainQuestFailureConsequence: string;
   mainQuestLongTermImpact: string;
+  primaryActionType: CreatorActionType;
   primaryActionLabel: string;
   primaryActionDescription: string;
   primaryActionRiskLevel: RiskLevel;
+  secondaryActionType: CreatorActionType;
   secondaryActionLabel: string;
   secondaryActionDescription: string;
   secondaryActionRiskLevel: RiskLevel;
+  tertiaryActionType: CreatorActionType;
   tertiaryActionLabel: string;
   tertiaryActionDescription: string;
   tertiaryActionRiskLevel: RiskLevel;
@@ -88,12 +93,15 @@ export const defaultCreatorScenarioDraftInput: CreatorScenarioDraftInput = {
   mainQuestHiddenGoal: "找出谁在推动危机失控。",
   mainQuestFailureConsequence: "施压阵营将获得危机后的解释权。",
   mainQuestLongTermImpact: "剧本可以扩展成长线章节、基地项目和阵营战线。",
+  primaryActionType: "negotiate",
   primaryActionLabel: "安抚现场",
   primaryActionDescription: "稳住现场并推动剧本稳定度。",
   primaryActionRiskLevel: "medium",
+  secondaryActionType: "investigate",
   secondaryActionLabel: "追查源头",
   secondaryActionDescription: "追查关键证据并阻止施压阵营独占解释权。",
   secondaryActionRiskLevel: "high",
+  tertiaryActionType: "protect",
   tertiaryActionLabel: "争取证人",
   tertiaryActionDescription: "保护愿意开口的证人并转化为公开证词。",
   tertiaryActionRiskLevel: "medium",
@@ -122,6 +130,11 @@ const riskOr = (
   value: RiskLevel | undefined,
   fallback: RiskLevel,
 ): RiskLevel => value ?? fallback;
+
+const actionTypeOr = (
+  value: CreatorActionType | undefined,
+  fallback: CreatorActionType,
+): CreatorActionType => value ?? fallback;
 
 const boundedInt = (
   value: number,
@@ -208,6 +221,10 @@ export const buildCreatorScenarioDraft = (
     input.mainQuestLongTermImpact,
     defaultCreatorScenarioDraftInput.mainQuestLongTermImpact,
   );
+  const primaryActionType = actionTypeOr(
+    input.primaryActionType,
+    defaultCreatorScenarioDraftInput.primaryActionType,
+  );
   const primaryActionLabel = textOr(
     input.primaryActionLabel,
     defaultCreatorScenarioDraftInput.primaryActionLabel,
@@ -220,6 +237,10 @@ export const buildCreatorScenarioDraft = (
     input.primaryActionRiskLevel,
     defaultCreatorScenarioDraftInput.primaryActionRiskLevel,
   );
+  const secondaryActionType = actionTypeOr(
+    input.secondaryActionType,
+    defaultCreatorScenarioDraftInput.secondaryActionType,
+  );
   const secondaryActionLabel = textOr(
     input.secondaryActionLabel,
     defaultCreatorScenarioDraftInput.secondaryActionLabel,
@@ -231,6 +252,10 @@ export const buildCreatorScenarioDraft = (
   const secondaryActionRiskLevel = riskOr(
     input.secondaryActionRiskLevel,
     defaultCreatorScenarioDraftInput.secondaryActionRiskLevel,
+  );
+  const tertiaryActionType = actionTypeOr(
+    input.tertiaryActionType,
+    defaultCreatorScenarioDraftInput.tertiaryActionType,
   );
   const tertiaryActionLabel = textOr(
     input.tertiaryActionLabel,
@@ -558,7 +583,7 @@ export const buildCreatorScenarioDraft = (
     actions: [
       {
         id: `${prefix}_primary_action`,
-        actionType: "negotiate",
+        actionType: primaryActionType,
         label: primaryActionLabel,
         description: primaryActionDescription,
         targetId: guideId,
@@ -571,7 +596,7 @@ export const buildCreatorScenarioDraft = (
       },
       {
         id: `${prefix}_secondary_action`,
-        actionType: "investigate",
+        actionType: secondaryActionType,
         label: secondaryActionLabel,
         description: secondaryActionDescription,
         targetId: pressureLocationId,
@@ -585,7 +610,7 @@ export const buildCreatorScenarioDraft = (
       },
       {
         id: `${prefix}_tertiary_action`,
-        actionType: "protect",
+        actionType: tertiaryActionType,
         label: tertiaryActionLabel,
         description: tertiaryActionDescription,
         targetId: guideId,

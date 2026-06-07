@@ -142,12 +142,15 @@ describe("creator scenario import", () => {
           "巡逻队会宣布分诊失败，哨卡进入长期封闭。",
         mainQuestLongTermImpact:
           "公开分诊线会成为后续医疗据点和通行谈判的基础。",
+        primaryActionType: "protect",
         primaryActionLabel: "稳定分诊",
         primaryActionDescription: "把伤员按公开标准分流，争取镇民先稳住现场。",
         primaryActionRiskLevel: "low",
+        secondaryActionType: "negotiate",
         secondaryActionLabel: "谈判放行",
         secondaryActionDescription: "带着护理记录去哨卡争取临时通行窗口。",
         secondaryActionRiskLevel: "medium",
+        tertiaryActionType: "travel",
         tertiaryActionLabel: "转移伤员",
         tertiaryActionDescription: "保护重伤者离开封锁线并留下可验证名单。",
         tertiaryActionRiskLevel: "high",
@@ -193,6 +196,11 @@ describe("creator scenario import", () => {
       "稳定分诊",
       "谈判放行",
       "转移伤员",
+    ]);
+    expect(scenario.getActions(world).map((action) => action.actionType)).toEqual([
+      "protect",
+      "negotiate",
+      "travel",
     ]);
     expect(scenario.getActions(world).map((action) => action.description)).toEqual([
       "把伤员按公开标准分流，争取镇民先稳住现场。",

@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Creator Editable Action Types
+
+### Scope
+
+- Added TDD coverage proving creator quick drafts can author each playable action's `actionType` instead of being locked to negotiate, investigate, and protect templates.
+- Extended `CreatorScenarioDraftInput` with `primaryActionType`, `secondaryActionType`, and `tertiaryActionType`; generated drafts and imported creator packages now preserve those values in `PlayerAction.actionType`.
+- The creator GUI now exposes Chinese `行动一类型`, `行动二类型`, and `行动三类型` select controls, and the preview action section displays `行动名：说明（类型：调查/谈判/战斗/保护/交易/休整/旅行/放弃；风险：低/中/高）` before import.
+
+### Runtime Screenshot
+
+![Creator editable action types](screenshots/creator-action-type-runtime-2026-06-08.png)
+
+The screenshot was captured from a local runtime session after setting three different action types and verifying the creator preview reflected all three authored type labels.
+
+### Verification
+
+```bash
+npm test -- packages/shared/src/creatorScenarioDraft.test.ts apps/web/src/creatorScenarioPreview.test.ts packages/content/src/creatorScenario.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - Creator Editable Action Risks
 
 ### Scope

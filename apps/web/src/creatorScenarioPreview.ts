@@ -25,6 +25,18 @@ const riskLabel = {
   high: "高",
 } as const;
 
+const actionTypeLabel = {
+  investigate: "调查",
+  negotiate: "谈判",
+  fight: "战斗",
+  protect: "保护",
+  trade: "交易",
+  rest: "休整",
+  travel: "旅行",
+  ignore: "放弃",
+  custom: "自定义",
+} as const;
+
 export const buildCreatorDraftPreview = (
   input: CreatorScenarioDraftInput,
 ): CreatorDraftPreview => {
@@ -41,7 +53,7 @@ export const buildCreatorDraftPreview = (
   );
   const actions = draft.actions.map(
     (action) =>
-      `${action.label}：${action.description}（风险：${riskLabel[action.riskLevel]}）`,
+      `${action.label}：${action.description}（类型：${actionTypeLabel[action.actionType]}；风险：${riskLabel[action.riskLevel]}）`,
   );
   const endings = draft.endings.map(
     (ending) => `${ending.title}：${ending.summary}`,
