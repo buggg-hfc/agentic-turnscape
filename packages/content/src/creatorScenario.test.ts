@@ -135,6 +135,8 @@ describe("creator scenario import", () => {
         allyFactionName: "志愿护理队",
         pressureFactionName: "封锁巡逻队",
         mainQuestGoal: "在哨卡封闭前建立公开分诊线并争取放行窗口。",
+        mainQuestFailureConsequence:
+          "巡逻队会宣布分诊失败，哨卡进入长期封闭。",
         primaryActionLabel: "稳定分诊",
         secondaryActionLabel: "谈判放行",
         tertiaryActionLabel: "转移伤员",
@@ -156,6 +158,9 @@ describe("creator scenario import", () => {
     expect(Object.values(world.quests).map((quest) => quest.surfaceGoal)).toEqual([
       "在哨卡封闭前建立公开分诊线并争取放行窗口。",
     ]);
+    expect(
+      Object.values(world.quests).map((quest) => quest.failureConsequence),
+    ).toEqual(["巡逻队会宣布分诊失败，哨卡进入长期封闭。"]);
     const importedPressureClock = Object.values(world.clocks).find(
       (clock) => clock.name === "伤员潮",
     );

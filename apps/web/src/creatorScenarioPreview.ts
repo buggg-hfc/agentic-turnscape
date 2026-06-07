@@ -30,7 +30,8 @@ export const buildCreatorDraftPreview = (
     (clock) => `${clock.name} ${clock.progress}/${clock.max}：${clock.consequence}`,
   );
   const quests = Object.values(draft.world.quests).map(
-    (quest) => `${quest.name}：${quest.surfaceGoal}`,
+    (quest) =>
+      `${quest.name}：${quest.surfaceGoal}；失败：${quest.failureConsequence}`,
   );
   const actions = draft.actions.map((action) => action.label);
   const endings = draft.endings.map(

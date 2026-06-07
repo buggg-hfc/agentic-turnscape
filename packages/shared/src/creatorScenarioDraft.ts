@@ -16,6 +16,7 @@ export type CreatorScenarioDraftInput = {
   allyFactionName: string;
   pressureFactionName: string;
   mainQuestGoal: string;
+  mainQuestFailureConsequence: string;
   primaryActionLabel: string;
   secondaryActionLabel: string;
   tertiaryActionLabel: string;
@@ -74,6 +75,7 @@ export const defaultCreatorScenarioDraftInput: CreatorScenarioDraftInput = {
   allyFactionName: "本地互助会",
   pressureFactionName: "施压者联盟",
   mainQuestGoal: "在三天内稳住危机并给出公开解释。",
+  mainQuestFailureConsequence: "施压阵营将获得危机后的解释权。",
   primaryActionLabel: "安抚现场",
   secondaryActionLabel: "追查源头",
   tertiaryActionLabel: "争取证人",
@@ -166,6 +168,10 @@ export const buildCreatorScenarioDraft = (
   const mainQuestGoal = textOr(
     input.mainQuestGoal,
     defaultCreatorScenarioDraftInput.mainQuestGoal,
+  );
+  const mainQuestFailureConsequence = textOr(
+    input.mainQuestFailureConsequence,
+    defaultCreatorScenarioDraftInput.mainQuestFailureConsequence,
   );
   const primaryActionLabel = textOr(
     input.primaryActionLabel,
@@ -393,7 +399,7 @@ export const buildCreatorScenarioDraft = (
         npcIds: [guideId, pressureNpcId],
         factionIds: [allyFactionId, pressureFactionId],
         solutionTypes: ["negotiate", "investigate", "fight"],
-        failureConsequence: `${pressureFactionName}将获得危机后的解释权。`,
+        failureConsequence: mainQuestFailureConsequence,
         longTermImpact: `${title}可以扩展成长线章节、基地项目和阵营战线。`,
         status: "active",
       },

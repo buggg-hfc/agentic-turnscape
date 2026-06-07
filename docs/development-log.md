@@ -4,6 +4,17 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added tested editable main quest failure consequences for creator quick drafts. The GUI now shows `任务失败后果`, generated drafts preserve `mainQuestFailureConsequence`, imported creator packages keep it in `WorldState.quests[*].failureConsequence`, and the preview task section displays `任务目标；失败：后果`.
+- Captured a runtime screenshot showing the quest failure consequence field and preview task failure branch:
+
+![Creator editable quest failure consequences](screenshots/creator-quest-failure-consequence-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- packages/shared/src/creatorScenarioDraft.test.ts apps/web/src/creatorScenarioPreview.test.ts packages/content/src/creatorScenario.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added tested editable main quest goals for creator quick drafts. The GUI now shows `主线目标`, generated drafts preserve `mainQuestGoal`, imported creator packages keep it in `WorldState.quests[*].surfaceGoal`, and the preview outline includes a `任务` section.
 - Captured a runtime screenshot showing the main quest goal field and preview task objective:
 
