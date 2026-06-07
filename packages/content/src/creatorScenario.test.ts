@@ -143,8 +143,11 @@ describe("creator scenario import", () => {
         mainQuestLongTermImpact:
           "公开分诊线会成为后续医疗据点和通行谈判的基础。",
         primaryActionLabel: "稳定分诊",
+        primaryActionDescription: "把伤员按公开标准分流，争取镇民先稳住现场。",
         secondaryActionLabel: "谈判放行",
+        secondaryActionDescription: "带着护理记录去哨卡争取临时通行窗口。",
         tertiaryActionLabel: "转移伤员",
+        tertiaryActionDescription: "保护重伤者离开封锁线并留下可验证名单。",
         successEndingTitle: "伤员安置",
         pressureEndingTitle: "哨卡接管",
         successEndingSummary: "镇民接受公开分诊，伤员被送进可持续照护线。",
@@ -187,6 +190,11 @@ describe("creator scenario import", () => {
       "稳定分诊",
       "谈判放行",
       "转移伤员",
+    ]);
+    expect(scenario.getActions(world).map((action) => action.description)).toEqual([
+      "把伤员按公开标准分流，争取镇民先稳住现场。",
+      "带着护理记录去哨卡争取临时通行窗口。",
+      "保护重伤者离开封锁线并留下可验证名单。",
     ]);
     successWorld.player.momentum = 3;
     expect(scenario.evaluateEnding(successWorld)?.title).toBe("伤员安置");

@@ -21,8 +21,11 @@ export type CreatorScenarioDraftInput = {
   mainQuestFailureConsequence: string;
   mainQuestLongTermImpact: string;
   primaryActionLabel: string;
+  primaryActionDescription: string;
   secondaryActionLabel: string;
+  secondaryActionDescription: string;
   tertiaryActionLabel: string;
+  tertiaryActionDescription: string;
   successEndingTitle: string;
   successEndingSummary: string;
   pressureEndingTitle: string;
@@ -83,8 +86,11 @@ export const defaultCreatorScenarioDraftInput: CreatorScenarioDraftInput = {
   mainQuestFailureConsequence: "施压阵营将获得危机后的解释权。",
   mainQuestLongTermImpact: "剧本可以扩展成长线章节、基地项目和阵营战线。",
   primaryActionLabel: "安抚现场",
+  primaryActionDescription: "稳住现场并推动剧本稳定度。",
   secondaryActionLabel: "追查源头",
+  secondaryActionDescription: "追查关键证据并阻止施压阵营独占解释权。",
   tertiaryActionLabel: "争取证人",
+  tertiaryActionDescription: "保护愿意开口的证人并转化为公开证词。",
   successEndingTitle: "局势稳定",
   successEndingSummary: "居民看见了可执行的未来，危机被转化为长期优势。",
   pressureEndingTitle: "危机失控",
@@ -195,13 +201,25 @@ export const buildCreatorScenarioDraft = (
     input.primaryActionLabel,
     defaultCreatorScenarioDraftInput.primaryActionLabel,
   );
+  const primaryActionDescription = textOr(
+    input.primaryActionDescription,
+    defaultCreatorScenarioDraftInput.primaryActionDescription,
+  );
   const secondaryActionLabel = textOr(
     input.secondaryActionLabel,
     defaultCreatorScenarioDraftInput.secondaryActionLabel,
   );
+  const secondaryActionDescription = textOr(
+    input.secondaryActionDescription,
+    defaultCreatorScenarioDraftInput.secondaryActionDescription,
+  );
   const tertiaryActionLabel = textOr(
     input.tertiaryActionLabel,
     defaultCreatorScenarioDraftInput.tertiaryActionLabel,
+  );
+  const tertiaryActionDescription = textOr(
+    input.tertiaryActionDescription,
+    defaultCreatorScenarioDraftInput.tertiaryActionDescription,
   );
   const successEndingTitle = textOr(
     input.successEndingTitle,
@@ -519,7 +537,7 @@ export const buildCreatorScenarioDraft = (
         id: `${prefix}_primary_action`,
         actionType: "negotiate",
         label: primaryActionLabel,
-        description: `借助${guideName}和${allyFactionName}稳住现场，推动${title}稳定度。`,
+        description: primaryActionDescription,
         targetId: guideId,
         leverage: [
           `scenario:${id}`,
@@ -532,7 +550,7 @@ export const buildCreatorScenarioDraft = (
         id: `${prefix}_secondary_action`,
         actionType: "investigate",
         label: secondaryActionLabel,
-        description: `前往${pressureLocationName}寻找证据，阻止${pressureFactionName}独占解释权。`,
+        description: secondaryActionDescription,
         targetId: pressureLocationId,
         leverage: [
           `scenario:${id}`,
@@ -546,7 +564,7 @@ export const buildCreatorScenarioDraft = (
         id: `${prefix}_tertiary_action`,
         actionType: "protect",
         label: tertiaryActionLabel,
-        description: `保护愿意开口的证人和${guideName}，让${allyFactionName}能把${crisisName}转化为公开证词。`,
+        description: tertiaryActionDescription,
         targetId: guideId,
         leverage: [
           `scenario:${id}`,

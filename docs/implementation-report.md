@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Creator Editable Action Descriptions
+
+### Scope
+
+- Added TDD coverage proving creator quick drafts can author each playable action's user-facing description instead of relying on fixed templates.
+- Extended `CreatorScenarioDraftInput` with `primaryActionDescription`, `secondaryActionDescription`, and `tertiaryActionDescription`; generated drafts and imported creator packages now preserve those fields in `PlayerAction.description`.
+- The creator GUI now exposes Chinese `行动一说明`, `行动二说明`, and `行动三说明` text areas, and the preview action section displays `行动名：说明` before import.
+
+### Runtime Screenshot
+
+![Creator editable action descriptions](screenshots/creator-action-descriptions-runtime-2026-06-08.png)
+
+The screenshot was captured from a local runtime session after opening the scenario selection screen, filling three action descriptions, and verifying the creator preview reflected all three authored action descriptions.
+
+### Verification
+
+```bash
+npm test -- packages/shared/src/creatorScenarioDraft.test.ts apps/web/src/creatorScenarioPreview.test.ts packages/content/src/creatorScenario.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - Creator Editable Quest Long-Term Impact
 
 ### Scope

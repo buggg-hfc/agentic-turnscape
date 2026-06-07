@@ -4,6 +4,17 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added tested editable action descriptions for creator quick drafts. The GUI now shows `行动一说明`, `行动二说明`, and `行动三说明`; generated drafts preserve `primaryActionDescription`, `secondaryActionDescription`, and `tertiaryActionDescription`; imported creator packages expose those strings through `PlayerAction.description`; and the preview action section displays `行动名：说明`.
+- Captured a runtime screenshot showing the editable action-description fields and the preview action list:
+
+![Creator editable action descriptions](screenshots/creator-action-descriptions-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- packages/shared/src/creatorScenarioDraft.test.ts apps/web/src/creatorScenarioPreview.test.ts packages/content/src/creatorScenario.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added tested editable main quest long-term impact text for creator quick drafts. The GUI now shows `长期影响`, generated drafts preserve `mainQuestLongTermImpact`, imported creator packages keep it in `WorldState.quests[*].longTermImpact`, and the preview task section displays `任务目标；真相：背景；隐线：目标；失败：后果；影响：长期钩子`.
 - Captured a runtime screenshot showing the long-term impact field and preview campaign hook:
 

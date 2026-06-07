@@ -27,8 +27,11 @@ describe("creator scenario draft preview", () => {
       mainQuestLongTermImpact:
         "灯塔复明会开启码头自治线和下一章航路谈判。",
       primaryActionLabel: "安抚码头",
+      primaryActionDescription: "让船工和家属先承认同一份灯塔维修时间表。",
       secondaryActionLabel: "追查灯塔",
+      secondaryActionDescription: "进入旧灯塔机房检查被调包的备用灯芯。",
       tertiaryActionLabel: "召集船工",
+      tertiaryActionDescription: "保护愿意作证的船工并把证词带回议事厅。",
       successEndingTitle: "灯塔复明",
       pressureEndingTitle: "黑帆接管",
       successEndingSummary: "灯塔重新照亮外海，码头有了继续谈判的资本。",
@@ -75,7 +78,11 @@ describe("creator scenario draft preview", () => {
       {
         title: "行动",
         count: 3,
-        items: ["安抚码头", "追查灯塔", "召集船工"],
+        items: [
+          "安抚码头：让船工和家属先承认同一份灯塔维修时间表。",
+          "追查灯塔：进入旧灯塔机房检查被调包的备用灯芯。",
+          "召集船工：保护愿意作证的船工并把证词带回议事厅。",
+        ],
       },
       {
         title: "结局",

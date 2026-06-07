@@ -1200,6 +1200,16 @@ const CreatorScenarioImportPanel = ({
           }
         />
       </label>
+      <label className="creator-field wide">
+        <span>行动一说明</span>
+        <textarea
+          value={draft.primaryActionDescription}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("primaryActionDescription", event.target.value)
+          }
+        />
+      </label>
       <label className="creator-field">
         <span>行动二</span>
         <input
@@ -1210,6 +1220,16 @@ const CreatorScenarioImportPanel = ({
           }
         />
       </label>
+      <label className="creator-field wide">
+        <span>行动二说明</span>
+        <textarea
+          value={draft.secondaryActionDescription}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("secondaryActionDescription", event.target.value)
+          }
+        />
+      </label>
       <label className="creator-field">
         <span>行动三</span>
         <input
@@ -1217,6 +1237,16 @@ const CreatorScenarioImportPanel = ({
           disabled={disabled}
           onChange={(event) =>
             onDraftChange("tertiaryActionLabel", event.target.value)
+          }
+        />
+      </label>
+      <label className="creator-field wide">
+        <span>行动三说明</span>
+        <textarea
+          value={draft.tertiaryActionDescription}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("tertiaryActionDescription", event.target.value)
           }
         />
       </label>

@@ -33,7 +33,9 @@ export const buildCreatorDraftPreview = (
     (quest) =>
       `${quest.name}：${quest.surfaceGoal}；真相：${quest.realBackground}；隐线：${quest.hiddenGoal}；失败：${quest.failureConsequence}；影响：${quest.longTermImpact}`,
   );
-  const actions = draft.actions.map((action) => action.label);
+  const actions = draft.actions.map(
+    (action) => `${action.label}：${action.description}`,
+  );
   const endings = draft.endings.map(
     (ending) => `${ending.title}：${ending.summary}`,
   );

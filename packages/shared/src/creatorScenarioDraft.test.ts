@@ -40,8 +40,11 @@ describe("creator scenario draft builder", () => {
       mainQuestLongTermImpact:
         "雨声真相会成为旧城后续修复和居民自治的证据。",
       primaryActionLabel: "安抚街坊",
+      primaryActionDescription: "组织街坊在巷口建立公开证词桌。",
       secondaryActionLabel: "追查雨声",
+      secondaryActionDescription: "沿雨棚水痕追查旧仓库的隐藏监控。",
       tertiaryActionLabel: "争取证人",
+      tertiaryActionDescription: "保护愿意开口的住户并安排安全转移。",
       successEndingTitle: "雨声停歇",
       pressureEndingTitle: "旧城封门",
       successEndingSummary: "居民愿意公开作证，旧城获得继续修复的机会。",
@@ -99,6 +102,11 @@ describe("creator scenario draft builder", () => {
       "雨声真相会成为旧城后续修复和居民自治的证据。",
     ]);
     expect(draft.actions).toHaveLength(3);
+    expect(draft.actions.map((action) => action.description)).toEqual([
+      "组织街坊在巷口建立公开证词桌。",
+      "沿雨棚水痕追查旧仓库的隐藏监控。",
+      "保护愿意开口的住户并安排安全转移。",
+    ]);
     for (const action of draft.actions) {
       expect(PlayerActionSchema.parse(action).label).toMatch(
         /安抚街坊|追查雨声|争取证人/,
