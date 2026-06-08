@@ -26,6 +26,15 @@ const resourceSummary = (resources: Record<string, number>) =>
     .map(([name, amount]) => `${name} ${amount}`)
     .join("，") || "无";
 
+const relationshipSummary = (
+  draft: ReturnType<typeof buildCreatorScenarioDraft>,
+) =>
+  Object.entries(draft.world.relationships).map(([id, relationship]) => {
+    const characterId = id.startsWith("player:") ? id.slice("player:".length) : id;
+    const characterName = draft.world.characters[characterId]?.name ?? characterId;
+    return `${draft.world.player.name} -> ${characterName}：信任 ${relationship.trust}，兴趣 ${relationship.interest}，怀疑 ${relationship.suspicion}`;
+  });
+
 const playerSummary = (draft: ReturnType<typeof buildCreatorScenarioDraft>) => {
   const { player } = draft.world;
   return `${player.name}：生命 ${player.resources.health ?? 0}，体力 ${
@@ -87,6 +96,7 @@ export const buildCreatorDraftPreview = (
     (faction) =>
       `${faction.name}：${faction.publicGoal}；计划：${faction.currentPlan}；资源：${resourceSummary(faction.resources)}`,
   );
+  const relationships = relationshipSummary(draft);
   const clocks = Object.values(draft.world.clocks).map(
     (clock) => `${clock.name} ${clock.progress}/${clock.max}：${clock.consequence}`,
   );
@@ -119,6 +129,7 @@ export const buildCreatorDraftPreview = (
       { title: "玩家", count: 1, items: [playerSummary(draft)] },
       { title: "地点", count: locations.length, items: locations },
       { title: "NPC", count: characters.length, items: characters },
+      { title: "关系", count: relationships.length, items: relationships },
       { title: "阵营", count: factions.length, items: factions },
       { title: "危机钟", count: clocks.length, items: clocks },
       { title: "任务", count: quests.length, items: quests },

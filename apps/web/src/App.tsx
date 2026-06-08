@@ -1612,6 +1612,66 @@ const CreatorScenarioImportPanel = ({
         />
       </label>
       <label className="creator-field">
+        <span>关键 NPC 信任</span>
+        <input
+          type="number"
+          min={0}
+          max={5}
+          value={creatorDraftNumberValue(
+            draft.guideRelationshipTrust,
+            defaultCreatorScenarioDraftInput.guideRelationshipTrust,
+            1,
+          )}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange(
+              "guideRelationshipTrust",
+              Number.parseInt(event.target.value, 10),
+            )
+          }
+        />
+      </label>
+      <label className="creator-field">
+        <span>关键 NPC 兴趣</span>
+        <input
+          type="number"
+          min={0}
+          max={5}
+          value={creatorDraftNumberValue(
+            draft.guideRelationshipInterest,
+            defaultCreatorScenarioDraftInput.guideRelationshipInterest,
+            1,
+          )}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange(
+              "guideRelationshipInterest",
+              Number.parseInt(event.target.value, 10),
+            )
+          }
+        />
+      </label>
+      <label className="creator-field">
+        <span>关键 NPC 怀疑</span>
+        <input
+          type="number"
+          min={0}
+          max={5}
+          value={creatorDraftNumberValue(
+            draft.guideRelationshipSuspicion,
+            defaultCreatorScenarioDraftInput.guideRelationshipSuspicion,
+            0,
+          )}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange(
+              "guideRelationshipSuspicion",
+              Number.parseInt(event.target.value, 10),
+            )
+          }
+        />
+      </label>
+      <label className="creator-field">
         <span>对手 NPC</span>
         <input
           value={draft.pressureNpcName}
@@ -1658,6 +1718,66 @@ const CreatorScenarioImportPanel = ({
           disabled={disabled}
           onChange={(event) =>
             onDraftChange("pressureNpcSecret", event.target.value)
+          }
+        />
+      </label>
+      <label className="creator-field">
+        <span>对手 NPC 信任</span>
+        <input
+          type="number"
+          min={0}
+          max={5}
+          value={creatorDraftNumberValue(
+            draft.pressureNpcRelationshipTrust,
+            defaultCreatorScenarioDraftInput.pressureNpcRelationshipTrust,
+            0,
+          )}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange(
+              "pressureNpcRelationshipTrust",
+              Number.parseInt(event.target.value, 10),
+            )
+          }
+        />
+      </label>
+      <label className="creator-field">
+        <span>对手 NPC 兴趣</span>
+        <input
+          type="number"
+          min={0}
+          max={5}
+          value={creatorDraftNumberValue(
+            draft.pressureNpcRelationshipInterest,
+            defaultCreatorScenarioDraftInput.pressureNpcRelationshipInterest,
+            1,
+          )}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange(
+              "pressureNpcRelationshipInterest",
+              Number.parseInt(event.target.value, 10),
+            )
+          }
+        />
+      </label>
+      <label className="creator-field">
+        <span>对手 NPC 怀疑</span>
+        <input
+          type="number"
+          min={0}
+          max={5}
+          value={creatorDraftNumberValue(
+            draft.pressureNpcRelationshipSuspicion,
+            defaultCreatorScenarioDraftInput.pressureNpcRelationshipSuspicion,
+            1,
+          )}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange(
+              "pressureNpcRelationshipSuspicion",
+              Number.parseInt(event.target.value, 10),
+            )
           }
         />
       </label>

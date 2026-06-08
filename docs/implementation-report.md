@@ -2,6 +2,30 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Creator Starting Relationships
+
+### Scope
+
+- Added TDD coverage for creator-authored opening relationships.
+- The quick-create scenario draft now supports editable trust, interest, and suspicion values for the player's key NPC and opposing NPC relationships while remaining backward-compatible with older creator draft inputs.
+- The Chinese creator GUI exposes relationship number controls, and the draft preview includes a `关系` section so scenario creators can check the social starting position before import.
+
+### Runtime Screenshot
+
+![Creator starting relationships](screenshots/creator-relationships-runtime-2026-06-08.png)
+
+The screenshot was captured from the local Web + API runtime after editing the creator form to set `临时调停人`, `林澈`, and `黑帆船长` with custom opening relationship values. The generated `关系` preview shows `信任 3，兴趣 2，怀疑 0` for the key NPC and `信任 0，兴趣 3，怀疑 4` for the opposing NPC.
+
+### Verification
+
+```bash
+npm test -- packages/shared/src/creatorScenarioDraft.test.ts --reporter=dot
+npm test -- apps/web/src/creatorScenarioPreview.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - Creator Player Attributes
 
 ### Scope

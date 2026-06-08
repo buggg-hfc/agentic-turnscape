@@ -39,11 +39,17 @@ describe("creator scenario draft preview", () => {
       guidePublicImage: "林澈握着潮汐账本，能让船工先坐下来。",
       guideShortTermGoal: "让维修时间表先被所有人承认。",
       guideSecret: "林澈知道备用灯芯发票藏在哪里。",
+      guideRelationshipTrust: 3,
+      guideRelationshipInterest: 2,
+      guideRelationshipSuspicion: 0,
       pressureNpcName: "黑帆船长",
       pressureNpcRole: "走私船队领袖",
       pressureNpcPublicImage: "黑帆船长把封航说成保护港口的唯一办法。",
       pressureNpcShortTermGoal: "控制旧灯塔机房并拖慢维修。",
       pressureNpcSecret: "黑帆船长提前换走了备用灯芯。",
+      pressureNpcRelationshipTrust: 0,
+      pressureNpcRelationshipInterest: 3,
+      pressureNpcRelationshipSuspicion: 4,
       allyFactionName: "码头互助会",
       pressureFactionName: "黑帆承包队",
       allyFactionPublicGoal: "公开修复灯塔并保护船工证词。",
@@ -109,6 +115,14 @@ describe("creator scenario draft preview", () => {
         items: [
           "林澈：码头调停人；公开：林澈握着潮汐账本，能让船工先坐下来。；目标：让维修时间表先被所有人承认。；秘密：林澈知道备用灯芯发票藏在哪里。",
           "黑帆船长：走私船队领袖；公开：黑帆船长把封航说成保护港口的唯一办法。；目标：控制旧灯塔机房并拖慢维修。；秘密：黑帆船长提前换走了备用灯芯。",
+        ],
+      },
+      {
+        title: "关系",
+        count: 2,
+        items: [
+          "临时调停人 -> 林澈：信任 3，兴趣 2，怀疑 0",
+          "临时调停人 -> 黑帆船长：信任 0，兴趣 3，怀疑 4",
         ],
       },
       {

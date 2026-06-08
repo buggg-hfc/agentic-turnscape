@@ -43,11 +43,17 @@ export type CreatorScenarioDraftInput = {
   guidePublicImage: string;
   guideShortTermGoal: string;
   guideSecret: string;
+  guideRelationshipTrust?: number;
+  guideRelationshipInterest?: number;
+  guideRelationshipSuspicion?: number;
   pressureNpcName: string;
   pressureNpcRole: string;
   pressureNpcPublicImage: string;
   pressureNpcShortTermGoal: string;
   pressureNpcSecret: string;
+  pressureNpcRelationshipTrust?: number;
+  pressureNpcRelationshipInterest?: number;
+  pressureNpcRelationshipSuspicion?: number;
   allyFactionName: string;
   pressureFactionName: string;
   allyFactionPublicGoal: string;
@@ -151,11 +157,17 @@ export const defaultCreatorScenarioDraftInput: CreatorScenarioDraftInput = {
   guidePublicImage: "熟悉起始地点的人，愿意给玩家第一份可信情报。",
   guideShortTermGoal: "协助玩家建立第一条公开线索。",
   guideSecret: "曾经和施压阵营做过一次失败交易。",
+  guideRelationshipTrust: 1,
+  guideRelationshipInterest: 1,
+  guideRelationshipSuspicion: 0,
   pressureNpcName: "施压代表",
   pressureNpcRole: "施压代表",
   pressureNpcPublicImage: "不断要求立刻处理危机的人。",
   pressureNpcShortTermGoal: "把现场选择推向对自己有利的一边。",
   pressureNpcSecret: "隐藏了一条会改变公众判断的证据。",
+  pressureNpcRelationshipTrust: 0,
+  pressureNpcRelationshipInterest: 1,
+  pressureNpcRelationshipSuspicion: 1,
   allyFactionName: "本地互助会",
   pressureFactionName: "施压者联盟",
   allyFactionPublicGoal: "公开处理危机，让居民看到可执行的办法。",
@@ -435,6 +447,30 @@ export const buildCreatorScenarioDraft = (
     input.guideSecret ?? "",
     defaultCreatorScenarioDraftInput.guideSecret,
   );
+  const guideRelationshipTrust = boundedInt(
+    input.guideRelationshipTrust ??
+      defaultCreatorScenarioDraftInput.guideRelationshipTrust ??
+      1,
+    defaultCreatorScenarioDraftInput.guideRelationshipTrust ?? 1,
+    0,
+    5,
+  );
+  const guideRelationshipInterest = boundedInt(
+    input.guideRelationshipInterest ??
+      defaultCreatorScenarioDraftInput.guideRelationshipInterest ??
+      1,
+    defaultCreatorScenarioDraftInput.guideRelationshipInterest ?? 1,
+    0,
+    5,
+  );
+  const guideRelationshipSuspicion = boundedInt(
+    input.guideRelationshipSuspicion ??
+      defaultCreatorScenarioDraftInput.guideRelationshipSuspicion ??
+      0,
+    defaultCreatorScenarioDraftInput.guideRelationshipSuspicion ?? 0,
+    0,
+    5,
+  );
   const pressureNpcName = textOr(
     input.pressureNpcName,
     defaultCreatorScenarioDraftInput.pressureNpcName,
@@ -454,6 +490,30 @@ export const buildCreatorScenarioDraft = (
   const pressureNpcSecret = textOr(
     input.pressureNpcSecret ?? "",
     defaultCreatorScenarioDraftInput.pressureNpcSecret,
+  );
+  const pressureNpcRelationshipTrust = boundedInt(
+    input.pressureNpcRelationshipTrust ??
+      defaultCreatorScenarioDraftInput.pressureNpcRelationshipTrust ??
+      0,
+    defaultCreatorScenarioDraftInput.pressureNpcRelationshipTrust ?? 0,
+    0,
+    5,
+  );
+  const pressureNpcRelationshipInterest = boundedInt(
+    input.pressureNpcRelationshipInterest ??
+      defaultCreatorScenarioDraftInput.pressureNpcRelationshipInterest ??
+      1,
+    defaultCreatorScenarioDraftInput.pressureNpcRelationshipInterest ?? 1,
+    0,
+    5,
+  );
+  const pressureNpcRelationshipSuspicion = boundedInt(
+    input.pressureNpcRelationshipSuspicion ??
+      defaultCreatorScenarioDraftInput.pressureNpcRelationshipSuspicion ??
+      1,
+    defaultCreatorScenarioDraftInput.pressureNpcRelationshipSuspicion ?? 1,
+    0,
+    5,
   );
   const allyFactionName = textOr(
     input.allyFactionName,
@@ -750,22 +810,22 @@ export const buildCreatorScenarioDraft = (
     },
     relationships: {
       [`player:${guideId}`]: {
-        trust: 1,
+        trust: guideRelationshipTrust,
         affinity: 0,
         respect: 0,
         fear: 0,
-        interest: 1,
+        interest: guideRelationshipInterest,
         debt: 0,
-        suspicion: 0,
+        suspicion: guideRelationshipSuspicion,
       },
       [`player:${pressureNpcId}`]: {
-        trust: 0,
+        trust: pressureNpcRelationshipTrust,
         affinity: 0,
         respect: 0,
         fear: 0,
-        interest: 1,
+        interest: pressureNpcRelationshipInterest,
         debt: 0,
-        suspicion: 1,
+        suspicion: pressureNpcRelationshipSuspicion,
       },
     },
     quests: {

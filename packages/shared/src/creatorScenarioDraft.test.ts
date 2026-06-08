@@ -52,11 +52,17 @@ describe("creator scenario draft builder", () => {
       guidePublicImage: "林姐熟悉每条巷子的门牌和住户关系。",
       guideShortTermGoal: "帮玩家把第一批证词公开登记。",
       guideSecret: "林姐曾替承包队保管过一晚仓库钥匙。",
+      guideRelationshipTrust: 3,
+      guideRelationshipInterest: 2,
+      guideRelationshipSuspicion: 0,
       pressureNpcName: "周队",
       pressureNpcRole: "拆迁现场指挥",
       pressureNpcPublicImage: "周队总是带着封街文件和施工队一起出现。",
       pressureNpcShortTermGoal: "逼居民承认雨声只是安全隐患。",
       pressureNpcSecret: "周队调走了雨夜最后一名仓库看守。",
+      pressureNpcRelationshipTrust: 0,
+      pressureNpcRelationshipInterest: 2,
+      pressureNpcRelationshipSuspicion: 4,
       allyFactionName: "街坊互助会",
       pressureFactionName: "拆迁承包队",
       allyFactionPublicGoal: "公开保护旧城住户并建立夜巡表。",
@@ -138,6 +144,18 @@ describe("creator scenario draft builder", () => {
       "林姐曾替承包队保管过一晚仓库钥匙。",
       "周队调走了雨夜最后一名仓库看守。",
     ]);
+    expect(draft.world.relationships["player:rain_alley_test_guide"]).toMatchObject({
+      trust: 3,
+      interest: 2,
+      suspicion: 0,
+    });
+    expect(
+      draft.world.relationships["player:rain_alley_test_pressure_lead"],
+    ).toMatchObject({
+      trust: 0,
+      interest: 2,
+      suspicion: 4,
+    });
     expect(Object.values(draft.world.locations).map((location) => location.name)).toEqual(
       expect.arrayContaining(["长明巷口", "旧仓库雨棚"]),
     );
