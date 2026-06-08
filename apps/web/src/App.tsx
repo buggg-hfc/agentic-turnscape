@@ -1244,6 +1244,16 @@ const CreatorScenarioImportPanel = ({
           ))}
         </select>
       </label>
+      <label className="creator-field wide">
+        <span>开场解法</span>
+        <input
+          value={draft.openingSceneSolutions ?? ""}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("openingSceneSolutions", event.target.value)
+          }
+        />
+      </label>
       <label className="creator-field">
         <span>冲突场景</span>
         <input
@@ -1268,6 +1278,16 @@ const CreatorScenarioImportPanel = ({
           ))}
         </select>
       </label>
+      <label className="creator-field wide">
+        <span>冲突解法</span>
+        <input
+          value={draft.pressureSceneSolutions ?? ""}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("pressureSceneSolutions", event.target.value)
+          }
+        />
+      </label>
       <label className="creator-field">
         <span>终局场景</span>
         <input
@@ -1291,6 +1311,16 @@ const CreatorScenarioImportPanel = ({
             </option>
           ))}
         </select>
+      </label>
+      <label className="creator-field wide">
+        <span>终局解法</span>
+        <input
+          value={draft.finalSceneSolutions ?? ""}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("finalSceneSolutions", event.target.value)
+          }
+        />
       </label>
       <label className="creator-field">
         <span>玩家身份</span>

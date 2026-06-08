@@ -31,6 +31,8 @@ For gameplay work, tests should prove the rule invariant rather than a single lu
 
 ## Verified Slices
 
+- Creator tooling now supports tested editable scene solution hooks: opening, pressure, and final solution fields parse Chinese or English entries into canonical `nonCombatSolutions`, while the Chinese draft preview reflects those hooks before import.
+
 - Creator tooling now supports tested editable scene types: opening, pressure, and final scene-kind controls feed generated draft scene `kind` values across `social`, `combat`, and `exploration`, while the Chinese draft preview reflects those authored types before import.
 
 - Creator tooling now supports tested editable scene names: opening, pressure, and final scene-name fields feed generated draft scenes, while the Chinese draft preview exposes a `场景` card with type, location, NPC, and solution hooks before import.

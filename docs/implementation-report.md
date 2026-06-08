@@ -2,6 +2,30 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Creator Scene Solutions
+
+### Scope
+
+- Added TDD coverage for creator-authored scene solution hooks.
+- The quick-create scenario draft now accepts editable opening, pressure, and final scene solution text, parsing Chinese or English entries such as `调查`, `交易`, `谈判`, `放弃`, `保护`, and `休整` into canonical scene solution tokens.
+- The Chinese creator GUI exposes scene-solution fields, and the draft preview reflects those authored hooks inside the `场景` card before import.
+
+### Runtime Screenshot
+
+![Creator scene solutions](screenshots/creator-scene-solutions-runtime-2026-06-08.png)
+
+The screenshot was captured from the local Web + API runtime after editing the creator form to set opening solutions to `调查,交易`, pressure solutions to `谈判,放弃`, and final solutions to `保护,休整`. The generated preview shows those solution hooks in the `场景` card.
+
+### Verification
+
+```bash
+npm test -- packages/shared/src/creatorScenarioDraft.test.ts --reporter=dot
+npm test -- apps/web/src/creatorScenarioPreview.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - Creator Scene Kinds
 
 ### Scope

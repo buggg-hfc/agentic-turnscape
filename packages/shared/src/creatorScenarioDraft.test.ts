@@ -29,6 +29,9 @@ describe("creator scenario draft builder", () => {
       openingSceneKind: "exploration",
       pressureSceneKind: "social",
       finalSceneKind: "combat",
+      openingSceneSolutions: "调查,交易",
+      pressureSceneSolutions: "谈判,放弃",
+      finalSceneSolutions: "保护,休整",
       playerName: "临时调查员",
       playerHealth: 4,
       playerStamina: 5,
@@ -234,6 +237,11 @@ describe("creator scenario draft builder", () => {
       "exploration",
       "social",
       "combat",
+    ]);
+    expect(draft.scenes.map((scene) => scene.nonCombatSolutions)).toEqual([
+      ["investigate", "trade"],
+      ["negotiate", "withdraw"],
+      ["protect", "rest"],
     ]);
     expect(Object.values(draft.world.quests).map((quest) => quest.surfaceGoal)).toEqual([
       "在雨夜结束前公开怨念来源并保护旧城住户。",

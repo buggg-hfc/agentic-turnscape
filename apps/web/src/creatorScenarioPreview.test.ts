@@ -16,6 +16,9 @@ describe("creator scenario draft preview", () => {
       openingSceneKind: "exploration",
       pressureSceneKind: "social",
       finalSceneKind: "combat",
+      openingSceneSolutions: "调查,交易",
+      pressureSceneSolutions: "谈判,放弃",
+      finalSceneSolutions: "保护,休整",
       playerName: "临时调停人",
       playerHealth: 4,
       playerStamina: 5,
@@ -131,9 +134,9 @@ describe("creator scenario draft preview", () => {
         title: "场景",
         count: 3,
         items: [
-          "潮汐账本听证：探索；地点：潮汐议事厅；NPC：林澈，黑帆船长；解法：谈判，保护，调查",
-          "灯塔机房冲突：社交；地点：旧灯塔机房；NPC：黑帆船长；解法：谈判，放弃，调查",
-          "航标归属裁定：战斗；地点：潮汐议事厅；NPC：林澈，黑帆船长；解法：谈判，调查",
+          "潮汐账本听证：探索；地点：潮汐议事厅；NPC：林澈，黑帆船长；解法：调查，交易",
+          "灯塔机房冲突：社交；地点：旧灯塔机房；NPC：黑帆船长；解法：谈判，放弃",
+          "航标归属裁定：战斗；地点：潮汐议事厅；NPC：林澈，黑帆船长；解法：保护，休整",
         ],
       },
       {

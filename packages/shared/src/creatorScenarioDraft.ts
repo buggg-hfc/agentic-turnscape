@@ -7,6 +7,7 @@ export type CreatorActionTarget =
   | "startLocation"
   | "pressureLocation";
 export type CreatorSceneKind = "combat" | "social" | "exploration";
+export type CreatorSceneSolution = CreatorActionType | "withdraw";
 
 export type CreatorScenarioDraftInput = {
   id: string;
@@ -21,6 +22,9 @@ export type CreatorScenarioDraftInput = {
   openingSceneKind?: CreatorSceneKind;
   pressureSceneKind?: CreatorSceneKind;
   finalSceneKind?: CreatorSceneKind;
+  openingSceneSolutions?: string;
+  pressureSceneSolutions?: string;
+  finalSceneSolutions?: string;
   playerName: string;
   playerHealth?: number;
   playerStamina?: number;
@@ -304,6 +308,63 @@ const parseListText = (value: string): string[] =>
 const listOr = (value: string, fallback: string): string[] => {
   const values = parseListText(value);
   return values.length > 0 ? values : parseListText(fallback);
+};
+
+const sceneSolutionAliases: Record<string, CreatorSceneSolution> = {
+  investigate: "investigate",
+  "调查": "investigate",
+  "調查": "investigate",
+  negotiate: "negotiate",
+  "谈判": "negotiate",
+  "談判": "negotiate",
+  "协商": "negotiate",
+  "協商": "negotiate",
+  fight: "fight",
+  "战斗": "fight",
+  "戰鬥": "fight",
+  protect: "protect",
+  "保护": "protect",
+  "保護": "protect",
+  trade: "trade",
+  "交易": "trade",
+  rest: "rest",
+  "休整": "rest",
+  "休息": "rest",
+  travel: "travel",
+  "旅行": "travel",
+  "移动": "travel",
+  "移動": "travel",
+  ignore: "ignore",
+  "忽略": "ignore",
+  withdraw: "withdraw",
+  "放弃": "withdraw",
+  "放棄": "withdraw",
+  "撤退": "withdraw",
+};
+
+const parseSceneSolutionText = (value: string): CreatorSceneSolution[] => {
+  const seen = new Set<CreatorSceneSolution>();
+  const solutions: CreatorSceneSolution[] = [];
+  const entries = value
+    .split(/[,\n;，；]+/)
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+  for (const entry of entries) {
+    const normalized = entry.toLowerCase();
+    const solution = sceneSolutionAliases[normalized] ?? sceneSolutionAliases[entry];
+    if (!solution || seen.has(solution)) continue;
+    seen.add(solution);
+    solutions.push(solution);
+  }
+  return solutions;
+};
+
+const sceneSolutionsOr = (
+  value: string,
+  fallback: string,
+): CreatorSceneSolution[] => {
+  const solutions = parseSceneSolutionText(value);
+  return solutions.length > 0 ? solutions : parseSceneSolutionText(fallback);
 };
 
 export const buildCreatorScenarioDraft = (
@@ -772,6 +833,18 @@ export const buildCreatorScenarioDraft = (
   const openingSceneKind = sceneKindOr(input.openingSceneKind, "social");
   const pressureSceneKind = sceneKindOr(input.pressureSceneKind, "combat");
   const finalSceneKind = sceneKindOr(input.finalSceneKind, "exploration");
+  const openingSceneSolutions = sceneSolutionsOr(
+    input.openingSceneSolutions ?? "",
+    "negotiate,protect,investigate",
+  );
+  const pressureSceneSolutions = sceneSolutionsOr(
+    input.pressureSceneSolutions ?? "",
+    "negotiate,withdraw,investigate",
+  );
+  const finalSceneSolutions = sceneSolutionsOr(
+    input.finalSceneSolutions ?? "",
+    "negotiate,investigate",
+  );
 
   const world: WorldState = {
     time: { day: 1, phase: "morning" },
@@ -1033,7 +1106,7 @@ export const buildCreatorScenarioDraft = (
         locationId: startLocationId,
         npcIds: [guideId, pressureNpcId],
         crisisClockIds: [pressureClockId],
-        nonCombatSolutions: ["negotiate", "protect", "investigate"],
+        nonCombatSolutions: openingSceneSolutions,
       },
       {
         id: combatSceneId,
@@ -1043,7 +1116,7 @@ export const buildCreatorScenarioDraft = (
         locationId: pressureLocationId,
         npcIds: [pressureNpcId],
         crisisClockIds: [pressureClockId, stabilityClockId],
-        nonCombatSolutions: ["negotiate", "withdraw", "investigate"],
+        nonCombatSolutions: pressureSceneSolutions,
       },
       {
         id: finalSceneId,
@@ -1053,7 +1126,7 @@ export const buildCreatorScenarioDraft = (
         locationId: startLocationId,
         npcIds: [guideId, pressureNpcId],
         crisisClockIds: [stabilityClockId],
-        nonCombatSolutions: ["negotiate", "investigate"],
+        nonCombatSolutions: finalSceneSolutions,
       },
     ],
     actions: [
