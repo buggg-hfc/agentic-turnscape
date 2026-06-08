@@ -4,6 +4,17 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added a tested Chinese interpretation sentence for freeform player actions. The composer now turns the current prose into a readable pre-submit summary such as `裁判将按“保护”结算；目标：诊所；风险：高；投入：情报、金钱。结果仍由规则裁判确认。`, so the player can see how the rule pipeline will receive an unlimited action before committing it.
+- Captured a runtime screenshot showing the new interpretation line under the existing freeform preview chips:
+
+![Freeform action interpretation](screenshots/freeform-interpretation-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- apps/web/src/freeformAction.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added tested chronicle patch summaries for replay rows. The web timeline now names concrete referee-confirmed effects such as `地点：旧哨站`, `情报 +1`, `周烬信任 +1`, clock movement, reputation tags, and momentum before the total `state_patch` change count, so players can connect prior choices to visible consequences instead of reading only `N 项已确认变化`.
 - Captured a runtime screenshot showing the replay panel after a fixed-seed `调查失踪商队` turn:
 

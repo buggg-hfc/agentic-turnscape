@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   FREEFORM_ACTION_MAX_LENGTH,
   addFreeformActionHistoryEntry,
+  buildFreeformActionInterpretation,
   buildFreeformActionPreview,
   buildFreeformComposerState,
   buildFreeformPlayerAction,
@@ -246,6 +247,9 @@ describe("freeform action builder", () => {
       "目标：旧哨站",
       "投入：情报、金钱",
     ]);
+    expect(buildFreeformActionInterpretation(action!, context)).toBe(
+      "裁判将按“调查”结算；目标：旧哨站；风险：中；投入：情报、金钱。结果仍由规则裁判确认。",
+    );
   });
 
   it("does not turn unavailable resource words into freeform leverage", () => {

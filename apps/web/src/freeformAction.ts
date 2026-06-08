@@ -645,6 +645,34 @@ export const buildFreeformActionPreview = (
   ];
 };
 
+export const buildFreeformActionInterpretation = (
+  action: PlayerAction,
+  context?: FreeformTargetContext,
+): string => {
+  const intent = action.leverage
+    .find((item) => item.startsWith("freeform:intent:"))
+    ?.slice("freeform:intent:".length) as FreeformIntent | undefined;
+  const risk = action.leverage
+    .find((item) => item.startsWith("freeform:risk:"))
+    ?.slice("freeform:risk:".length) as
+    | PlayerAction["riskLevel"]
+    | undefined;
+  const target = targetById(action.targetId, context);
+  const targetText = targetTextOf(action);
+  const committedResourceLabels = committedResourceLabelsOf(action);
+  const segments = [
+    `裁判将按“${intent ? intentLabels[intent] : "开放行动"}”结算`,
+    ...(target || targetText
+      ? [`目标：${target ? displayLabel(target.id, target.label) : targetText}`]
+      : []),
+    `风险：${risk ? riskLabels[risk] : "中"}`,
+    ...(committedResourceLabels.length > 0
+      ? [`投入：${committedResourceLabels.join("、")}`]
+      : []),
+  ];
+  return `${segments.join("；")}。结果仍由规则裁判确认。`;
+};
+
 export type FreeformComposerState = {
   selected: boolean;
   selectDisabled: boolean;

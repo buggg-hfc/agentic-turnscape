@@ -62,6 +62,7 @@ import { displayLabel } from "./displayLabels.js";
 import {
   FREEFORM_ACTION_MAX_LENGTH,
   addFreeformActionHistoryEntry,
+  buildFreeformActionInterpretation,
   buildFreeformActionPreview,
   buildFreeformComposerState,
   buildFreeformPlayerAction,
@@ -512,6 +513,13 @@ export const App = () => {
       freeformAction ? buildFreeformActionPreview(freeformAction, state) : [],
     [freeformAction, state],
   );
+  const freeformActionInterpretation = useMemo(
+    () =>
+      freeformAction
+        ? buildFreeformActionInterpretation(freeformAction, state)
+        : undefined,
+    [freeformAction, state],
+  );
   const freeformComposerState = useMemo(
     () =>
       buildFreeformComposerState(
@@ -864,6 +872,11 @@ export const App = () => {
                   <span key={item}>{item}</span>
                 ))}
               </div>
+            ) : null}
+            {freeformActionInterpretation ? (
+              <p className="freeform-action-interpretation">
+                {freeformActionInterpretation}
+              </p>
             ) : null}
             {freeformActionHistory.length > 0 ? (
               <div className="freeform-action-history">

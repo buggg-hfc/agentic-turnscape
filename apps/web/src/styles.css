@@ -766,6 +766,16 @@ button {
   font-weight: 700;
 }
 
+.freeform-action-interpretation {
+  margin: 0;
+  border-left: 2px solid rgba(227, 193, 111, 0.58);
+  padding: 6px 9px;
+  background: rgba(227, 193, 111, 0.08);
+  color: #d7e2db;
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
 .freeform-action-history {
   display: grid;
   gap: 7px;

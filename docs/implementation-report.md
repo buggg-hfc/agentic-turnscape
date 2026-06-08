@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Freeform Action Interpretation Summary
+
+### Scope
+
+- Added TDD coverage for a Chinese freeform action interpretation sentence. The GUI now explains how the current prose will be routed before the player submits it.
+- The summary combines referee-facing intent, target, risk, and committed resources into one sentence, then reminds the player that final consequences still require rule-referee confirmation.
+- This keeps freeform play open-ended while making the immediate action pipeline easier to understand than chips alone.
+
+### Runtime Screenshot
+
+![Freeform action interpretation](screenshots/freeform-interpretation-runtime-2026-06-08.png)
+
+The screenshot was captured from the local Web + API runtime after starting a Border Seven Days campaign and entering a freeform protection action with target, resources, method, and avoidance constraints. The GUI displays chips plus `裁判将按“保护”结算；目标：诊所；风险：高；投入：情报、金钱。结果仍由规则裁判确认。`
+
+### Verification
+
+```bash
+npm test -- apps/web/src/freeformAction.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - Chronicle Patch Change Summaries
 
 ### Scope

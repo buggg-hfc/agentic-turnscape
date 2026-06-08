@@ -31,6 +31,8 @@ For gameplay work, tests should prove the rule invariant rather than a single lu
 
 ## Verified Slices
 
+- Freeform player actions now have a tested Chinese interpretation summary in the GUI: chips still expose intent/risk/target/resources/method/boundaries, and a single sentence explains how the referee will receive the action while making clear that final consequences remain rule-owned.
+
 - Chronicle replay rows now have tested consequence summaries: the web timeline extracts visible referee-confirmed `state_patch` effects such as location changes, resource deltas, relationship shifts, crisis-clock movement, reputation tags, and momentum before the total confirmed-change count, helping players see how earlier choices produced current outcomes.
 
 - Freeform negotiation and trade now reuse the tested social chip rules: custom actions routed by `freeform:intent:negotiate` or `freeform:intent:trade` convert committed `favor`, `intel`, and `money` resources into spendable chip requests, reject unavailable resources, and avoid double-spending money.
