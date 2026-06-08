@@ -31,6 +31,10 @@ For gameplay work, tests should prove the rule invariant rather than a single lu
 
 ## Verified Slices
 
+- The main GUI now has a tested RPG world map layer: player-visible `WorldState` is converted into current-location map nodes, route lines, danger tones, NPC/clock summaries, and faction pressure bars, and the Chinese turn screen shows this map before action selection.
+
+- Creator tooling now supports tested editable faction doctrine fields: support and pressure faction internal conflict, operating style, and bottom line feed generated `WorldState.factions[*]` values, while the Chinese draft preview exposes `分歧`, `风格`, and `底线` before import.
+
 - Creator tooling now supports tested editable faction hidden goals: support and pressure faction hidden-agenda fields feed generated `WorldState.factions[*].hiddenGoal`, while the Chinese draft preview exposes `隐藏：...` in the faction card before import.
 
 - Creator tooling now supports tested editable scene solution hooks: opening, pressure, and final solution fields parse Chinese or English entries into canonical `nonCombatSolutions`, while the Chinese draft preview reflects those hooks before import.

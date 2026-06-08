@@ -620,6 +620,188 @@ button {
   padding-left: 10px;
 }
 
+.world-map {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 16px;
+}
+
+.world-map-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.world-map-header .panel-heading {
+  margin: 0;
+}
+
+.world-map-header > span {
+  border-radius: 999px;
+  padding: 5px 9px;
+  background: rgba(227, 193, 111, 0.13);
+  color: #fff1c5;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.world-map-canvas {
+  position: relative;
+  min-height: 360px;
+  overflow: hidden;
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(32, 54, 49, 0.82), rgba(14, 20, 22, 0.88)),
+    radial-gradient(circle at 22% 26%, rgba(103, 160, 143, 0.28), transparent 24%),
+    radial-gradient(circle at 74% 35%, rgba(227, 193, 111, 0.2), transparent 20%),
+    radial-gradient(circle at 58% 78%, rgba(217, 108, 74, 0.22), transparent 24%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+.world-map-canvas::before {
+  position: absolute;
+  inset: 12px;
+  content: "";
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 36px 36px;
+  pointer-events: none;
+}
+
+.world-map-canvas svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.world-map-canvas line {
+  stroke: rgba(240, 201, 119, 0.46);
+  stroke-dasharray: 5 5;
+  stroke-width: 0.9;
+}
+
+.map-node {
+  position: absolute;
+  display: grid;
+  gap: 3px;
+  width: 128px;
+  min-height: 76px;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  padding: 9px 10px 11px;
+  background: rgba(12, 18, 19, 0.9);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.32);
+}
+
+.map-node.current {
+  border-color: rgba(255, 241, 197, 0.92);
+  box-shadow:
+    0 0 0 3px rgba(227, 193, 111, 0.17),
+    0 16px 36px rgba(0, 0, 0, 0.38);
+}
+
+.map-node.safe {
+  border-color: rgba(102, 198, 163, 0.48);
+}
+
+.map-node.warning {
+  border-color: rgba(227, 193, 111, 0.58);
+}
+
+.map-node.danger {
+  border-color: rgba(217, 108, 74, 0.72);
+}
+
+.map-node.critical {
+  border-color: rgba(239, 83, 80, 0.86);
+}
+
+.map-node-name,
+.map-node-meta {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.map-node-name {
+  color: #fff8e0;
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.map-node-meta {
+  color: #c8d6ce;
+  font-size: 12px;
+}
+
+.map-node i {
+  display: block;
+  height: 5px;
+  max-width: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #66c6a3, #e3c16f, #d96c4a);
+}
+
+.world-map-node-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.world-map-node-list > div {
+  min-width: 0;
+  border-left: 3px solid rgba(103, 160, 143, 0.72);
+  border-radius: 0 8px 8px 0;
+  padding: 8px 9px;
+  background: rgba(255, 255, 255, 0.055);
+}
+
+.world-map-node-list > div.active {
+  border-left-color: #e3c16f;
+  background: rgba(227, 193, 111, 0.1);
+}
+
+.world-map-node-list strong,
+.world-map-node-list span,
+.world-map-node-list small {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.world-map-node-list strong {
+  color: #fff1c5;
+  font-size: 13px;
+}
+
+.world-map-node-list span,
+.world-map-node-list small {
+  margin-top: 3px;
+  color: #b8c6bd;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.world-map-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.world-map-legend span {
+  border-radius: 999px;
+  padding: 5px 8px;
+  background: rgba(255, 255, 255, 0.075);
+  color: #c8d6ce;
+  font-size: 12px;
+  font-weight: 750;
+}
+
 .action-list {
   display: grid;
   gap: 9px;
@@ -1428,6 +1610,19 @@ meter {
   }
 
   .dashboard {
+    grid-template-columns: 1fr;
+  }
+
+  .world-map-canvas {
+    min-height: 300px;
+  }
+
+  .map-node {
+    width: 112px;
+    min-height: 70px;
+  }
+
+  .world-map-node-list {
     grid-template-columns: 1fr;
   }
 

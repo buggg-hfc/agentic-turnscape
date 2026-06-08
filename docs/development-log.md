@@ -4,6 +4,28 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added a tested RPG world map GUI to the main turn screen. Visible `WorldState` now becomes map nodes with current-location routing, danger labels, NPC counts, visible clock summaries, and faction pressure bars, giving the Chinese interface a more game-like spatial layer before the player chooses fixed or freeform actions.
+- Captured a runtime screenshot after starting `边境七日`, showing six location nodes and five route lines in the main game UI:
+
+![RPG world map runtime](screenshots/rpg-world-map-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- apps/web/src/worldMap.test.ts packages/shared/src/creatorScenarioDraft.test.ts apps/web/src/creatorScenarioPreview.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
+- Added tested creator-authored faction doctrine fields. Quick-create drafts can now edit support and pressure faction internal conflict, operating style, and bottom line; generated worlds store those values in `WorldState.factions`, and the Chinese preview shows `分歧`, `风格`, and `底线` inside the `阵营` card before import.
+- Captured runtime screenshots after editing the creator form, showing both doctrine fields and the faction preview:
+
+![Creator faction doctrine fields](screenshots/creator-faction-doctrine-fields-runtime-2026-06-08.png)
+
+![Creator faction doctrine preview](screenshots/creator-faction-doctrine-preview-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- packages/shared/src/creatorScenarioDraft.test.ts apps/web/src/creatorScenarioPreview.test.ts --reporter=dot`
+  - `npm run typecheck`
+
 - Added tested creator-authored faction hidden goals. Quick-create drafts can now edit support and pressure faction `hiddenGoal` text; generated worlds store those agendas in `WorldState.factions`, and the Chinese preview shows `隐藏：...` inside the `阵营` card before import.
 - Captured runtime screenshots after editing the creator form, showing both hidden-goal fields and the faction preview:
 

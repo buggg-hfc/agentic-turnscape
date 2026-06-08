@@ -89,10 +89,16 @@ describe("creator scenario draft builder", () => {
       allyFactionCurrentPlan: "先把雨棚下的商户组织成互保队。",
       allyFactionResources: "街坊:3,旧地图:2",
       allyFactionHiddenGoal: "保住一份会牵连互助会前任会长的旧账本。",
+      allyFactionInternalConflict: "老街坊想公开全部账本，年轻志愿者担心引来报复。",
+      allyFactionStyle: "先安置居民，再用证词慢慢压住拆迁队。",
+      allyFactionBottomLine: "不能把失踪者家属当作谈判筹码。",
       pressureFactionPublicGoal: "声称封街可以保护居民安全。",
       pressureFactionCurrentPlan: "用施工围挡切断雨巷入口。",
       pressureFactionResources: "围挡:4,账本:1",
       pressureFactionHiddenGoal: "把旧账本销毁并迫使住户接受拆迁补偿。",
+      pressureFactionInternalConflict: "承包方想立刻清场，账房想等玩家犯错后再出手。",
+      pressureFactionStyle: "制造时间压力，把复杂纠纷包装成安全命令。",
+      pressureFactionBottomLine: "不会公开承认账本来源。",
       mainQuestGoal: "在雨夜结束前公开怨念来源并保护旧城住户。",
       mainQuestRealBackground:
         "失踪者留下的水渍指向旧仓库，拆迁队提前封存了最后一段监控。",
@@ -220,6 +226,18 @@ describe("creator scenario draft builder", () => {
     expect(Object.values(draft.world.factions).map((faction) => faction.hiddenGoal)).toEqual([
       "保住一份会牵连互助会前任会长的旧账本。",
       "把旧账本销毁并迫使住户接受拆迁补偿。",
+    ]);
+    expect(Object.values(draft.world.factions).map((faction) => faction.internalConflict)).toEqual([
+      "老街坊想公开全部账本，年轻志愿者担心引来报复。",
+      "承包方想立刻清场，账房想等玩家犯错后再出手。",
+    ]);
+    expect(Object.values(draft.world.factions).map((faction) => faction.style)).toEqual([
+      "先安置居民，再用证词慢慢压住拆迁队。",
+      "制造时间压力，把复杂纠纷包装成安全命令。",
+    ]);
+    expect(Object.values(draft.world.factions).map((faction) => faction.bottomLine)).toEqual([
+      "不能把失踪者家属当作谈判筹码。",
+      "不会公开承认账本来源。",
     ]);
     const pressureClock = Object.values(draft.world.clocks).find(
       (clock) => clock.name === "雨声怨念",

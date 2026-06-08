@@ -82,10 +82,16 @@ export type CreatorScenarioDraftInput = {
   allyFactionCurrentPlan: string;
   allyFactionResources: string;
   allyFactionHiddenGoal?: string;
+  allyFactionInternalConflict?: string;
+  allyFactionStyle?: string;
+  allyFactionBottomLine?: string;
   pressureFactionPublicGoal: string;
   pressureFactionCurrentPlan: string;
   pressureFactionResources: string;
   pressureFactionHiddenGoal?: string;
+  pressureFactionInternalConflict?: string;
+  pressureFactionStyle?: string;
+  pressureFactionBottomLine?: string;
   mainQuestGoal: string;
   mainQuestRealBackground: string;
   mainQuestHiddenGoal: string;
@@ -206,10 +212,16 @@ export const defaultCreatorScenarioDraftInput: CreatorScenarioDraftInput = {
   allyFactionCurrentPlan: "先把起始地点变成可信的协商点。",
   allyFactionResources: "志愿者:2,补给:2",
   allyFactionHiddenGoal: "保护组织里曾经犯错的人不被立即清算。",
+  allyFactionInternalConflict: "有人想公开全部真相，有人担心真相会引发二次混乱。",
+  allyFactionStyle: "稳住现场、收集证据、争取居民信任。",
+  allyFactionBottomLine: "不能让无辜者替危机背锅。",
   pressureFactionPublicGoal: "要求立刻用强硬方式终止危机。",
   pressureFactionCurrentPlan: "把危机塑造成只能由自己解决的问题。",
   pressureFactionResources: "执行者:2,筹码:2",
   pressureFactionHiddenGoal: "借危机后续规则获得长期控制权。",
+  pressureFactionInternalConflict: "强硬派想马上行动，算计派想等玩家犯错。",
+  pressureFactionStyle: "制造时间压力，把复杂问题简化成二选一。",
+  pressureFactionBottomLine: "不会放弃通过恐惧扩大影响力的机会。",
   mainQuestGoal: "在三天内稳住危机并给出公开解释。",
   mainQuestRealBackground: "施压阵营正在遮掩一条能改变公众判断的关键证据。",
   mainQuestHiddenGoal: "找出谁在推动危机失控。",
@@ -687,6 +699,18 @@ export const buildCreatorScenarioDraft = (
     input.allyFactionHiddenGoal ?? "",
     defaultCreatorScenarioDraftInput.allyFactionHiddenGoal ?? "",
   );
+  const allyFactionInternalConflict = textOr(
+    input.allyFactionInternalConflict ?? "",
+    defaultCreatorScenarioDraftInput.allyFactionInternalConflict ?? "",
+  );
+  const allyFactionStyle = textOr(
+    input.allyFactionStyle ?? "",
+    defaultCreatorScenarioDraftInput.allyFactionStyle ?? "",
+  );
+  const allyFactionBottomLine = textOr(
+    input.allyFactionBottomLine ?? "",
+    defaultCreatorScenarioDraftInput.allyFactionBottomLine ?? "",
+  );
   const pressureFactionPublicGoal = textOr(
     input.pressureFactionPublicGoal ?? "",
     defaultCreatorScenarioDraftInput.pressureFactionPublicGoal,
@@ -702,6 +726,18 @@ export const buildCreatorScenarioDraft = (
   const pressureFactionHiddenGoal = textOr(
     input.pressureFactionHiddenGoal ?? "",
     defaultCreatorScenarioDraftInput.pressureFactionHiddenGoal ?? "",
+  );
+  const pressureFactionInternalConflict = textOr(
+    input.pressureFactionInternalConflict ?? "",
+    defaultCreatorScenarioDraftInput.pressureFactionInternalConflict ?? "",
+  );
+  const pressureFactionStyle = textOr(
+    input.pressureFactionStyle ?? "",
+    defaultCreatorScenarioDraftInput.pressureFactionStyle ?? "",
+  );
+  const pressureFactionBottomLine = textOr(
+    input.pressureFactionBottomLine ?? "",
+    defaultCreatorScenarioDraftInput.pressureFactionBottomLine ?? "",
   );
   const mainQuestGoal = textOr(
     input.mainQuestGoal,
@@ -988,9 +1024,9 @@ export const buildCreatorScenarioDraft = (
         baseId: startLocationId,
         allies: [],
         enemies: [pressureFactionId],
-        internalConflict: "有人想公开全部真相，有人担心真相会引发二次混乱。",
-        style: "稳住现场、收集证据、争取居民信任。",
-        bottomLine: "不能让无辜者替危机背锅。",
+        internalConflict: allyFactionInternalConflict,
+        style: allyFactionStyle,
+        bottomLine: allyFactionBottomLine,
         currentPlan: allyFactionCurrentPlan,
         clockIds: [stabilityClockId],
       },
@@ -1004,9 +1040,9 @@ export const buildCreatorScenarioDraft = (
         baseId: pressureLocationId,
         allies: [],
         enemies: [allyFactionId],
-        internalConflict: "强硬派想马上行动，算计派想等玩家犯错。",
-        style: "制造时间压力，把复杂问题简化成二选一。",
-        bottomLine: "不会放弃通过恐惧扩大影响力的机会。",
+        internalConflict: pressureFactionInternalConflict,
+        style: pressureFactionStyle,
+        bottomLine: pressureFactionBottomLine,
         currentPlan: pressureFactionCurrentPlan,
         clockIds: [pressureClockId],
       },

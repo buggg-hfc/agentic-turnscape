@@ -2,6 +2,52 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - RPG World Map GUI
+
+### Scope
+
+- Added a tested `buildWorldMap` view model that turns player-visible `WorldState` into RPG map nodes, current-location routing, danger tones, NPC counts, visible crisis-clock labels, and faction-pressure bars.
+- The main Chinese turn interface now embeds `世界地图` above the current-scene prose so players can scan the town spatially before choosing fixed or freeform actions.
+- The map renders six Border Seven Days locations, route lines from the current location, danger states, NPC/clock summaries, and a compact legend without allowing Agent prose to mutate state.
+
+### Runtime Screenshot
+
+![RPG world map runtime](screenshots/rpg-world-map-runtime-2026-06-08.png)
+
+The screenshot was captured from the local Web + API runtime after starting `边境七日`. Runtime assertions confirmed `6` map nodes, `5` route lines, the world-map panel, current-location header, NPC/clock summaries, and absence of secret-shaped rendered text.
+
+### Verification
+
+```bash
+npm test -- apps/web/src/worldMap.test.ts packages/shared/src/creatorScenarioDraft.test.ts apps/web/src/creatorScenarioPreview.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
+## 2026-06-08 - Creator Faction Doctrine
+
+### Scope
+
+- Added TDD coverage for creator-authored faction internal conflict, operating style, and bottom line.
+- The quick-create scenario draft now accepts editable doctrine fields for support and pressure factions and writes them into `WorldState.factions[*].internalConflict`, `style`, and `bottomLine`.
+- The Chinese creator GUI exposes the new faction fields, and the draft preview shows `分歧`, `风格`, and `底线` inside the `阵营` card before import.
+
+### Runtime Screenshots
+
+![Creator faction doctrine fields](screenshots/creator-faction-doctrine-fields-runtime-2026-06-08.png)
+
+![Creator faction doctrine preview](screenshots/creator-faction-doctrine-preview-runtime-2026-06-08.png)
+
+The screenshots were captured from the local Web + API runtime after editing doctrine fields to `公开账本`, `协商取证`, and `不害居民`, then checking the preview before import.
+
+### Verification
+
+```bash
+npm test -- packages/shared/src/creatorScenarioDraft.test.ts apps/web/src/creatorScenarioPreview.test.ts --reporter=dot
+npm run typecheck
+```
+
 ## 2026-06-08 - Creator Faction Hidden Goals
 
 ### Scope

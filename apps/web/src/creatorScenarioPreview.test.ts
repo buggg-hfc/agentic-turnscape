@@ -76,10 +76,16 @@ describe("creator scenario draft preview", () => {
       allyFactionCurrentPlan: "先组织船工看守潮汐议事厅。",
       allyFactionResources: "船工:4,油料:2",
       allyFactionHiddenGoal: "隐藏一份会暴露旧走私账的燃料借据。",
+      allyFactionInternalConflict: "老船工想立刻公开账本，年轻船员担心黑帆报复。",
+      allyFactionStyle: "先固定证词，再把维修权交回码头。",
+      allyFactionBottomLine: "不能让船工家属被当作封航筹码。",
       pressureFactionPublicGoal: "声称只有封航才能避免事故扩大。",
       pressureFactionCurrentPlan: "用巡逻船封住外海航标。",
       pressureFactionResources: "巡逻船:3,账本:1",
       pressureFactionHiddenGoal: "趁灯塔停摆夺走外海航标收费权。",
+      pressureFactionInternalConflict: "船长想立刻接管航标，账房想先销毁燃料借据。",
+      pressureFactionStyle: "把灯塔事故解释成必须封航的安全事件。",
+      pressureFactionBottomLine: "不会交出备用灯芯票据。",
       mainQuestGoal: "在下一次潮汐前修复灯塔并公开黑帆的封航证据。",
       mainQuestRealBackground:
         "停摆前夜有人把备用灯芯调包，只有潮汐记录能证明黑帆提前进场。",
@@ -169,8 +175,8 @@ describe("creator scenario draft preview", () => {
         title: "阵营",
         count: 2,
         items: [
-          "码头互助会：公开修复灯塔并保护船工证词。；隐藏：隐藏一份会暴露旧走私账的燃料借据。；计划：先组织船工看守潮汐议事厅。；资源：船工 4，油料 2",
-          "黑帆承包队：声称只有封航才能避免事故扩大。；隐藏：趁灯塔停摆夺走外海航标收费权。；计划：用巡逻船封住外海航标。；资源：巡逻船 3，账本 1",
+          "码头互助会：公开修复灯塔并保护船工证词。；隐藏：隐藏一份会暴露旧走私账的燃料借据。；分歧：老船工想立刻公开账本，年轻船员担心黑帆报复。；风格：先固定证词，再把维修权交回码头。；底线：不能让船工家属被当作封航筹码。；计划：先组织船工看守潮汐议事厅。；资源：船工 4，油料 2",
+          "黑帆承包队：声称只有封航才能避免事故扩大。；隐藏：趁灯塔停摆夺走外海航标收费权。；分歧：船长想立刻接管航标，账房想先销毁燃料借据。；风格：把灯塔事故解释成必须封航的安全事件。；底线：不会交出备用灯芯票据。；计划：用巡逻船封住外海航标。；资源：巡逻船 3，账本 1",
         ],
       },
       {

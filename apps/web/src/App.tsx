@@ -25,6 +25,7 @@ import {
   HeartPulse,
   History,
   KeyRound,
+  Map,
   MessageSquare,
   Play,
   RefreshCcw,
@@ -93,6 +94,7 @@ import {
   type LlmProviderPresetId,
 } from "./llmSettings.js";
 import { displayPlayerAction } from "./playerActionDisplay.js";
+import { buildWorldMap, type WorldMapView } from "./worldMap.js";
 import {
   formatCreatorScenarioDefinition,
   getSavedCreatorScenarioDefinition,
@@ -477,6 +479,7 @@ export const App = () => {
   }, [freeformActionText]);
 
   const location = state ? state.locations[state.currentLocationId] : undefined;
+  const worldMap = useMemo(() => (state ? buildWorldMap(state) : undefined), [state]);
   const visibleClocks = useMemo(
     () =>
       state ? Object.values(state.clocks).filter((clock) => clock.visible) : [],
@@ -794,6 +797,7 @@ export const App = () => {
             <ScrollText size={19} />
             <h2>当前场景</h2>
           </div>
+          {worldMap ? <WorldMapPanel map={worldMap} /> : null}
           <p className="scene-text">{location.description}</p>
           <div className="fact-list">
             {location.publicInfo.map((fact) => (
@@ -2078,6 +2082,36 @@ const CreatorScenarioImportPanel = ({
         />
       </label>
       <label className="creator-field wide">
+        <span>支援阵营内部分歧</span>
+        <textarea
+          value={draft.allyFactionInternalConflict ?? ""}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("allyFactionInternalConflict", event.target.value)
+          }
+        />
+      </label>
+      <label className="creator-field wide">
+        <span>支援阵营风格</span>
+        <textarea
+          value={draft.allyFactionStyle ?? ""}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("allyFactionStyle", event.target.value)
+          }
+        />
+      </label>
+      <label className="creator-field wide">
+        <span>支援阵营底线</span>
+        <textarea
+          value={draft.allyFactionBottomLine ?? ""}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("allyFactionBottomLine", event.target.value)
+          }
+        />
+      </label>
+      <label className="creator-field wide">
         <span>支援阵营计划</span>
         <textarea
           value={draft.allyFactionCurrentPlan}
@@ -2125,6 +2159,36 @@ const CreatorScenarioImportPanel = ({
           disabled={disabled}
           onChange={(event) =>
             onDraftChange("pressureFactionHiddenGoal", event.target.value)
+          }
+        />
+      </label>
+      <label className="creator-field wide">
+        <span>施压阵营内部分歧</span>
+        <textarea
+          value={draft.pressureFactionInternalConflict ?? ""}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("pressureFactionInternalConflict", event.target.value)
+          }
+        />
+      </label>
+      <label className="creator-field wide">
+        <span>施压阵营风格</span>
+        <textarea
+          value={draft.pressureFactionStyle ?? ""}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("pressureFactionStyle", event.target.value)
+          }
+        />
+      </label>
+      <label className="creator-field wide">
+        <span>施压阵营底线</span>
+        <textarea
+          value={draft.pressureFactionBottomLine ?? ""}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("pressureFactionBottomLine", event.target.value)
           }
         />
       </label>
@@ -2604,6 +2668,65 @@ const Narration = ({
         <span>{resolution.publicSummary}</span>
       </div>
     ) : null}
+  </section>
+);
+
+const WorldMapPanel = ({ map }: { map: WorldMapView }) => (
+  <section className="world-map">
+    <div className="world-map-header">
+      <div className="panel-heading compact">
+        <Map size={17} />
+        <h3>世界地图</h3>
+      </div>
+      <span>当前位置：{map.currentLocationName}</span>
+    </div>
+    <div className="world-map-canvas" aria-label="世界地图">
+      <svg viewBox="0 0 100 100" role="presentation" aria-hidden="true">
+        {map.connections.map((connection) => (
+          <line
+            key={`${connection.from}-${connection.to}`}
+            x1={connection.fromX}
+            y1={connection.fromY}
+            x2={connection.toX}
+            y2={connection.toY}
+          />
+        ))}
+      </svg>
+      {map.nodes.map((node) => (
+        <div
+          key={node.id}
+          className={`map-node ${node.dangerTone} ${
+            node.isCurrent ? "current" : ""
+          }`}
+          style={{
+            left: `${node.x}%`,
+            top: `${node.y}%`,
+          }}
+          aria-label={`${node.name}，${node.summary}`}
+        >
+          <span className="map-node-name">{node.name}</span>
+          <span className="map-node-meta">{node.dangerLabel}</span>
+          <i style={{ width: `${node.pressurePercent}%` }} />
+        </div>
+      ))}
+    </div>
+    <div className="world-map-node-list">
+      {map.nodes.map((node) => (
+        <div key={node.id} className={node.isCurrent ? "active" : ""}>
+          <strong>{node.name}</strong>
+          <span>{node.summary}</span>
+          <small>
+            NPC：{node.npcNames.join("，") || "暂无"}；时钟：
+            {node.clockNames.join("，") || "暂无"}
+          </small>
+        </div>
+      ))}
+    </div>
+    <div className="world-map-legend">
+      {map.legend.map((item) => (
+        <span key={item}>{item}</span>
+      ))}
+    </div>
   </section>
 );
 
