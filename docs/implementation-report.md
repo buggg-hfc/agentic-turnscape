@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Freeform Resource Commitments
+
+### Scope
+
+- Added TDD coverage for explicit freeform resource commitments. Player prose such as `资源：情报，金钱` now maps only currently visible, positive player resources into real mechanical leverage tokens like `intel` and `money`.
+- Unavailable or non-commit resources are ignored. The tested path rejects `favor` when the count is `0` and rejects `pressure` as a state pressure value rather than a spendable advantage.
+- The Chinese freeform composer preview now adds an `投入：情报、金钱` chip, while arbitrary prose and `freeform:*` metadata still cannot mutate state or inflate dice modifiers outside the referee-owned rules pipeline.
+
+### Runtime Screenshot
+
+![Freeform resource commitments](screenshots/freeform-resource-commit-runtime-2026-06-08.png)
+
+The screenshot was captured from the local Web + API runtime after starting a Border Seven Days campaign and entering a freeform action with `资源：情报，金钱，人情，压力`. The runtime check verified the preview chips `意图：调查`, `风险：中`, `目标：旧哨站`, and `投入：情报、金钱`, while confirming `人情` and `压力` did not appear as committed resources.
+
+### Verification
+
+```bash
+npm test -- apps/web/src/freeformAction.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - Freeform Metadata Balance
 
 ### Scope

@@ -31,6 +31,8 @@ For gameplay work, tests should prove the rule invariant rather than a single lu
 
 ## Verified Slices
 
+- Freeform player actions now support tested resource commitments: explicit `资源：情报，金钱` text becomes real `intel` / `money` leverage only when those player resources are visible and positive, while unavailable or non-commit state words such as `人情` at `0` and `压力` do not become mechanical advantages.
+
 - Freeform metadata now has tested referee-side balance: structured `freeform:*` tokens can steer rule-channel interpretation and GUI previews, but they are excluded from automatic mechanical leverage so open-ended prose cannot inflate 2d6 modifiers without real resources.
 
 - Freeform player actions now support tested approach and avoidance constraints: `方式：...` and `避免：...` become structured `freeform:approachText:*` / `freeform:constraintText:*` metadata and Chinese GUI chips, while all authoritative consequences still come from referee patches.

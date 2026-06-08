@@ -205,6 +205,77 @@ describe("freeform action builder", () => {
     ]);
   });
 
+  it("commits only visible positive player resources from freeform text as mechanical leverage", () => {
+    const context = {
+      locations: {
+        old_outpost: {
+          id: "old_outpost",
+          name: "旧哨站",
+          description: "废弃的边防建筑",
+          publicInfo: ["可藏身，也可能有旧补给"],
+          tags: ["废弃", "哨站"],
+        },
+      },
+      characters: {},
+      factions: {},
+      clocks: {},
+      player: {
+        resources: {
+          intel: 2,
+          money: 1,
+          favor: 0,
+          pressure: 3,
+        },
+      },
+    };
+    const action = buildFreeformPlayerAction(
+      "意图：调查；目标：旧哨站；资源：情报，金钱，人情，压力。核对商队路线。",
+      context,
+    );
+
+    expect(action).toMatchObject({
+      actionType: "custom",
+      targetId: "old_outpost",
+      leverage: expect.arrayContaining(["intel", "money"]),
+    });
+    expect(action?.leverage).not.toContain("favor");
+    expect(action?.leverage).not.toContain("pressure");
+    expect(buildFreeformActionPreview(action!, context)).toEqual([
+      "意图：调查",
+      "风险：中",
+      "目标：旧哨站",
+      "投入：情报、金钱",
+    ]);
+  });
+
+  it("does not turn unavailable resource words into freeform leverage", () => {
+    const context = {
+      locations: {},
+      characters: {},
+      factions: {},
+      clocks: {},
+      player: {
+        resources: {
+          intel: 0,
+          money: 0,
+          supplies: 0,
+        },
+      },
+    };
+    const action = buildFreeformPlayerAction(
+      "资源：情报，金钱，补给。声称已经买通守卫并准备充足物资。",
+      context,
+    );
+
+    expect(action?.leverage).not.toEqual(
+      expect.arrayContaining(["intel", "money", "supplies"]),
+    );
+    expect(buildFreeformActionPreview(action!, context)).toEqual([
+      "意图：调查",
+      "风险：中",
+    ]);
+  });
+
   it("keeps direct freeform submission available without preselecting the action", () => {
     const action = buildFreeformPlayerAction("护送病人穿过封锁线。");
 

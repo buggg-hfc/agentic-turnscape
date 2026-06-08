@@ -4,6 +4,7 @@ import type {
   FactionState,
   LocationState,
   PlayerAction,
+  WorldState,
 } from "@agentic-turnscape/shared";
 import { displayLabel } from "./displayLabels.js";
 
@@ -35,6 +36,7 @@ export type FreeformTargetContext = {
     string,
     Pick<ClockState, "id" | "name" | "consequence" | "visible">
   >;
+  player?: Pick<WorldState["player"], "resources">;
 };
 
 type FreeformTargetCandidate = {
@@ -293,6 +295,17 @@ const targetTextTokenPrefix = "freeform:targetText:";
 const approachTextTokenPrefix = "freeform:approachText:";
 const constraintTextTokenPrefix = "freeform:constraintText:";
 
+const freeformResourceAliases = {
+  intel: ["intel", "情报", "线索", "证据", "消息"],
+  money: ["money", "金钱", "资金", "现金", "买通"],
+  favor: ["favor", "人情", "情面", "帮手"],
+  supplies: ["supplies", "补给", "物资", "药品"],
+  stamina: ["stamina", "体力", "精力"],
+  focus: ["focus", "专注", "注意力"],
+} satisfies Record<string, string[]>;
+const freeformResourceIds = Object.keys(freeformResourceAliases);
+const freeformResourceIdSet = new Set(freeformResourceIds);
+
 const explicitFieldOf = (description: string, labels: string[]): string | undefined => {
   const labelPattern = labels.join("|");
   const match = description.match(new RegExp(`(?:${labelPattern})\\s*[:：]\\s*([^\\s,.;!?，。；、]{1,24})`, "iu"));
@@ -336,6 +349,19 @@ const explicitApproachTextOf = (description: string): string | undefined =>
 const explicitConstraintTextOf = (description: string): string | undefined =>
   explicitPhraseFieldOf(description, ["避免", "避开", "底线", "avoid", "constraint"]);
 
+const explicitResourceTextOf = (description: string): string | undefined => {
+  const labelPattern = ["资源", "投入", "使用", "resource", "resources", "use"].join(
+    "|",
+  );
+  const match = description.match(
+    new RegExp(
+      `(?:${labelPattern})\\s*[:：]\\s*([^。；;!?！？\n]{1,80})`,
+      "iu",
+    ),
+  );
+  return match?.[1]?.trim();
+};
+
 const cleanKeyword = (value: string | undefined): string | undefined => {
   const keyword = value?.trim().toLocaleLowerCase();
   return keyword && keyword.length >= 2 ? keyword : undefined;
@@ -343,6 +369,40 @@ const cleanKeyword = (value: string | undefined): string | undefined => {
 
 const keywordList = (values: Array<string | undefined>): string[] => [
   ...new Set(values.flatMap((value) => cleanKeyword(value) ?? [])),
+];
+
+const resourceKeywords = (id: string): string[] =>
+  keywordList([
+    id,
+    displayLabel(id),
+    ...(freeformResourceAliases[
+      id as keyof typeof freeformResourceAliases
+    ] ?? []),
+  ]);
+
+const committedResourceIdsOf = (
+  description: string,
+  context?: FreeformTargetContext,
+): string[] => {
+  const resourceText = explicitResourceTextOf(description);
+  const playerResources = context?.player?.resources;
+  if (!resourceText || !playerResources) return [];
+
+  const normalizedResourceText = resourceText.toLocaleLowerCase();
+  return freeformResourceIds.filter((id) => {
+    if ((playerResources[id] ?? 0) <= 0) return false;
+    return resourceKeywords(id).some((keyword) =>
+      normalizedResourceText.includes(keyword),
+    );
+  });
+};
+
+const committedResourceLabelsOf = (action: PlayerAction): string[] => [
+  ...new Set(
+    action.leverage
+      .filter((item) => freeformResourceIdSet.has(item))
+      .map((id) => displayLabel(id)),
+  ),
 ];
 
 const staticTargetCandidates: FreeformTargetCandidate[] = targetKeywords.map(
@@ -526,19 +586,25 @@ export const analyzeFreeformAction = (
           ? "high"
           : "medium");
   const leverage = ["freeform", `freeform:intent:${intent}`, `freeform:risk:${riskLevel}`];
+  const addLeverage = (token: string): void => {
+    if (!leverage.includes(token)) leverage.push(token);
+  };
   if (target) {
-    leverage.push(`freeform:target:${target.id}`);
+    addLeverage(`freeform:target:${target.id}`);
     if (target.id.startsWith("custom_target_")) {
-      leverage.push(`${targetTextTokenPrefix}${target.label}`);
+      addLeverage(`${targetTextTokenPrefix}${target.label}`);
     }
+  }
+  for (const resourceId of committedResourceIdsOf(description, context)) {
+    addLeverage(resourceId);
   }
   const approachText = explicitApproachTextOf(description);
   if (approachText) {
-    leverage.push(`${approachTextTokenPrefix}${approachText}`);
+    addLeverage(`${approachTextTokenPrefix}${approachText}`);
   }
   const constraintText = explicitConstraintTextOf(description);
   if (constraintText) {
-    leverage.push(`${constraintTextTokenPrefix}${constraintText}`);
+    addLeverage(`${constraintTextTokenPrefix}${constraintText}`);
   }
 
   return {
@@ -564,11 +630,15 @@ export const buildFreeformActionPreview = (
   const targetText = targetTextOf(action);
   const approachText = approachTextOf(action);
   const constraintText = constraintTextOf(action);
+  const committedResourceLabels = committedResourceLabelsOf(action);
   return [
     `意图：${intent ? intentLabels[intent] : "开放"}`,
     `风险：${risk ? riskLabels[risk] : "中"}`,
     ...(target || targetText
       ? [`目标：${target ? displayLabel(target.id, target.label) : targetText}`]
+      : []),
+    ...(committedResourceLabels.length > 0
+      ? [`投入：${committedResourceLabels.join("、")}`]
       : []),
     ...(approachText ? [`方式：${approachText}`] : []),
     ...(constraintText ? [`避开：${constraintText}`] : [])

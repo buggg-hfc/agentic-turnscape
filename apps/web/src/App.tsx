@@ -799,7 +799,7 @@ export const App = () => {
             </div>
             <textarea
               aria-label="自由行动"
-              placeholder="意图：保护；目标：诊所；方式：伪装成药材队；避免：伤害平民。"
+              placeholder="意图：保护；目标：诊所；资源：情报，金钱；方式：伪装成药材队；避免：伤害平民。"
               value={freeformActionText}
               maxLength={FREEFORM_ACTION_MAX_LENGTH}
               disabled={loadState === "running"}
