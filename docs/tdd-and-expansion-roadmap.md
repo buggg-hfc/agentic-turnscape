@@ -31,6 +31,8 @@ For gameplay work, tests should prove the rule invariant rather than a single lu
 
 ## Verified Slices
 
+- Creator tooling now supports tested editable day schedules: three day-event text areas feed creator-authored `mainEvent` values into generated draft days, while the Chinese draft preview exposes a `日程` card before import so scenario pacing can be reviewed without editing JSON.
+
 - Creator tooling now supports tested editable NPC resources: freeform `resource:amount` lists for the key NPC and opposing NPC feed into generated `WorldState.characters[*].resources` and appear in the Chinese NPC draft preview before import.
 
 - Creator tooling now supports tested editable NPC skills: social, investigation, and defense ratings for the key NPC and opposing NPC feed into generated `WorldState.characters[*].skills` and appear in the Chinese NPC draft preview before import.

@@ -1188,6 +1188,30 @@ const CreatorScenarioImportPanel = ({
           onChange={(event) => onDraftChange("premise", event.target.value)}
         />
       </label>
+      <label className="creator-field wide">
+        <span>第一天事件</span>
+        <textarea
+          value={draft.dayOneEvent ?? ""}
+          disabled={disabled}
+          onChange={(event) => onDraftChange("dayOneEvent", event.target.value)}
+        />
+      </label>
+      <label className="creator-field wide">
+        <span>第二天事件</span>
+        <textarea
+          value={draft.dayTwoEvent ?? ""}
+          disabled={disabled}
+          onChange={(event) => onDraftChange("dayTwoEvent", event.target.value)}
+        />
+      </label>
+      <label className="creator-field wide">
+        <span>第三天事件</span>
+        <textarea
+          value={draft.dayThreeEvent ?? ""}
+          disabled={disabled}
+          onChange={(event) => onDraftChange("dayThreeEvent", event.target.value)}
+        />
+      </label>
       <label className="creator-field">
         <span>玩家身份</span>
         <input

@@ -20,6 +20,9 @@ describe("creator scenario draft builder", () => {
       id: "rain-alley-test",
       title: "雨巷试作",
       premise: "旧城区的雨声里混入了失踪者的敲门声。",
+      dayOneEvent: "第 1 天：雨巷居民提交第一份证词。",
+      dayTwoEvent: "第 2 天：拆迁队围住旧仓库雨棚。",
+      dayThreeEvent: "第 3 天：玩家必须公开解释雨声真相。",
       playerName: "临时调查员",
       playerHealth: 4,
       playerStamina: 5,
@@ -211,14 +214,11 @@ describe("creator scenario draft builder", () => {
       max: 6,
       consequence: "雨棚下的怨念满格时，拆迁队会拿到封街理由。",
     });
-    expect(draft.days).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          day: 1,
-          mainEvent: "雨巷试作：旧城区的雨声里混入了失踪者的敲门声。",
-        }),
-      ]),
-    );
+    expect(draft.days.map((day) => day.mainEvent)).toEqual([
+      "第 1 天：雨巷居民提交第一份证词。",
+      "第 2 天：拆迁队围住旧仓库雨棚。",
+      "第 3 天：玩家必须公开解释雨声真相。",
+    ]);
     expect(Object.values(draft.world.quests).map((quest) => quest.surfaceGoal)).toEqual([
       "在雨夜结束前公开怨念来源并保护旧城住户。",
     ]);

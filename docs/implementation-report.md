@@ -2,6 +2,30 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Creator Day Schedule
+
+### Scope
+
+- Added TDD coverage for creator-authored day schedule text.
+- The quick-create scenario draft now accepts editable day-one, day-two, and day-three main events while falling back to the previous derived schedule when older drafts omit those fields.
+- The Chinese creator GUI exposes three day-event text areas, and the draft preview includes a `日程` card so scenario creators can verify the campaign rhythm before import.
+
+### Runtime Screenshot
+
+![Creator day schedule](screenshots/creator-day-schedule-runtime-2026-06-08.png)
+
+The screenshot was captured from the local Web + API runtime after editing the creator form with custom three-day events. The generated preview shows `日程` with `第 1 天：船工递交夜航日志。`, `第 2 天：商会封锁旧灯塔。`, and `第 3 天：玩家公开选择由谁解释事故。`.
+
+### Verification
+
+```bash
+npm test -- packages/shared/src/creatorScenarioDraft.test.ts --reporter=dot
+npm test -- apps/web/src/creatorScenarioPreview.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - Creator NPC Resources
 
 ### Scope

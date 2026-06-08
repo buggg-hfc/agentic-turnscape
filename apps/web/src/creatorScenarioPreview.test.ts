@@ -7,6 +7,9 @@ describe("creator scenario draft preview", () => {
       id: "harbor-maker",
       title: "港口试作",
       premise: "风暴夜后，港务厅和走私者都想控制唯一的灯塔。",
+      dayOneEvent: "第 1 天：船工把潮汐账本交到议事厅。",
+      dayTwoEvent: "第 2 天：黑帆封住旧灯塔机房。",
+      dayThreeEvent: "第 3 天：玩家决定灯塔停摆真相由谁公布。",
       playerName: "临时调停人",
       playerHealth: 4,
       playerStamina: 5,
@@ -107,6 +110,15 @@ describe("creator scenario draft preview", () => {
         count: 1,
         items: [
           "临时调停人：生命 4，体力 5，金钱 3，情报 2；技能：社交 4，调查 3；属性：体魄 3，敏捷 4，知识 5，洞察 3，魅力 2，意志 4",
+        ],
+      },
+      {
+        title: "日程",
+        count: 3,
+        items: [
+          "第 1 天：船工把潮汐账本交到议事厅。",
+          "第 2 天：黑帆封住旧灯塔机房。",
+          "第 3 天：玩家决定灯塔停摆真相由谁公布。",
         ],
       },
       {

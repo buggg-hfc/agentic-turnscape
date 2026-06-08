@@ -84,6 +84,11 @@ export const buildCreatorDraftPreview = (
   input: CreatorScenarioDraftInput,
 ): CreatorDraftPreview => {
   const draft = buildCreatorScenarioDraft(input);
+  const days = draft.days.map((day) =>
+    day.mainEvent.startsWith(`第 ${day.day} 天`)
+      ? day.mainEvent
+      : `第 ${day.day} 天：${day.mainEvent}`,
+  );
   const locations = Object.values(draft.world.locations).map(
     (location) =>
       `${location.name}：${location.description}；公开：${listSummary(location.publicInfo)}；隐藏：${listSummary(location.hiddenInfo)}；危险：${location.dangerLevel}`,
@@ -131,6 +136,7 @@ export const buildCreatorDraftPreview = (
     ].join(" / "),
     sections: [
       { title: "玩家", count: 1, items: [playerSummary(draft)] },
+      { title: "日程", count: days.length, items: days },
       { title: "地点", count: locations.length, items: locations },
       { title: "NPC", count: characters.length, items: characters },
       { title: "关系", count: relationships.length, items: relationships },

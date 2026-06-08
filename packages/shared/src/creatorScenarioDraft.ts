@@ -11,6 +11,9 @@ export type CreatorScenarioDraftInput = {
   id: string;
   title: string;
   premise: string;
+  dayOneEvent?: string;
+  dayTwoEvent?: string;
+  dayThreeEvent?: string;
   playerName: string;
   playerHealth?: number;
   playerStamina?: number;
@@ -711,6 +714,18 @@ export const buildCreatorScenarioDraft = (
     input.pressureEndingSummary,
     defaultCreatorScenarioDraftInput.pressureEndingSummary,
   );
+  const dayOneEvent = textOr(
+    input.dayOneEvent ?? "",
+    `${title}：${premise}`,
+  );
+  const dayTwoEvent = textOr(
+    input.dayTwoEvent ?? "",
+    `${pressureFactionName}公开施压，${crisisName}进入危险阶段。`,
+  );
+  const dayThreeEvent = textOr(
+    input.dayThreeEvent ?? "",
+    `玩家必须决定${title}之后由谁来解释真相。`,
+  );
 
   const startLocationId = `${prefix}_start`;
   const pressureLocationId = `${prefix}_pressure_site`;
@@ -962,21 +977,21 @@ export const buildCreatorScenarioDraft = (
     days: [
       {
         day: 1,
-        mainEvent: `${title}：${premise}`,
+        mainEvent: dayOneEvent,
         defaultLocationId: startLocationId,
         sceneIds: [socialSceneId],
         clockPressure: [pressureClockId],
       },
       {
         day: 2,
-        mainEvent: `${pressureFactionName}公开施压，${crisisName}进入危险阶段。`,
+        mainEvent: dayTwoEvent,
         defaultLocationId: pressureLocationId,
         sceneIds: [combatSceneId],
         clockPressure: [pressureClockId, stabilityClockId],
       },
       {
         day: 3,
-        mainEvent: `玩家必须决定${title}之后由谁来解释真相。`,
+        mainEvent: dayThreeEvent,
         defaultLocationId: startLocationId,
         sceneIds: [finalSceneId],
         clockPressure: [stabilityClockId],
