@@ -1213,6 +1213,30 @@ const CreatorScenarioImportPanel = ({
         />
       </label>
       <label className="creator-field">
+        <span>开场场景</span>
+        <input
+          value={draft.openingSceneName ?? ""}
+          disabled={disabled}
+          onChange={(event) => onDraftChange("openingSceneName", event.target.value)}
+        />
+      </label>
+      <label className="creator-field">
+        <span>冲突场景</span>
+        <input
+          value={draft.pressureSceneName ?? ""}
+          disabled={disabled}
+          onChange={(event) => onDraftChange("pressureSceneName", event.target.value)}
+        />
+      </label>
+      <label className="creator-field">
+        <span>终局场景</span>
+        <input
+          value={draft.finalSceneName ?? ""}
+          disabled={disabled}
+          onChange={(event) => onDraftChange("finalSceneName", event.target.value)}
+        />
+      </label>
+      <label className="creator-field">
         <span>玩家身份</span>
         <input
           value={draft.playerName}

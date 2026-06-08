@@ -68,6 +68,25 @@ const actionTypeLabel = {
   custom: "自定义",
 } as const;
 
+const sceneKindLabel = {
+  combat: "战斗",
+  social: "社交",
+  exploration: "探索",
+} as const;
+
+const solutionLabel: Record<string, string> = {
+  investigate: "调查",
+  negotiate: "谈判",
+  fight: "战斗",
+  protect: "保护",
+  trade: "交易",
+  rest: "休整",
+  travel: "旅行",
+  ignore: "放弃",
+  withdraw: "放弃",
+  custom: "自定义",
+};
+
 const actionTargetName = (
   draft: ReturnType<typeof buildCreatorScenarioDraft>,
   targetId: string | undefined,
@@ -89,6 +108,16 @@ export const buildCreatorDraftPreview = (
       ? day.mainEvent
       : `第 ${day.day} 天：${day.mainEvent}`,
   );
+  const scenes = draft.scenes.map((scene) => {
+    const locationName = draft.world.locations[scene.locationId]?.name ?? scene.locationId;
+    const npcNames = scene.npcIds
+      .map((npcId) => draft.world.characters[npcId]?.name ?? npcId)
+      .join("，") || "无";
+    const solutions = scene.nonCombatSolutions
+      .map((solution) => solutionLabel[solution] ?? solution)
+      .join("，") || "无";
+    return `${scene.name}：${sceneKindLabel[scene.kind]}；地点：${locationName}；NPC：${npcNames}；解法：${solutions}`;
+  });
   const locations = Object.values(draft.world.locations).map(
     (location) =>
       `${location.name}：${location.description}；公开：${listSummary(location.publicInfo)}；隐藏：${listSummary(location.hiddenInfo)}；危险：${location.dangerLevel}`,
@@ -137,6 +166,7 @@ export const buildCreatorDraftPreview = (
     sections: [
       { title: "玩家", count: 1, items: [playerSummary(draft)] },
       { title: "日程", count: days.length, items: days },
+      { title: "场景", count: scenes.length, items: scenes },
       { title: "地点", count: locations.length, items: locations },
       { title: "NPC", count: characters.length, items: characters },
       { title: "关系", count: relationships.length, items: relationships },

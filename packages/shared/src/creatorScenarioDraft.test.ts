@@ -23,6 +23,9 @@ describe("creator scenario draft builder", () => {
       dayOneEvent: "第 1 天：雨巷居民提交第一份证词。",
       dayTwoEvent: "第 2 天：拆迁队围住旧仓库雨棚。",
       dayThreeEvent: "第 3 天：玩家必须公开解释雨声真相。",
+      openingSceneName: "雨巷证词会",
+      pressureSceneName: "旧仓库雨棚对峙",
+      finalSceneName: "真相公布夜",
       playerName: "临时调查员",
       playerHealth: 4,
       playerStamina: 5,
@@ -218,6 +221,11 @@ describe("creator scenario draft builder", () => {
       "第 1 天：雨巷居民提交第一份证词。",
       "第 2 天：拆迁队围住旧仓库雨棚。",
       "第 3 天：玩家必须公开解释雨声真相。",
+    ]);
+    expect(draft.scenes.map((scene) => scene.name)).toEqual([
+      "雨巷证词会",
+      "旧仓库雨棚对峙",
+      "真相公布夜",
     ]);
     expect(Object.values(draft.world.quests).map((quest) => quest.surfaceGoal)).toEqual([
       "在雨夜结束前公开怨念来源并保护旧城住户。",

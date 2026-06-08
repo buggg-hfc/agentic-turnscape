@@ -14,6 +14,9 @@ export type CreatorScenarioDraftInput = {
   dayOneEvent?: string;
   dayTwoEvent?: string;
   dayThreeEvent?: string;
+  openingSceneName?: string;
+  pressureSceneName?: string;
+  finalSceneName?: string;
   playerName: string;
   playerHealth?: number;
   playerStamina?: number;
@@ -745,6 +748,18 @@ export const buildCreatorScenarioDraft = (
     startLocation: startLocationId,
     pressureLocation: pressureLocationId,
   };
+  const openingSceneName = textOr(
+    input.openingSceneName ?? "",
+    `${startLocationName}协商`,
+  );
+  const pressureSceneName = textOr(
+    input.pressureSceneName ?? "",
+    `${pressureLocationName}冲突`,
+  );
+  const finalSceneName = textOr(
+    input.finalSceneName ?? "",
+    `${title}最终选择`,
+  );
 
   const world: WorldState = {
     time: { day: 1, phase: "morning" },
@@ -1000,7 +1015,7 @@ export const buildCreatorScenarioDraft = (
     scenes: [
       {
         id: socialSceneId,
-        name: `${startLocationName}协商`,
+        name: openingSceneName,
         kind: "social",
         day: 1,
         locationId: startLocationId,
@@ -1010,7 +1025,7 @@ export const buildCreatorScenarioDraft = (
       },
       {
         id: combatSceneId,
-        name: `${pressureLocationName}冲突`,
+        name: pressureSceneName,
         kind: "combat",
         day: 2,
         locationId: pressureLocationId,
@@ -1020,7 +1035,7 @@ export const buildCreatorScenarioDraft = (
       },
       {
         id: finalSceneId,
-        name: `${title}最终选择`,
+        name: finalSceneName,
         kind: "exploration",
         day: 3,
         locationId: startLocationId,

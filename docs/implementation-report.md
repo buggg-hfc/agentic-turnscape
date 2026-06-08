@@ -2,6 +2,30 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Creator Scene Names
+
+### Scope
+
+- Added TDD coverage for creator-authored scene names.
+- The quick-create scenario draft now accepts editable opening, pressure, and final scene names while preserving the previous automatic names for older drafts.
+- The Chinese creator GUI exposes three scene-name fields, and the draft preview includes a `场景` card with scene type, location, NPCs, and non-combat solution hooks before import.
+
+### Runtime Screenshot
+
+![Creator scene names](screenshots/creator-scene-names-runtime-2026-06-08.png)
+
+The screenshot was captured from the local Web + API runtime after editing the creator form with custom scene names. The generated preview shows `场景` entries for `潮汐账本听证`, `灯塔机房冲突`, and `航标归属裁定`.
+
+### Verification
+
+```bash
+npm test -- packages/shared/src/creatorScenarioDraft.test.ts --reporter=dot
+npm test -- apps/web/src/creatorScenarioPreview.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - Creator Day Schedule
 
 ### Scope

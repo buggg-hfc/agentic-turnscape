@@ -10,6 +10,9 @@ describe("creator scenario draft preview", () => {
       dayOneEvent: "第 1 天：船工把潮汐账本交到议事厅。",
       dayTwoEvent: "第 2 天：黑帆封住旧灯塔机房。",
       dayThreeEvent: "第 3 天：玩家决定灯塔停摆真相由谁公布。",
+      openingSceneName: "潮汐账本听证",
+      pressureSceneName: "灯塔机房冲突",
+      finalSceneName: "航标归属裁定",
       playerName: "临时调停人",
       playerHealth: 4,
       playerStamina: 5,
@@ -119,6 +122,15 @@ describe("creator scenario draft preview", () => {
           "第 1 天：船工把潮汐账本交到议事厅。",
           "第 2 天：黑帆封住旧灯塔机房。",
           "第 3 天：玩家决定灯塔停摆真相由谁公布。",
+        ],
+      },
+      {
+        title: "场景",
+        count: 3,
+        items: [
+          "潮汐账本听证：社交；地点：潮汐议事厅；NPC：林澈，黑帆船长；解法：谈判，保护，调查",
+          "灯塔机房冲突：战斗；地点：旧灯塔机房；NPC：黑帆船长；解法：谈判，放弃，调查",
+          "航标归属裁定：探索；地点：潮汐议事厅；NPC：林澈，黑帆船长；解法：谈判，调查",
         ],
       },
       {
