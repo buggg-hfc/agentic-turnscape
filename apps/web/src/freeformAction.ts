@@ -305,6 +305,9 @@ const freeformResourceAliases = {
 } satisfies Record<string, string[]>;
 const freeformResourceIds = Object.keys(freeformResourceAliases);
 const freeformResourceIdSet = new Set(freeformResourceIds);
+const nonCommittableResourceAliases = {
+  pressure: ["pressure", "压力"],
+} satisfies Record<string, string[]>;
 
 const explicitFieldOf = (description: string, labels: string[]): string | undefined => {
   const labelPattern = labels.join("|");
@@ -395,6 +398,39 @@ const committedResourceIdsOf = (
       normalizedResourceText.includes(keyword),
     );
   });
+};
+
+const mentionsResource = (resourceText: string, id: string): boolean =>
+  resourceKeywords(id).some((keyword) => resourceText.includes(keyword));
+
+export const buildFreeformResourceWarnings = (
+  value: string,
+  context?: FreeformTargetContext,
+): string[] => {
+  const description = normalizeFreeformText(value);
+  const resourceText = explicitResourceTextOf(description)?.toLocaleLowerCase();
+  if (!resourceText) return [];
+
+  const playerResources = context?.player?.resources;
+  const warnings: string[] = [];
+  for (const id of freeformResourceIds) {
+    if (!mentionsResource(resourceText, id)) continue;
+    if ((playerResources?.[id] ?? 0) <= 0) {
+      warnings.push(`未投入：${displayLabel(id)}不足`);
+    }
+  }
+
+  for (const [id, aliases] of Object.entries(nonCommittableResourceAliases)) {
+    if (
+      keywordList([id, displayLabel(id), ...aliases]).some((keyword) =>
+        resourceText.includes(keyword),
+      )
+    ) {
+      warnings.push(`未投入：${displayLabel(id)}不是可投入资源`);
+    }
+  }
+
+  return [...new Set(warnings)];
 };
 
 const committedResourceLabelsOf = (action: PlayerAction): string[] => [

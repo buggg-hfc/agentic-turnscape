@@ -4,6 +4,17 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added tested freeform resource warning chips. The composer now keeps valid positive resources in the `投入` preview and separately explains skipped resources such as `未投入：人情不足` and `未投入：压力不是可投入资源`, so the player can understand why unlimited prose did not become unlimited mechanical leverage.
+- Captured a runtime screenshot showing the new warning chips under the freeform interpretation line:
+
+![Freeform resource warnings](screenshots/freeform-resource-warnings-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- apps/web/src/freeformAction.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added a tested Chinese interpretation sentence for freeform player actions. The composer now turns the current prose into a readable pre-submit summary such as `裁判将按“保护”结算；目标：诊所；风险：高；投入：情报、金钱。结果仍由规则裁判确认。`, so the player can see how the rule pipeline will receive an unlimited action before committing it.
 - Captured a runtime screenshot showing the new interpretation line under the existing freeform preview chips:
 

@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Freeform Resource Warning Feedback
+
+### Scope
+
+- Added TDD coverage for freeform resource warnings when the player names resources that cannot actually be committed.
+- The Chinese GUI now keeps valid positive resources in the normal `投入` preview while explaining skipped resources as warning chips, such as `未投入：人情不足` and `未投入：压力不是可投入资源`.
+- This preserves the open-ended action textbox while making the referee-owned resource boundary visible before the turn is submitted.
+
+### Runtime Screenshot
+
+![Freeform resource warnings](screenshots/freeform-resource-warnings-runtime-2026-06-08.png)
+
+The screenshot was captured from the local Web + API runtime after starting a Border Seven Days campaign and entering `资源：情报，金钱，人情，压力`. The GUI shows `投入：情报、金钱` plus the two skipped-resource warning chips, proving the player can see which parts of the prose become real leverage and which parts remain narrative intent.
+
+### Verification
+
+```bash
+npm test -- apps/web/src/freeformAction.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - Freeform Action Interpretation Summary
 
 ### Scope

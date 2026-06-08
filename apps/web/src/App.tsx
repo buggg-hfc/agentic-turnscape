@@ -64,6 +64,7 @@ import {
   addFreeformActionHistoryEntry,
   buildFreeformActionInterpretation,
   buildFreeformActionPreview,
+  buildFreeformResourceWarnings,
   buildFreeformComposerState,
   buildFreeformPlayerAction,
   clearFreeformActionDraft,
@@ -520,6 +521,10 @@ export const App = () => {
         : undefined,
     [freeformAction, state],
   );
+  const freeformResourceWarnings = useMemo(
+    () => buildFreeformResourceWarnings(freeformActionText, state),
+    [freeformActionText, state],
+  );
   const freeformComposerState = useMemo(
     () =>
       buildFreeformComposerState(
@@ -877,6 +882,13 @@ export const App = () => {
               <p className="freeform-action-interpretation">
                 {freeformActionInterpretation}
               </p>
+            ) : null}
+            {freeformResourceWarnings.length > 0 ? (
+              <div className="freeform-resource-warnings">
+                {freeformResourceWarnings.map((item) => (
+                  <span key={item}>{item}</span>
+                ))}
+              </div>
             ) : null}
             {freeformActionHistory.length > 0 ? (
               <div className="freeform-action-history">

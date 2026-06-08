@@ -31,6 +31,8 @@ For gameplay work, tests should prove the rule invariant rather than a single lu
 
 ## Verified Slices
 
+- Freeform resource warnings now have tested GUI coverage: explicit resources such as `情报` and `金钱` still become committed leverage only when available, while skipped entries such as unavailable `人情` or non-spendable `压力` are explained as `未投入` chips before the player submits the turn.
+
 - Freeform player actions now have a tested Chinese interpretation summary in the GUI: chips still expose intent/risk/target/resources/method/boundaries, and a single sentence explains how the referee will receive the action while making clear that final consequences remain rule-owned.
 
 - Chronicle replay rows now have tested consequence summaries: the web timeline extracts visible referee-confirmed `state_patch` effects such as location changes, resource deltas, relationship shifts, crisis-clock movement, reputation tags, and momentum before the total confirmed-change count, helping players see how earlier choices produced current outcomes.

@@ -4,6 +4,7 @@ import {
   addFreeformActionHistoryEntry,
   buildFreeformActionInterpretation,
   buildFreeformActionPreview,
+  buildFreeformResourceWarnings,
   buildFreeformComposerState,
   buildFreeformPlayerAction,
   clearFreeformActionDraft,
@@ -250,6 +251,12 @@ describe("freeform action builder", () => {
     expect(buildFreeformActionInterpretation(action!, context)).toBe(
       "裁判将按“调查”结算；目标：旧哨站；风险：中；投入：情报、金钱。结果仍由规则裁判确认。",
     );
+    expect(
+      buildFreeformResourceWarnings(
+        "意图：调查；目标：旧哨站；资源：情报，金钱，人情，压力。核对商队路线。",
+        context,
+      ),
+    ).toEqual(["未投入：人情不足", "未投入：压力不是可投入资源"]);
   });
 
   it("does not turn unavailable resource words into freeform leverage", () => {
