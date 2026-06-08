@@ -31,6 +31,8 @@ For gameplay work, tests should prove the rule invariant rather than a single lu
 
 ## Verified Slices
 
+- Freeform custom targets now have tested GUI confirmation: unknown explicit targets remain valid player-authored hooks, but the composer marks them as `新目标：...需由裁判确认` until the referee produces authoritative state changes.
+
 - Freeform resource warnings now have tested GUI coverage: explicit resources such as `情报` and `金钱` still become committed leverage only when available, while skipped entries such as unavailable `人情` or non-spendable `压力` are explained as `未投入` chips before the player submits the turn.
 
 - Freeform player actions now have a tested Chinese interpretation summary in the GUI: chips still expose intent/risk/target/resources/method/boundaries, and a single sentence explains how the referee will receive the action while making clear that final consequences remain rule-owned.

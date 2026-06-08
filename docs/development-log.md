@@ -4,6 +4,17 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added tested custom target confirmation for freeform actions. When the player writes a target that does not match any visible location, NPC, faction, or clock, the composer keeps it as an open-ended target and shows `新目标：东门水塔需由裁判确认`, so player-authored world hooks stay possible without pretending they are already confirmed facts.
+- Captured a runtime screenshot showing the new custom target note chip below the normal target preview:
+
+![Freeform custom target confirmation](screenshots/freeform-custom-target-note-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- apps/web/src/freeformAction.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added tested freeform resource warning chips. The composer now keeps valid positive resources in the `投入` preview and separately explains skipped resources such as `未投入：人情不足` and `未投入：压力不是可投入资源`, so the player can understand why unlimited prose did not become unlimited mechanical leverage.
 - Captured a runtime screenshot showing the new warning chips under the freeform interpretation line:
 

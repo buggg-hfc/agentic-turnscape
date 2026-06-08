@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Freeform Custom Target Confirmation
+
+### Scope
+
+- Added TDD coverage for explicit freeform targets that are not yet visible world entities.
+- The GUI still preserves unknown targets such as `东门水塔` as legal custom targets, then adds an informational chip `新目标：东门水塔需由裁判确认`.
+- This keeps player freedom open while making clear that a newly invented target is player intent until the rule referee confirms how it enters the world.
+
+### Runtime Screenshot
+
+![Freeform custom target confirmation](screenshots/freeform-custom-target-note-runtime-2026-06-08.png)
+
+The screenshot was captured from the local Web + API runtime after starting a Border Seven Days campaign and entering `意图：调查；目标：东门水塔`. The composer shows the target chip, the new confirmation chip, and the referee interpretation sentence before the turn can be submitted.
+
+### Verification
+
+```bash
+npm test -- apps/web/src/freeformAction.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - Freeform Resource Warning Feedback
 
 ### Scope

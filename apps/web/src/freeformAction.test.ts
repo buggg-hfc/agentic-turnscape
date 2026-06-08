@@ -5,6 +5,7 @@ import {
   buildFreeformActionInterpretation,
   buildFreeformActionPreview,
   buildFreeformResourceWarnings,
+  buildFreeformTargetNotes,
   buildFreeformComposerState,
   buildFreeformPlayerAction,
   clearFreeformActionDraft,
@@ -105,6 +106,7 @@ describe("freeform action builder", () => {
       "风险：中",
       "目标：黑石商会",
     ]);
+    expect(buildFreeformTargetNotes(action!, visibleWorldTargets)).toEqual([]);
   });
 
   it("keeps an explicit custom target when no world entity matches", () => {
@@ -129,6 +131,9 @@ describe("freeform action builder", () => {
       "意图：调查",
       "风险：中",
       "目标：东门水塔",
+    ]);
+    expect(buildFreeformTargetNotes(action!)).toEqual([
+      "新目标：东门水塔需由裁判确认",
     ]);
   });
 

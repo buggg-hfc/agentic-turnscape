@@ -65,6 +65,7 @@ import {
   buildFreeformActionInterpretation,
   buildFreeformActionPreview,
   buildFreeformResourceWarnings,
+  buildFreeformTargetNotes,
   buildFreeformComposerState,
   buildFreeformPlayerAction,
   clearFreeformActionDraft,
@@ -525,6 +526,11 @@ export const App = () => {
     () => buildFreeformResourceWarnings(freeformActionText, state),
     [freeformActionText, state],
   );
+  const freeformTargetNotes = useMemo(
+    () =>
+      freeformAction ? buildFreeformTargetNotes(freeformAction, state) : [],
+    [freeformAction, state],
+  );
   const freeformComposerState = useMemo(
     () =>
       buildFreeformComposerState(
@@ -874,6 +880,13 @@ export const App = () => {
             {freeformActionPreview.length > 0 ? (
               <div className="freeform-action-preview">
                 {freeformActionPreview.map((item) => (
+                  <span key={item}>{item}</span>
+                ))}
+              </div>
+            ) : null}
+            {freeformTargetNotes.length > 0 ? (
+              <div className="freeform-target-notes">
+                {freeformTargetNotes.map((item) => (
                   <span key={item}>{item}</span>
                 ))}
               </div>

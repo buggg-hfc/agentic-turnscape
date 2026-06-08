@@ -441,6 +441,17 @@ const committedResourceLabelsOf = (action: PlayerAction): string[] => [
   ),
 ];
 
+export const buildFreeformTargetNotes = (
+  action: PlayerAction,
+  context?: FreeformTargetContext,
+): string[] => {
+  if (action.actionType !== "custom") return [];
+  const targetText = targetTextOf(action);
+  if (!targetText) return [];
+  if (targetById(action.targetId, context)) return [];
+  return [`新目标：${targetText}需由裁判确认`];
+};
+
 const staticTargetCandidates: FreeformTargetCandidate[] = targetKeywords.map(
   (target) => ({
     ...target,

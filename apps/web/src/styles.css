@@ -776,6 +776,22 @@ button {
   line-height: 1.45;
 }
 
+.freeform-target-notes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.freeform-target-notes span {
+  border: 1px solid rgba(113, 198, 190, 0.34);
+  border-radius: 999px;
+  padding: 5px 8px;
+  background: rgba(24, 83, 80, 0.2);
+  color: #baf0e8;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
 .freeform-resource-warnings {
   display: flex;
   flex-wrap: wrap;
