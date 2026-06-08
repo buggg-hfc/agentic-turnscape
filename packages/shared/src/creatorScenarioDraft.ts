@@ -43,6 +43,9 @@ export type CreatorScenarioDraftInput = {
   guidePublicImage: string;
   guideShortTermGoal: string;
   guideSecret: string;
+  guideSocialSkill?: number;
+  guideInvestigationSkill?: number;
+  guideDefenseSkill?: number;
   guideRelationshipTrust?: number;
   guideRelationshipInterest?: number;
   guideRelationshipSuspicion?: number;
@@ -51,6 +54,9 @@ export type CreatorScenarioDraftInput = {
   pressureNpcPublicImage: string;
   pressureNpcShortTermGoal: string;
   pressureNpcSecret: string;
+  pressureNpcSocialSkill?: number;
+  pressureNpcInvestigationSkill?: number;
+  pressureNpcDefenseSkill?: number;
   pressureNpcRelationshipTrust?: number;
   pressureNpcRelationshipInterest?: number;
   pressureNpcRelationshipSuspicion?: number;
@@ -157,6 +163,9 @@ export const defaultCreatorScenarioDraftInput: CreatorScenarioDraftInput = {
   guidePublicImage: "熟悉起始地点的人，愿意给玩家第一份可信情报。",
   guideShortTermGoal: "协助玩家建立第一条公开线索。",
   guideSecret: "曾经和施压阵营做过一次失败交易。",
+  guideSocialSkill: 2,
+  guideInvestigationSkill: 2,
+  guideDefenseSkill: 1,
   guideRelationshipTrust: 1,
   guideRelationshipInterest: 1,
   guideRelationshipSuspicion: 0,
@@ -165,6 +174,9 @@ export const defaultCreatorScenarioDraftInput: CreatorScenarioDraftInput = {
   pressureNpcPublicImage: "不断要求立刻处理危机的人。",
   pressureNpcShortTermGoal: "把现场选择推向对自己有利的一边。",
   pressureNpcSecret: "隐藏了一条会改变公众判断的证据。",
+  pressureNpcSocialSkill: 2,
+  pressureNpcInvestigationSkill: 1,
+  pressureNpcDefenseSkill: 2,
   pressureNpcRelationshipTrust: 0,
   pressureNpcRelationshipInterest: 1,
   pressureNpcRelationshipSuspicion: 1,
@@ -447,6 +459,26 @@ export const buildCreatorScenarioDraft = (
     input.guideSecret ?? "",
     defaultCreatorScenarioDraftInput.guideSecret,
   );
+  const guideSocialSkill = boundedInt(
+    input.guideSocialSkill ?? defaultCreatorScenarioDraftInput.guideSocialSkill ?? 2,
+    defaultCreatorScenarioDraftInput.guideSocialSkill ?? 2,
+    0,
+    5,
+  );
+  const guideInvestigationSkill = boundedInt(
+    input.guideInvestigationSkill ??
+      defaultCreatorScenarioDraftInput.guideInvestigationSkill ??
+      2,
+    defaultCreatorScenarioDraftInput.guideInvestigationSkill ?? 2,
+    0,
+    5,
+  );
+  const guideDefenseSkill = boundedInt(
+    input.guideDefenseSkill ?? defaultCreatorScenarioDraftInput.guideDefenseSkill ?? 1,
+    defaultCreatorScenarioDraftInput.guideDefenseSkill ?? 1,
+    0,
+    5,
+  );
   const guideRelationshipTrust = boundedInt(
     input.guideRelationshipTrust ??
       defaultCreatorScenarioDraftInput.guideRelationshipTrust ??
@@ -490,6 +522,30 @@ export const buildCreatorScenarioDraft = (
   const pressureNpcSecret = textOr(
     input.pressureNpcSecret ?? "",
     defaultCreatorScenarioDraftInput.pressureNpcSecret,
+  );
+  const pressureNpcSocialSkill = boundedInt(
+    input.pressureNpcSocialSkill ??
+      defaultCreatorScenarioDraftInput.pressureNpcSocialSkill ??
+      2,
+    defaultCreatorScenarioDraftInput.pressureNpcSocialSkill ?? 2,
+    0,
+    5,
+  );
+  const pressureNpcInvestigationSkill = boundedInt(
+    input.pressureNpcInvestigationSkill ??
+      defaultCreatorScenarioDraftInput.pressureNpcInvestigationSkill ??
+      1,
+    defaultCreatorScenarioDraftInput.pressureNpcInvestigationSkill ?? 1,
+    0,
+    5,
+  );
+  const pressureNpcDefenseSkill = boundedInt(
+    input.pressureNpcDefenseSkill ??
+      defaultCreatorScenarioDraftInput.pressureNpcDefenseSkill ??
+      2,
+    defaultCreatorScenarioDraftInput.pressureNpcDefenseSkill ?? 2,
+    0,
+    5,
   );
   const pressureNpcRelationshipTrust = boundedInt(
     input.pressureNpcRelationshipTrust ??
@@ -739,7 +795,11 @@ export const buildCreatorScenarioDraft = (
           charm: 2,
           will: 2,
         },
-        skills: { social: 2, investigation: 2, defense: 1 },
+        skills: {
+          social: guideSocialSkill,
+          investigation: guideInvestigationSkill,
+          defense: guideDefenseSkill,
+        },
         resources: { favors: 2, intel: 1 },
         conditions: [],
         knownFacts: [premise],
@@ -767,7 +827,11 @@ export const buildCreatorScenarioDraft = (
           charm: 3,
           will: 2,
         },
-        skills: { social: 2, investigation: 1, defense: 2 },
+        skills: {
+          social: pressureNpcSocialSkill,
+          investigation: pressureNpcInvestigationSkill,
+          defense: pressureNpcDefenseSkill,
+        },
         resources: { influence: 2, money: 1 },
         conditions: [],
         knownFacts: [`${crisisName}已经被用来动员人群。`],

@@ -1612,6 +1612,60 @@ const CreatorScenarioImportPanel = ({
         />
       </label>
       <label className="creator-field">
+        <span>关键 NPC 社交</span>
+        <input
+          type="number"
+          min={0}
+          max={5}
+          value={creatorDraftNumberValue(
+            draft.guideSocialSkill,
+            defaultCreatorScenarioDraftInput.guideSocialSkill,
+            2,
+          )}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("guideSocialSkill", Number.parseInt(event.target.value, 10))
+          }
+        />
+      </label>
+      <label className="creator-field">
+        <span>关键 NPC 调查</span>
+        <input
+          type="number"
+          min={0}
+          max={5}
+          value={creatorDraftNumberValue(
+            draft.guideInvestigationSkill,
+            defaultCreatorScenarioDraftInput.guideInvestigationSkill,
+            2,
+          )}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange(
+              "guideInvestigationSkill",
+              Number.parseInt(event.target.value, 10),
+            )
+          }
+        />
+      </label>
+      <label className="creator-field">
+        <span>关键 NPC 防卫</span>
+        <input
+          type="number"
+          min={0}
+          max={5}
+          value={creatorDraftNumberValue(
+            draft.guideDefenseSkill,
+            defaultCreatorScenarioDraftInput.guideDefenseSkill,
+            1,
+          )}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("guideDefenseSkill", Number.parseInt(event.target.value, 10))
+          }
+        />
+      </label>
+      <label className="creator-field">
         <span>关键 NPC 信任</span>
         <input
           type="number"
@@ -1718,6 +1772,66 @@ const CreatorScenarioImportPanel = ({
           disabled={disabled}
           onChange={(event) =>
             onDraftChange("pressureNpcSecret", event.target.value)
+          }
+        />
+      </label>
+      <label className="creator-field">
+        <span>对手 NPC 社交</span>
+        <input
+          type="number"
+          min={0}
+          max={5}
+          value={creatorDraftNumberValue(
+            draft.pressureNpcSocialSkill,
+            defaultCreatorScenarioDraftInput.pressureNpcSocialSkill,
+            2,
+          )}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange(
+              "pressureNpcSocialSkill",
+              Number.parseInt(event.target.value, 10),
+            )
+          }
+        />
+      </label>
+      <label className="creator-field">
+        <span>对手 NPC 调查</span>
+        <input
+          type="number"
+          min={0}
+          max={5}
+          value={creatorDraftNumberValue(
+            draft.pressureNpcInvestigationSkill,
+            defaultCreatorScenarioDraftInput.pressureNpcInvestigationSkill,
+            1,
+          )}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange(
+              "pressureNpcInvestigationSkill",
+              Number.parseInt(event.target.value, 10),
+            )
+          }
+        />
+      </label>
+      <label className="creator-field">
+        <span>对手 NPC 防卫</span>
+        <input
+          type="number"
+          min={0}
+          max={5}
+          value={creatorDraftNumberValue(
+            draft.pressureNpcDefenseSkill,
+            defaultCreatorScenarioDraftInput.pressureNpcDefenseSkill,
+            2,
+          )}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange(
+              "pressureNpcDefenseSkill",
+              Number.parseInt(event.target.value, 10),
+            )
           }
         />
       </label>

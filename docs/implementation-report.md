@@ -2,6 +2,30 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Creator NPC Skills
+
+### Scope
+
+- Added TDD coverage for creator-authored NPC skill ratings.
+- The quick-create scenario draft now supports editable social, investigation, and defense skills for the key NPC and opposing NPC while remaining backward-compatible with older creator draft inputs.
+- The Chinese creator GUI exposes NPC skill number controls, and the draft preview includes those values inside each `NPC` card so scenario creators can check who is better at negotiation, investigation, or conflict before import.
+
+### Runtime Screenshot
+
+![Creator NPC skills](screenshots/creator-npc-skills-runtime-2026-06-08.png)
+
+The screenshot was captured from the local Web + API runtime after editing the creator form to set `林澈` and `黑帆船长` with custom NPC skills. The generated `NPC` preview shows `技能：社交 4，调查 3，防卫 2` for the key NPC and `技能：社交 5，调查 1，防卫 4` for the opposing NPC.
+
+### Verification
+
+```bash
+npm test -- packages/shared/src/creatorScenarioDraft.test.ts --reporter=dot
+npm test -- apps/web/src/creatorScenarioPreview.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - Creator Starting Relationships
 
 ### Scope

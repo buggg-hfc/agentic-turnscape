@@ -52,6 +52,9 @@ describe("creator scenario draft builder", () => {
       guidePublicImage: "林姐熟悉每条巷子的门牌和住户关系。",
       guideShortTermGoal: "帮玩家把第一批证词公开登记。",
       guideSecret: "林姐曾替承包队保管过一晚仓库钥匙。",
+      guideSocialSkill: 4,
+      guideInvestigationSkill: 3,
+      guideDefenseSkill: 2,
       guideRelationshipTrust: 3,
       guideRelationshipInterest: 2,
       guideRelationshipSuspicion: 0,
@@ -60,6 +63,9 @@ describe("creator scenario draft builder", () => {
       pressureNpcPublicImage: "周队总是带着封街文件和施工队一起出现。",
       pressureNpcShortTermGoal: "逼居民承认雨声只是安全隐患。",
       pressureNpcSecret: "周队调走了雨夜最后一名仓库看守。",
+      pressureNpcSocialSkill: 5,
+      pressureNpcInvestigationSkill: 1,
+      pressureNpcDefenseSkill: 4,
       pressureNpcRelationshipTrust: 0,
       pressureNpcRelationshipInterest: 2,
       pressureNpcRelationshipSuspicion: 4,
@@ -143,6 +149,10 @@ describe("creator scenario draft builder", () => {
     expect(Object.values(draft.world.characters).map((npc) => npc.secret)).toEqual([
       "林姐曾替承包队保管过一晚仓库钥匙。",
       "周队调走了雨夜最后一名仓库看守。",
+    ]);
+    expect(Object.values(draft.world.characters).map((npc) => npc.skills)).toEqual([
+      { social: 4, investigation: 3, defense: 2 },
+      { social: 5, investigation: 1, defense: 4 },
     ]);
     expect(draft.world.relationships["player:rain_alley_test_guide"]).toMatchObject({
       trust: 3,

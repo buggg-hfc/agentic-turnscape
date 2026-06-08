@@ -90,7 +90,11 @@ export const buildCreatorDraftPreview = (
   );
   const characters = Object.values(draft.world.characters).map(
     (character) =>
-      `${character.name}：${character.role}；公开：${character.publicImage}；目标：${character.shortTermGoal}；秘密：${character.secret}`,
+      `${character.name}：${character.role}；公开：${character.publicImage}；目标：${character.shortTermGoal}；技能：社交 ${
+        character.skills.social ?? 0
+      }，调查 ${character.skills.investigation ?? 0}，防卫 ${
+        character.skills.defense ?? 0
+      }；秘密：${character.secret}`,
   );
   const factions = Object.values(draft.world.factions).map(
     (faction) =>

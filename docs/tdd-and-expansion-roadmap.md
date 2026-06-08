@@ -31,6 +31,8 @@ For gameplay work, tests should prove the rule invariant rather than a single lu
 
 ## Verified Slices
 
+- Creator tooling now supports tested editable NPC skills: social, investigation, and defense ratings for the key NPC and opposing NPC feed into generated `WorldState.characters[*].skills` and appear in the Chinese NPC draft preview before import.
+
 - Creator tooling now supports tested editable opening relationships: player trust, interest, and suspicion toward the key NPC and opposing NPC feed into generated `WorldState.relationships` and appear in a Chinese `关系` draft preview before import.
 
 - Creator tooling now supports tested editable player base attributes: physique, agility, knowledge, insight, charm, and will feed into generated `WorldState.player.attributes` and appear in the Chinese draft preview before import.

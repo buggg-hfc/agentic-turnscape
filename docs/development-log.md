@@ -4,6 +4,18 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added tested creator-authored NPC skills. Quick-create drafts can now edit social, investigation, and defense skills for the key NPC and opposing NPC; generated worlds use those skill values, and the Chinese preview shows them inside the `NPC` card before import.
+- Captured a runtime screenshot after editing the creator form, showing the NPC skill preview:
+
+![Creator NPC skills](screenshots/creator-npc-skills-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- packages/shared/src/creatorScenarioDraft.test.ts --reporter=dot`
+  - `npm test -- apps/web/src/creatorScenarioPreview.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added tested creator-authored opening relationships. Quick-create drafts can now edit player trust, interest, and suspicion toward the key NPC and opposing NPC; generated worlds use those relationship values, and the Chinese preview shows them in a new `关系` card before import.
 - Captured a runtime screenshot after editing the creator form, showing the relationship preview:
 
