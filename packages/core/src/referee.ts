@@ -49,8 +49,12 @@ const hasRelationship = (state: WorldState, characterId: string): boolean =>
   Boolean(state.relationships[`player:${characterId}`]);
 const hasClock = (state: WorldState, clockId: string): boolean => Boolean(state.clocks[clockId]);
 const systemLeveragePrefixes = ["scenario:", "clock:", "pressureClock:", "route:", "step:"];
+const isSystemLeverageToken = (token: string): boolean =>
+  token === "freeform" ||
+  token.startsWith("freeform:") ||
+  systemLeveragePrefixes.some((prefix) => token.startsWith(prefix));
 const mechanicalLeverageOf = (leverage: string[]): string[] =>
-  leverage.filter((token) => !systemLeveragePrefixes.some((prefix) => token.startsWith(prefix)));
+  leverage.filter((token) => !isSystemLeverageToken(token));
 const addClockInc = (
   changes: StatePatch["changes"],
   state: WorldState,

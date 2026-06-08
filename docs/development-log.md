@@ -4,6 +4,17 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added tested referee-side balance for freeform metadata. Structured freeform tokens now steer intent and preview semantics but are filtered out of mechanical leverage, while real tokens such as `clinic_protocol` still grant normal rule bonuses.
+- Captured a runtime screenshot showing the same open-ended GUI metadata chips used by the balanced freeform path:
+
+![Freeform metadata balance](screenshots/freeform-metadata-balance-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- packages/core/src/core.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added tested approach and avoidance parsing for freeform player actions. The GUI builder now preserves `方式：...` as `freeform:approachText:*` and `避免：...` as `freeform:constraintText:*`, then previews them as `方式` / `避开` chips so open-ended player intent can carry method and boundaries without bypassing referee adjudication.
 - Captured a runtime screenshot showing the in-game freeform composer with explicit approach and avoidance chips:
 

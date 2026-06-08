@@ -31,6 +31,8 @@ For gameplay work, tests should prove the rule invariant rather than a single lu
 
 ## Verified Slices
 
+- Freeform metadata now has tested referee-side balance: structured `freeform:*` tokens can steer rule-channel interpretation and GUI previews, but they are excluded from automatic mechanical leverage so open-ended prose cannot inflate 2d6 modifiers without real resources.
+
 - Freeform player actions now support tested approach and avoidance constraints: `方式：...` and `避免：...` become structured `freeform:approachText:*` / `freeform:constraintText:*` metadata and Chinese GUI chips, while all authoritative consequences still come from referee patches.
 
 - LLM JSON retry budgets now have tested provider/API/UI coverage: request-level settings persist a bounded `jsonRetries` value, pass it into the Agent client, and surface `JSON 重试次数` / `重试预算` in the Chinese GUI without exposing secrets.

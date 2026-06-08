@@ -171,6 +171,53 @@ describe("dice and adjudication", () => {
     expect(next.clocks.plague_spread?.progress).toBeLessThan(state.clocks.plague_spread!.progress);
     expect(freeformEvent?.tags).toContain("protect");
   });
+
+  it("does not count freeform metadata tokens as automatic mechanical leverage", () => {
+    const state = createBorderSevenDaysWorld();
+    state.player.attributes.will = 2;
+    state.player.skills.defense = 1;
+    state.player.resources.pressure = 0;
+    const action: PlayerAction = {
+      actionType: "custom",
+      label: "自由行动：低调撤离病人",
+      description: "意图：保护；目标：诊所；方式：伪装成药材队；避免：伤害平民。",
+      targetId: "clinic",
+      leverage: [
+        "freeform",
+        "freeform:intent:protect",
+        "freeform:risk:medium",
+        "freeform:target:clinic",
+        "freeform:approachText:伪装成药材队",
+        "freeform:constraintText:伤害平民",
+      ],
+      riskLevel: "medium",
+    };
+
+    const resolution = adjudicateTurn({
+      state,
+      playerAction: action,
+      proposals: [],
+      turnId: "turn-freeform-metadata",
+      seed: "freeform-metadata-balance",
+    });
+
+    expect(resolution.roll.attribute).toBe("will");
+    expect(resolution.roll.skill).toBe("defense");
+    expect(resolution.roll.modifier).toBe(3);
+
+    const withRealLeverage = adjudicateTurn({
+      state,
+      playerAction: {
+        ...action,
+        leverage: [...action.leverage, "clinic_protocol"],
+      },
+      proposals: [],
+      turnId: "turn-freeform-real-leverage",
+      seed: "freeform-metadata-balance",
+    });
+
+    expect(withRealLeverage.roll.modifier).toBe(4);
+  });
 });
 
 describe("state patches", () => {

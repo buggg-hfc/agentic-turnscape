@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Freeform Metadata Balance
+
+### Scope
+
+- Added TDD coverage proving freeform metadata tokens such as `freeform:intent:*`, `freeform:risk:*`, `freeform:target:*`, `freeform:approachText:*`, and `freeform:constraintText:*` do not automatically count as mechanical leverage.
+- The referee still uses `freeform:intent:*` to choose the proper rule channel, but 2d6 modifiers now come from attributes, skills, pressure, and real resource/leverage tokens such as `clinic_protocol`.
+- This keeps open-ended player prose expressive without letting labels like `方式` or `避免` bypass the rules engine or inflate success odds.
+
+### Runtime Screenshot
+
+![Freeform metadata balance](screenshots/freeform-metadata-balance-runtime-2026-06-08.png)
+
+The screenshot was captured from the local Web + API runtime after starting a Border Seven Days campaign and entering a freeform action with approach and avoidance metadata. The runtime check verified `方式：伪装成药材队`, `避开：伤害平民`, and rejected API-key-shaped text.
+
+### Verification
+
+```bash
+npm test -- packages/core/src/core.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - Freeform Approach Constraints
 
 ### Scope
