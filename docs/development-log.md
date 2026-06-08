@@ -4,6 +4,18 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added tested creator-authored scene types. Quick-create drafts can now edit opening, pressure, and final scene kinds across `social`, `combat`, and `exploration`; generated drafts use those kinds, and the Chinese preview reflects them in the `场景` card before import.
+- Captured a runtime screenshot after editing the creator form, showing the scene type preview:
+
+![Creator scene kinds](screenshots/creator-scene-kinds-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- packages/shared/src/creatorScenarioDraft.test.ts --reporter=dot`
+  - `npm test -- apps/web/src/creatorScenarioPreview.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added tested creator-authored scene names. Quick-create drafts can now edit opening, pressure, and final scene names; generated drafts use those names, and the Chinese preview shows a `场景` card with scene type, location, NPCs, and solution hooks before import.
 - Captured a runtime screenshot after editing the creator form, showing the scene preview:
 

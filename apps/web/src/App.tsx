@@ -6,6 +6,7 @@ import {
   type ClockState,
   type CreatorActionType,
   type CreatorScenarioDraftInput,
+  type CreatorSceneKind,
   type LlmConfig,
   type PlayerAction,
   type RiskLevel,
@@ -125,6 +126,7 @@ type LoadState = "booting" | "selecting" | "ready" | "running" | "error";
 type ScenarioImportStatus = { kind: "success" | "error"; message: string };
 type CreatorActionTypeOption = { value: CreatorActionType; label: string };
 type CreatorActionTargetOption = { value: CreatorActionTarget; label: string };
+type CreatorSceneKindOption = { value: CreatorSceneKind; label: string };
 type CreatorRiskOption = { value: RiskLevel; label: string };
 
 type RelationshipEntry = {
@@ -162,6 +164,12 @@ const creatorActionTargetOptions: CreatorActionTargetOption[] = [
   { value: "pressureNpc", label: "对手 NPC" },
   { value: "startLocation", label: "起始地点" },
   { value: "pressureLocation", label: "冲突地点" },
+];
+
+const creatorSceneKindOptions: CreatorSceneKindOption[] = [
+  { value: "social", label: "社交" },
+  { value: "combat", label: "战斗" },
+  { value: "exploration", label: "探索" },
 ];
 
 const creatorRiskOptions: CreatorRiskOption[] = [
@@ -1221,6 +1229,22 @@ const CreatorScenarioImportPanel = ({
         />
       </label>
       <label className="creator-field">
+        <span>开场类型</span>
+        <select
+          value={draft.openingSceneKind ?? "social"}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("openingSceneKind", event.target.value as CreatorSceneKind)
+          }
+        >
+          {creatorSceneKindOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label className="creator-field">
         <span>冲突场景</span>
         <input
           value={draft.pressureSceneName ?? ""}
@@ -1229,12 +1253,44 @@ const CreatorScenarioImportPanel = ({
         />
       </label>
       <label className="creator-field">
+        <span>冲突类型</span>
+        <select
+          value={draft.pressureSceneKind ?? "combat"}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("pressureSceneKind", event.target.value as CreatorSceneKind)
+          }
+        >
+          {creatorSceneKindOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label className="creator-field">
         <span>终局场景</span>
         <input
           value={draft.finalSceneName ?? ""}
           disabled={disabled}
           onChange={(event) => onDraftChange("finalSceneName", event.target.value)}
         />
+      </label>
+      <label className="creator-field">
+        <span>终局类型</span>
+        <select
+          value={draft.finalSceneKind ?? "exploration"}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("finalSceneKind", event.target.value as CreatorSceneKind)
+          }
+        >
+          {creatorSceneKindOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
       </label>
       <label className="creator-field">
         <span>玩家身份</span>

@@ -6,6 +6,7 @@ export type CreatorActionTarget =
   | "pressureNpc"
   | "startLocation"
   | "pressureLocation";
+export type CreatorSceneKind = "combat" | "social" | "exploration";
 
 export type CreatorScenarioDraftInput = {
   id: string;
@@ -17,6 +18,9 @@ export type CreatorScenarioDraftInput = {
   openingSceneName?: string;
   pressureSceneName?: string;
   finalSceneName?: string;
+  openingSceneKind?: CreatorSceneKind;
+  pressureSceneKind?: CreatorSceneKind;
+  finalSceneKind?: CreatorSceneKind;
   playerName: string;
   playerHealth?: number;
   playerStamina?: number;
@@ -116,7 +120,7 @@ export type CreatorScenarioDraft = Record<string, unknown> & {
   scenes: Array<{
     id: string;
     name: string;
-    kind: "combat" | "social" | "exploration";
+    kind: CreatorSceneKind;
     day: number;
     locationId: string;
     npcIds: string[];
@@ -253,6 +257,11 @@ const actionTargetOr = (
   value: CreatorActionTarget | undefined,
   fallback: CreatorActionTarget,
 ): CreatorActionTarget => value ?? fallback;
+
+const sceneKindOr = (
+  value: CreatorSceneKind | undefined,
+  fallback: CreatorSceneKind,
+): CreatorSceneKind => value ?? fallback;
 
 const boundedInt = (
   value: number,
@@ -760,6 +769,9 @@ export const buildCreatorScenarioDraft = (
     input.finalSceneName ?? "",
     `${title}最终选择`,
   );
+  const openingSceneKind = sceneKindOr(input.openingSceneKind, "social");
+  const pressureSceneKind = sceneKindOr(input.pressureSceneKind, "combat");
+  const finalSceneKind = sceneKindOr(input.finalSceneKind, "exploration");
 
   const world: WorldState = {
     time: { day: 1, phase: "morning" },
@@ -1016,7 +1028,7 @@ export const buildCreatorScenarioDraft = (
       {
         id: socialSceneId,
         name: openingSceneName,
-        kind: "social",
+        kind: openingSceneKind,
         day: 1,
         locationId: startLocationId,
         npcIds: [guideId, pressureNpcId],
@@ -1026,7 +1038,7 @@ export const buildCreatorScenarioDraft = (
       {
         id: combatSceneId,
         name: pressureSceneName,
-        kind: "combat",
+        kind: pressureSceneKind,
         day: 2,
         locationId: pressureLocationId,
         npcIds: [pressureNpcId],
@@ -1036,7 +1048,7 @@ export const buildCreatorScenarioDraft = (
       {
         id: finalSceneId,
         name: finalSceneName,
-        kind: "exploration",
+        kind: finalSceneKind,
         day: 3,
         locationId: startLocationId,
         npcIds: [guideId, pressureNpcId],

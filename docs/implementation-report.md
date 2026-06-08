@@ -2,6 +2,30 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Creator Scene Kinds
+
+### Scope
+
+- Added TDD coverage for creator-authored scene types.
+- The quick-create scenario draft now accepts editable opening, pressure, and final scene kinds across `social`, `combat`, and `exploration` while preserving the previous default kind order for older drafts.
+- The Chinese creator GUI exposes scene-kind select controls, and the draft preview reflects the authored scene type inside the `场景` card before import.
+
+### Runtime Screenshot
+
+![Creator scene kinds](screenshots/creator-scene-kinds-runtime-2026-06-08.png)
+
+The screenshot was captured from the local Web + API runtime after editing the creator form to set the opening scene to `探索`, the pressure scene to `社交`, and the final scene to `战斗`. The generated preview shows those scene types next to the authored scene names.
+
+### Verification
+
+```bash
+npm test -- packages/shared/src/creatorScenarioDraft.test.ts --reporter=dot
+npm test -- apps/web/src/creatorScenarioPreview.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - Creator Scene Names
 
 ### Scope
