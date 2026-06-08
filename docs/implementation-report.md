@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Freeform Custom Target Result Confirmation
+
+### Scope
+
+- Added TDD coverage for referee results when a freeform action targets a player-authored custom target such as `东门水塔`.
+- The referee now repeats the boundary in public results: `新目标“东门水塔”需要后续裁判确认`, and tags the public event with `custom_target`.
+- This makes the open-ended target visible after adjudication and in replay without creating a location or mutating authoritative world facts directly.
+
+### Runtime Screenshot
+
+![Freeform custom target result](screenshots/freeform-custom-target-result-runtime-2026-06-08.png)
+
+The screenshot was captured from the local Web + API runtime after directly executing a Border Seven Days freeform investigation targeting `东门水塔`. The narration strip, turn progress, and replay panel all show the referee-owned confirmation note instead of treating the player-authored target as an already confirmed world object.
+
+### Verification
+
+```bash
+npm test -- packages/core/src/core.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - Freeform Custom Target Confirmation
 
 ### Scope

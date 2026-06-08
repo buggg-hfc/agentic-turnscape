@@ -4,6 +4,17 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added tested referee-result confirmation for custom freeform targets. Successful or blocked custom-target actions now keep the target as player-authored intent, add a `custom_target` public-event tag, and surface `新目标“东门水塔”需要后续裁判确认` in the result summary instead of silently turning the target into a world fact.
+- Captured a runtime screenshot after directly executing a freeform investigation of `东门水塔`, showing the confirmation note in narration, turn progress, and replay:
+
+![Freeform custom target result](screenshots/freeform-custom-target-result-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- packages/core/src/core.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added tested custom target confirmation for freeform actions. When the player writes a target that does not match any visible location, NPC, faction, or clock, the composer keeps it as an open-ended target and shows `新目标：东门水塔需由裁判确认`, so player-authored world hooks stay possible without pretending they are already confirmed facts.
 - Captured a runtime screenshot showing the new custom target note chip below the normal target preview:
 

@@ -172,6 +172,48 @@ describe("dice and adjudication", () => {
     expect(freeformEvent?.tags).toContain("protect");
   });
 
+  it("marks unresolved custom freeform targets as pending referee confirmation", () => {
+    const state = createBorderSevenDaysWorld();
+    state.player.attributes.insight = 5;
+    state.player.skills.survival = 5;
+    const action: PlayerAction = {
+      actionType: "custom",
+      label: "自由行动：调查东门水塔",
+      description: "意图：调查；目标：东门水塔；寻找能看见哨卡的瞭望记录。",
+      targetId: "custom_target_east_gate_tower",
+      leverage: [
+        "freeform",
+        "freeform:intent:investigate",
+        "freeform:risk:medium",
+        "freeform:target:custom_target_east_gate_tower",
+        "freeform:targetText:东门水塔",
+      ],
+      riskLevel: "medium",
+    };
+
+    const resolution = adjudicateTurn({
+      state,
+      playerAction: action,
+      proposals: [],
+      turnId: "turn-freeform-custom-target",
+      seed: "freeform-custom-target",
+    });
+    const next = applyStatePatch(state, resolution.patch);
+    const freeformEvent = next.publicEvents.find((item) =>
+      item.tags.includes("freeform"),
+    );
+
+    expect(next.locations).not.toHaveProperty("custom_target_east_gate_tower");
+    expect(next.currentLocationId).toBe(state.currentLocationId);
+    expect(resolution.publicSummary).toContain(
+      "新目标“东门水塔”需要后续裁判确认",
+    );
+    expect(freeformEvent?.body).toContain(
+      "新目标“东门水塔”需要后续裁判确认",
+    );
+    expect(freeformEvent?.tags).toContain("custom_target");
+  });
+
   it("does not count freeform metadata tokens as automatic mechanical leverage", () => {
     const state = createBorderSevenDaysWorld();
     state.player.attributes.will = 2;

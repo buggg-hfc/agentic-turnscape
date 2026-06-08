@@ -111,6 +111,11 @@ const freeformIntentOf = (playerAction: PlayerAction): FreeformRuleChannel | und
   return freeformRuleChannels.has(intent as FreeformRuleChannel) ? (intent as FreeformRuleChannel) : undefined;
 };
 
+const customFreeformTargetTextOf = (playerAction: PlayerAction): string | undefined => {
+  if (!playerAction.targetId?.startsWith("custom_target_")) return undefined;
+  return tokenValue(playerAction, "freeform:targetText:");
+};
+
 const socialLeverageOf = (
   state: WorldState,
   playerAction: PlayerAction,
@@ -533,7 +538,18 @@ export const adjudicateTurn = ({ state, playerAction, proposals, turnId, seed = 
     const freeformText = playerAction.description.trim() || playerAction.label;
     const inferredIntent = freeformIntentOf(playerAction) ?? "ignore";
     const inferredIntentLabel = freeformIntentLabels[inferredIntent];
-    const freeformTags = ["freeform", inferredIntent];
+    const customTargetText = customFreeformTargetTextOf(playerAction);
+    const customTargetNote = customTargetText
+      ? `新目标“${customTargetText}”需要后续裁判确认。`
+      : "";
+    const customTargetSummary = customTargetText
+      ? `；新目标“${customTargetText}”需要后续裁判确认`
+      : "";
+    const freeformTags = [
+      "freeform",
+      inferredIntent,
+      ...(customTargetText ? ["custom_target"] : []),
+    ];
     if (isSuccess(roll.level)) {
       changes.push(
         { op: "inc", path: "player.momentum", delta: 1, reason: "自由行动成功并制造可见进展" },
@@ -544,7 +560,7 @@ export const adjudicateTurn = ({ state, playerAction, proposals, turnId, seed = 
             state,
             turnId,
             "自由行动推进",
-            `玩家意图：${freeformText}。裁判将意图判定为“${inferredIntentLabel}”，并把它转换为合法的状态变化。`,
+            `玩家意图：${freeformText}。裁判将意图判定为“${inferredIntentLabel}”，并把它转换为合法的状态变化。${customTargetNote}`,
             freeformTags
           ),
           reason: "记录自由行动裁判结果"
@@ -588,7 +604,7 @@ export const adjudicateTurn = ({ state, playerAction, proposals, turnId, seed = 
         case "ignore":
           break;
       }
-      publicSummary = `自由行动按“${inferredIntentLabel}”推进：${freeformText}`;
+      publicSummary = `自由行动按“${inferredIntentLabel}”推进：${freeformText}${customTargetSummary}`;
       hiddenSummary = "自由行动文本只代表玩家意图；数值和世界状态后果仍由裁判规则决定。";
     } else {
       changes.push(
@@ -600,7 +616,7 @@ export const adjudicateTurn = ({ state, playerAction, proposals, turnId, seed = 
             state,
             turnId,
             "自由行动受阻",
-            `玩家意图：${freeformText}。裁判将意图判定为“${inferredIntentLabel}”，但局势没有按预想展开。`,
+            `玩家意图：${freeformText}。裁判将意图判定为“${inferredIntentLabel}”，但局势没有按预想展开。${customTargetNote}`,
             [...freeformTags, "setback"]
           ),
           reason: "记录自由行动受阻"
@@ -609,7 +625,7 @@ export const adjudicateTurn = ({ state, playerAction, proposals, turnId, seed = 
       if (inferredIntent === "fight") {
         addClockInc(changes, state, "martial_lockdown", 1, "失败的自由暴力行动仍提高戒严压力");
       }
-      publicSummary = `自由行动按“${inferredIntentLabel}”受阻：${freeformText}`;
+      publicSummary = `自由行动按“${inferredIntentLabel}”受阻：${freeformText}${customTargetSummary}`;
       hiddenSummary = "裁判没有把玩家叙述直接当作事实，只记录了合法的受阻后果。";
     }
   } else if (playerAction.actionType === "rest" || playerAction.actionType === "ignore") {
