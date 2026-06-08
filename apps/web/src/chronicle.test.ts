@@ -53,7 +53,9 @@ describe("chronicle timeline view model", () => {
             source: "referee",
             changes: [
               { op: "set", path: "time.phase", value: "afternoon", reason: "time advances" },
-              { op: "inc", path: "relationships.player:npc_adele.trust", delta: 1, reason: "Adele saw the player protect patients" }
+              { op: "inc", path: "player.resources.intel", delta: -1, reason: "spent intel" },
+              { op: "inc", path: "relationships.player:npc_adele.trust", delta: 1, reason: "Adele saw the player protect patients" },
+              { op: "inc", path: "clocks.plague_spread.progress", delta: -1, reason: "slowed plague" }
             ]
           }
         }
@@ -75,7 +77,7 @@ describe("chronicle timeline view model", () => {
         body: "The clinic cure effort gains time.",
         detail: "Adele closes the ledger and nods.",
         meta: "第 1 天 · 午后 · 诊所",
-        patchSummary: "2 项已确认变化"
+        patchSummary: "情报 -1 · 阿黛尔信任 +1 · 瘟疫扩散 -1 · 4 项已确认变化"
       }
     ]);
   });

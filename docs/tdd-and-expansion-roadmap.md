@@ -31,6 +31,8 @@ For gameplay work, tests should prove the rule invariant rather than a single lu
 
 ## Verified Slices
 
+- Chronicle replay rows now have tested consequence summaries: the web timeline extracts visible referee-confirmed `state_patch` effects such as location changes, resource deltas, relationship shifts, crisis-clock movement, reputation tags, and momentum before the total confirmed-change count, helping players see how earlier choices produced current outcomes.
+
 - Freeform negotiation and trade now reuse the tested social chip rules: custom actions routed by `freeform:intent:negotiate` or `freeform:intent:trade` convert committed `favor`, `intel`, and `money` resources into spendable chip requests, reject unavailable resources, and avoid double-spending money.
 
 - Freeform player actions now support tested resource commitments: explicit `资源：情报，金钱` text becomes real `intel` / `money` leverage only when those player resources are visible and positive, while unavailable or non-commit state words such as `人情` at `0` and `压力` do not become mechanical advantages.

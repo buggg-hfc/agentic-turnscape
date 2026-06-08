@@ -4,6 +4,17 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added tested chronicle patch summaries for replay rows. The web timeline now names concrete referee-confirmed effects such as `地点：旧哨站`, `情报 +1`, `周烬信任 +1`, clock movement, reputation tags, and momentum before the total `state_patch` change count, so players can connect prior choices to visible consequences instead of reading only `N 项已确认变化`.
+- Captured a runtime screenshot showing the replay panel after a fixed-seed `调查失踪商队` turn:
+
+![Chronicle patch summaries](screenshots/chronicle-patch-summary-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- apps/web/src/chronicle.test.ts apps/web/src/displayLabels.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added tested referee-side social chip spending for freeform negotiation and trade. Custom actions routed through `freeform:intent:negotiate` or `freeform:intent:trade` now convert committed `favor`, `intel`, and `money` resources into normal social chip requests, spend accepted resources through referee patches, and reject unavailable resources instead of granting free ordinary leverage.
 - Captured a runtime screenshot showing the in-game freeform negotiation composer with target and resource commitment chips:
 

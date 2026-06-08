@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Chronicle Patch Change Summaries
+
+### Scope
+
+- Added TDD coverage proving chronicle replay rows summarize concrete referee-confirmed `state_patch` effects instead of only showing a raw confirmed-change count.
+- Replay summaries now surface the first meaningful visible consequences for resources, relationships, clocks, current location, reputation tags, and player momentum while still ending with the total confirmed patch count.
+- Added display labels for Border Seven Days crisis clocks and remaining key NPC ids so replay text can say `周烬信任 +1` or `瘟疫扩散 -1` instead of exposing internal ids.
+
+### Runtime Screenshot
+
+![Chronicle patch summaries](screenshots/chronicle-patch-summary-runtime-2026-06-08.png)
+
+The screenshot was captured from the local Web + API runtime after running a fixed-seed Border Seven Days turn for `调查失踪商队`. The replay panel now shows `地点：旧哨站 · 情报 +1 · 周烬信任 +1 · 7 项已确认变化`, making the referee-owned consequences visible in the same place players review prior choices.
+
+### Verification
+
+```bash
+npm test -- apps/web/src/chronicle.test.ts apps/web/src/displayLabels.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - Freeform Social Chip Spending
 
 ### Scope
