@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   buildCompletedTurnProgressEvents,
+  buildResumeTurnProgressEvents,
   buildTurnProgressRows,
 } from "./turnProgress.js";
 
@@ -67,6 +68,41 @@ describe("turn progress display", () => {
     expect(buildTurnProgressRows(events, false)).toEqual([
       { title: "队列等待", detail: "等待后台结算回合。" },
       { title: "完成", detail: "玩家找到了商队线索。" },
+    ]);
+  });
+
+  it("builds resume progress rows for recoverable pending and failed turns", () => {
+    expect(buildTurnProgressRows(buildResumeTurnProgressEvents(), false)).toEqual(
+      [],
+    );
+    expect(
+      buildTurnProgressRows(
+        buildResumeTurnProgressEvents({ id: "turn-1", status: "complete" }),
+        false,
+      ),
+    ).toEqual([]);
+
+    expect(
+      buildTurnProgressRows(
+        buildResumeTurnProgressEvents({ id: "turn-2", status: "pending" }),
+        false,
+      ),
+    ).toEqual([
+      { title: "回合任务", detail: "状态：排队中" },
+      { title: "队列等待", detail: "等待后台结算回合。" },
+    ]);
+
+    expect(
+      buildTurnProgressRows(
+        buildResumeTurnProgressEvents({ id: "turn-3", status: "failed" }),
+        false,
+      ),
+    ).toEqual([
+      { title: "回合任务", detail: "状态：失败" },
+      {
+        title: "错误",
+        detail: "后台结算失败。可以选择其他行动继续推进。",
+      },
     ]);
   });
 });

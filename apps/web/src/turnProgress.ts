@@ -26,7 +26,7 @@ const statusLabel: Record<string, string> = {
 
 const messageLabel: Record<string, string> = {
   turn_waiting_for_worker: "等待后台结算回合。",
-  queued_turn_failed: "后台结算失败。",
+  queued_turn_failed: "后台结算失败。可以选择其他行动继续推进。",
 };
 
 const redactProgressSecrets = (value: string): string =>
@@ -83,4 +83,30 @@ export const buildCompletedTurnProgressEvents = (
       data: publicSummary ? { publicSummary } : { ok: true },
     },
   ];
+};
+
+export const buildResumeTurnProgressEvents = (lastTurn?: {
+  id?: string;
+  status?: string;
+}): TurnProgressEvent[] => {
+  if (!lastTurn || lastTurn.status === "complete") return [];
+  if (lastTurn.status === "pending") {
+    return [
+      { event: "turn", data: { id: lastTurn.id, status: "pending" } },
+      {
+        event: "pending",
+        data: { id: lastTurn.id, message: "turn_waiting_for_worker" },
+      },
+    ];
+  }
+  if (lastTurn.status === "failed") {
+    return [
+      { event: "turn", data: { id: lastTurn.id, status: "failed" } },
+      {
+        event: "error",
+        data: { id: lastTurn.id, message: "queued_turn_failed" },
+      },
+    ];
+  }
+  return [];
 };

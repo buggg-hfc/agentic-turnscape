@@ -2,6 +2,27 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Resumed Failure Turn Progress
+
+### Scope
+
+- Added TDD coverage for rebuilding turn-progress events when a campaign is resumed with a pending or failed last turn.
+- The main campaign GUI now preserves recoverable turn status after resume instead of clearing the progress panel.
+- Failed resumed turns display `状态：失败` and `后台结算失败。可以选择其他行动继续推进。`, keeping the player in the normal action loop.
+
+### Runtime Screenshot
+
+![Resumed failed turn progress](screenshots/resume-failed-turn-detail-runtime-2026-06-08.png)
+
+The screenshot was captured from the local web GUI with a mocked failed `lastTurn` and a real Border Seven Days world state. It verifies the action column shows a Chinese recovery message after the player enters the campaign, without rendering raw worker or failure tokens.
+
+### Verification
+
+```bash
+npm test -- apps/web/src/turnProgress.test.ts apps/web/src/api.test.ts --reporter=dot
+npm run typecheck
+```
+
 ## 2026-06-08 - Failed Turn Resume Visibility
 
 ### Scope

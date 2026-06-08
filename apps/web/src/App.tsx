@@ -105,6 +105,7 @@ import {
 } from "./scenarioSelection.js";
 import {
   buildCompletedTurnProgressEvents,
+  buildResumeTurnProgressEvents,
   buildTurnProgressRows,
 } from "./turnProgress.js";
 import type {
@@ -257,7 +258,7 @@ export const App = () => {
     setActions(payload.availableActions);
     setSelectedAction(payload.availableActions[0]);
     setLastResolution(payload.lastTurn?.resolution);
-    setTurnProgress([]);
+    setTurnProgress(buildResumeTurnProgressEvents(payload.lastTurn));
     setChronicleTimeline(
       buildChronicleTimeline(await api.chronicle(payload.campaignId)),
     );

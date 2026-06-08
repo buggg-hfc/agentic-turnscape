@@ -4,6 +4,15 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added tested recovery progress for resumed failed or pending turns. When a campaign opens with a failed last turn, the main action column now keeps the player-facing `回合进度` panel visible with `状态：失败` and `后台结算失败。可以选择其他行动继续推进。` instead of clearing the state after resume.
+- Captured a runtime screenshot showing the recovered failed-turn progress panel inside the campaign GUI:
+
+![Resumed failed turn progress](screenshots/resume-failed-turn-detail-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- apps/web/src/turnProgress.test.ts apps/web/src/api.test.ts --reporter=dot`
+  - `npm run typecheck`
+
 - Added tested failed-turn resume visibility for persistent campaigns. Prisma-backed `failTurn` now records the hidden failure log and refreshes campaign activity time, so a failed queued turn rises to the top of the resume list; the web resume helper shows `上回合失败` and `结算中`.
 - Captured a runtime screenshot showing failed and pending campaign resume rows in the Chinese GUI:
 
