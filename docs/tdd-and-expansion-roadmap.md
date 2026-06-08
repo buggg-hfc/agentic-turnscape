@@ -31,6 +31,8 @@ For gameplay work, tests should prove the rule invariant rather than a single lu
 
 ## Verified Slices
 
+- Freeform negotiation and trade now reuse the tested social chip rules: custom actions routed by `freeform:intent:negotiate` or `freeform:intent:trade` convert committed `favor`, `intel`, and `money` resources into spendable chip requests, reject unavailable resources, and avoid double-spending money.
+
 - Freeform player actions now support tested resource commitments: explicit `资源：情报，金钱` text becomes real `intel` / `money` leverage only when those player resources are visible and positive, while unavailable or non-commit state words such as `人情` at `0` and `压力` do not become mechanical advantages.
 
 - Freeform metadata now has tested referee-side balance: structured `freeform:*` tokens can steer rule-channel interpretation and GUI previews, but they are excluded from automatic mechanical leverage so open-ended prose cannot inflate 2d6 modifiers without real resources.

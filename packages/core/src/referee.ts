@@ -3,7 +3,11 @@ import { resolveCombatRound, type CombatMove, type CombatMoveType } from "./comb
 import { roll2d6, classifySuccess, successLabel, type SuccessLevel } from "./dice.js";
 import { resolveConditionUpkeep } from "./effects.js";
 import { resolveFactionPlans } from "./factions.js";
-import { resolveSocialLeverage, type SocialLeverageResolution } from "./social.js";
+import {
+  resolveSocialLeverage,
+  type SocialChipResource,
+  type SocialLeverageResolution,
+} from "./social.js";
 
 export type RefereeInput = {
   state: WorldState;
@@ -55,6 +59,17 @@ const isSystemLeverageToken = (token: string): boolean =>
   systemLeveragePrefixes.some((prefix) => token.startsWith(prefix));
 const mechanicalLeverageOf = (leverage: string[]): string[] =>
   leverage.filter((token) => !isSystemLeverageToken(token));
+const freeformSocialChipResources = new Set<SocialChipResource>([
+  "favor",
+  "intel",
+  "money",
+]);
+const freeformSocialLeverageOf = (leverage: string[]): string[] =>
+  leverage.map((token) =>
+    freeformSocialChipResources.has(token as SocialChipResource)
+      ? `chip:${token}:1`
+      : token,
+  );
 const addClockInc = (
   changes: StatePatch["changes"],
   state: WorldState,
@@ -96,6 +111,28 @@ const freeformIntentOf = (playerAction: PlayerAction): FreeformRuleChannel | und
   return freeformRuleChannels.has(intent as FreeformRuleChannel) ? (intent as FreeformRuleChannel) : undefined;
 };
 
+const socialLeverageOf = (
+  state: WorldState,
+  playerAction: PlayerAction,
+  freeformIntent: FreeformRuleChannel | undefined,
+  mechanicalLeverage: string[],
+): SocialLeverageResolution | undefined => {
+  const isDirectSocialAction =
+    playerAction.actionType === "negotiate" ||
+    playerAction.actionType === "trade";
+  const isFreeformSocialAction =
+    playerAction.actionType === "custom" &&
+    (freeformIntent === "negotiate" || freeformIntent === "trade");
+  if (!isDirectSocialAction && !isFreeformSocialAction) return undefined;
+
+  return resolveSocialLeverage(
+    state,
+    isFreeformSocialAction
+      ? freeformSocialLeverageOf(mechanicalLeverage)
+      : mechanicalLeverage,
+  );
+};
+
 const check = (
   state: WorldState,
   playerAction: PlayerAction,
@@ -128,10 +165,12 @@ const check = (
   const attributeScore = state.player.attributes[config.attribute] ?? 0;
   const skillScore = state.player.skills[config.skill] ?? 0;
   const mechanicalLeverage = mechanicalLeverageOf(playerAction.leverage);
-  const socialLeverage =
-    playerAction.actionType === "negotiate" || playerAction.actionType === "trade"
-      ? resolveSocialLeverage(state, mechanicalLeverage)
-      : undefined;
+  const socialLeverage = socialLeverageOf(
+    state,
+    playerAction,
+    freeformIntent,
+    mechanicalLeverage,
+  );
   const leverageBonus = socialLeverage?.totalBonus ?? Math.min(2, mechanicalLeverage.length);
   const pressurePenalty = Math.max(0, Math.floor((state.player.resources.pressure ?? 0) / 4));
   const modifier = attributeScore + skillScore + leverageBonus - pressurePenalty;
@@ -524,7 +563,12 @@ export const adjudicateTurn = ({ state, playerAction, proposals, turnId, seed = 
           }
           break;
         case "trade":
-          if ((state.player.resources.money ?? 0) > 0) {
+          if (
+            !roll.socialLeverage?.acceptedChips.some(
+              (chip) => chip.resource === "money",
+            ) &&
+            (state.player.resources.money ?? 0) > 0
+          ) {
             changes.push({ op: "inc", path: "player.resources.money", delta: -1, reason: "自由交易消耗金钱" });
           }
           changes.push({ op: "inc", path: "player.resources.favor", delta: 1, reason: "自由交易换来可用人情" });

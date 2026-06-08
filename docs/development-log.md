@@ -4,6 +4,17 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added tested referee-side social chip spending for freeform negotiation and trade. Custom actions routed through `freeform:intent:negotiate` or `freeform:intent:trade` now convert committed `favor`, `intel`, and `money` resources into normal social chip requests, spend accepted resources through referee patches, and reject unavailable resources instead of granting free ordinary leverage.
+- Captured a runtime screenshot showing the in-game freeform negotiation composer with target and resource commitment chips:
+
+![Freeform social chip spending](screenshots/freeform-social-chip-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- packages/core/src/social.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added tested resource commitment parsing for freeform player actions. The GUI now recognizes explicit `资源：情报，金钱` text as real `intel` / `money` leverage only when those resources are visible and positive in the current player state, while unavailable `人情` and non-commit `压力` remain out of the mechanical modifier path.
 - Captured a runtime screenshot showing the in-game freeform composer with the new `投入：情报、金钱` preview chip:
 

@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Freeform Social Chip Spending
+
+### Scope
+
+- Added TDD coverage proving freeform negotiation/trade resources are no longer free leverage. When a custom action is routed by `freeform:intent:negotiate` or `freeform:intent:trade`, committed `favor`, `intel`, and `money` tokens are adjudicated through the same social chip rules as fixed social actions.
+- Accepted freeform social chips now add the normal chip bonus and emit referee-owned resource spend patches. Unavailable resources are rejected instead of falling back to ordinary leverage, so forged `favor` cannot create a free modifier.
+- Freeform trade avoids double-spending `money` when that money has already been accepted as a social chip in the same referee settlement.
+
+### Runtime Screenshot
+
+![Freeform social chip spending](screenshots/freeform-social-chip-runtime-2026-06-08.png)
+
+The screenshot was captured from the local Web + API runtime after starting a Border Seven Days campaign and entering a freeform negotiation with `目标：罗文` and `资源：情报，金钱`. The GUI check verified `意图：谈判`, `风险：中`, `目标：罗文`, and `投入：情报、金钱`; the core TDD checks verify the actual chip spend and unavailable-resource rejection.
+
+### Verification
+
+```bash
+npm test -- packages/core/src/social.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - Freeform Resource Commitments
 
 ### Scope
