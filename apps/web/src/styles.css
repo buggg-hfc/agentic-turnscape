@@ -1247,8 +1247,28 @@ meter {
   background: rgba(240, 201, 119, 0.08);
 }
 
+.llm-runtime-summary.usage.steady > div {
+  border-color: rgba(103, 160, 143, 0.28);
+  background: rgba(103, 160, 143, 0.09);
+}
+
+.llm-runtime-summary.usage.warning > div {
+  border-color: rgba(240, 201, 119, 0.36);
+  background: rgba(240, 201, 119, 0.1);
+}
+
+.llm-runtime-summary.usage.over > div {
+  border-color: rgba(226, 91, 91, 0.34);
+  background: rgba(226, 91, 91, 0.1);
+}
+
+.llm-runtime-summary .usage-pressure {
+  grid-column: 1 / -1;
+}
+
 .llm-runtime-summary span,
-.llm-runtime-summary strong {
+.llm-runtime-summary strong,
+.llm-runtime-summary small {
   display: block;
   overflow-wrap: anywhere;
 }
@@ -1263,6 +1283,13 @@ meter {
   margin-top: 2px;
   color: #eef2ee;
   font-size: 12px;
+  line-height: 1.35;
+}
+
+.llm-runtime-summary small {
+  margin-top: 2px;
+  color: #b9c7c0;
+  font-size: 11px;
   line-height: 1.35;
 }
 

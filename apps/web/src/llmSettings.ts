@@ -32,6 +32,9 @@ export type LlmUsageSummary = {
   promptLabel: string;
   completionLabel: string;
   totalLabel: string;
+  pressure: "steady" | "warning" | "over";
+  pressureLabel: string;
+  pressureDetailLabel: string;
 };
 
 const defaultLlmProviderPreset: LlmProviderPreset = {
@@ -145,11 +148,30 @@ export const buildLlmUsageSummary = (
 ): LlmUsageSummary | undefined => {
   if (!usage || usage.requests <= 0) return undefined;
   const sanitized = sanitizeLlmSettings(settings);
+  const usedPercent = Math.max(
+    0,
+    Math.round((usage.totalTokens / sanitized.maxTokens) * 100),
+  );
+  const pressure =
+    usage.totalTokens >= sanitized.maxTokens
+      ? "over"
+      : usage.totalTokens >= Math.ceil(sanitized.maxTokens * 0.8)
+        ? "warning"
+        : "steady";
+  const pressureLabel =
+    pressure === "over"
+      ? "已超预算"
+      : pressure === "warning"
+        ? "接近预算"
+        : "预算正常";
   return {
     requestLabel: `${usage.requests} 次`,
     promptLabel: `${usage.promptTokens} 输入`,
     completionLabel: `${usage.completionTokens} 输出`,
     totalLabel: `${usage.totalTokens} / ${sanitized.maxTokens} Token`,
+    pressure,
+    pressureLabel,
+    pressureDetailLabel: `已用约 ${usedPercent}%`,
   };
 };
 

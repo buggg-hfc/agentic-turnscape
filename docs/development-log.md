@@ -4,6 +4,17 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added tested LLM budget pressure feedback for the Chinese settings panel. Last-turn usage is now classified as `steady`, `warning`, or `over` against the configured Token limit, and the GUI shows `预算压力` without exposing local API keys.
+- Captured a runtime screenshot showing the near-budget warning state:
+
+![LLM budget pressure](screenshots/llm-budget-pressure-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- apps/web/src/llmSettings.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added tested LLM usage monitoring for real OpenAI-compatible calls. The client now extracts provider `usage` metadata, the API aggregates it into `resolution.llmUsage` per completed turn without touching `WorldState`, and the Chinese LLM settings panel shows last-turn request/input/output/total token usage without rendering secrets.
 - Captured a runtime screenshot showing the new usage monitor in the right-side LLM panel:
 

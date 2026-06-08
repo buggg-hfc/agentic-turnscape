@@ -2317,7 +2317,10 @@ const LlmSettingsPanel = ({
       </div>
     </div>
     {usageSummary ? (
-      <div className="llm-runtime-summary usage" aria-label="LLM 用量监控">
+      <div
+        className={`llm-runtime-summary usage ${usageSummary.pressure}`}
+        aria-label="LLM 用量监控"
+      >
         <div>
           <span>上回合请求</span>
           <strong>{usageSummary.requestLabel}</strong>
@@ -2333,6 +2336,11 @@ const LlmSettingsPanel = ({
         <div>
           <span>总消耗</span>
           <strong>{usageSummary.totalLabel}</strong>
+        </div>
+        <div className="usage-pressure">
+          <span>预算压力</span>
+          <strong>{usageSummary.pressureLabel}</strong>
+          <small>{usageSummary.pressureDetailLabel}</small>
         </div>
       </div>
     ) : null}

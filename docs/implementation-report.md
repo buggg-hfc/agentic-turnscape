@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - LLM Budget Pressure
+
+### Scope
+
+- Added TDD coverage for classifying last-turn LLM usage as `steady`, `warning`, or `over` against the locally configured per-turn Token budget.
+- The Chinese LLM settings panel now renders a `预算压力` row with `预算正常`, `接近预算`, or `已超预算`, while still keeping API keys and provider secrets out of rendered text and world state.
+- The pressure state is derived from confirmed turn-level usage metadata only; it does not let the LLM mutate state, pricing, clocks, or rules.
+
+### Runtime Screenshot
+
+![LLM budget pressure](screenshots/llm-budget-pressure-runtime-2026-06-08.png)
+
+The screenshot was captured from the local web GUI with mocked API payloads containing a completed turn whose Token usage is near the configured budget. The runtime check verified the `预算压力` row, the `接近预算` status, `已用约 85%`, and rejected any API-key-shaped secret in rendered text.
+
+### Verification
+
+```bash
+npm test -- apps/web/src/llmSettings.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - LLM Usage Monitoring
 
 ### Scope

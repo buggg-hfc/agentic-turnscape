@@ -222,7 +222,56 @@ describe("LLM settings persistence", () => {
       promptLabel: "78 输入",
       completionLabel: "39 输出",
       totalLabel: "117 / 4096 Token",
+      pressure: "steady",
+      pressureLabel: "预算正常",
+      pressureDetailLabel: "已用约 3%",
     });
     expect(JSON.stringify(summary)).not.toContain("sk-localSecretOnly123");
+  });
+
+  it("classifies LLM token budget pressure for operator visibility", () => {
+    expect(
+      buildLlmUsageSummary(
+        {
+          requests: 4,
+          promptTokens: 3000,
+          completionTokens: 500,
+          totalTokens: 3500,
+        },
+        {
+          baseUrl: "https://api.deepseek.com",
+          model: "deepseek-v4-pro",
+          apiKey: "",
+          timeoutMs: 30000,
+          maxTokens: 4096,
+        },
+      ),
+    ).toMatchObject({
+      pressure: "warning",
+      pressureLabel: "接近预算",
+      pressureDetailLabel: "已用约 85%",
+    });
+
+    expect(
+      buildLlmUsageSummary(
+        {
+          requests: 4,
+          promptTokens: 3900,
+          completionTokens: 400,
+          totalTokens: 4300,
+        },
+        {
+          baseUrl: "http://localhost:11434/v1",
+          model: "local-story-model",
+          apiKey: "",
+          timeoutMs: 15000,
+          maxTokens: 4096,
+        },
+      ),
+    ).toMatchObject({
+      pressure: "over",
+      pressureLabel: "已超预算",
+      pressureDetailLabel: "已用约 105%",
+    });
   });
 });
