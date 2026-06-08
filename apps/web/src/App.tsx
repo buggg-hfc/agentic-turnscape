@@ -80,12 +80,13 @@ import {
   buildLlmRuntimeSummary,
   buildLlmUsageSummary,
   clearLlmSettings,
+  CURRENT_LLM_SETTINGS_STORAGE_LABEL,
   detectLlmProviderPresetId,
   llmConnectionErrorStatus,
   llmConnectionSuccessStatus,
   llmJsonModeOptions,
   llmProviderPresets,
-  loadLlmSettings,
+  loadLlmSettingsWithMetadata,
   saveLlmSettings,
   type LlmConnectionStatus,
   type LlmProviderPresetId,
@@ -210,8 +211,12 @@ export const App = () => {
   const [freeformActionHistory, setFreeformActionHistory] = useState<string[]>(
     () => loadFreeformActionHistory(),
   );
-  const [llmSettings, setLlmSettings] = useState<LlmConfig>(() =>
-    loadLlmSettings(),
+  const [initialLlmSettings] = useState(() => loadLlmSettingsWithMetadata());
+  const [llmSettings, setLlmSettings] = useState<LlmConfig>(
+    initialLlmSettings.settings,
+  );
+  const [llmSettingsStorageLabel, setLlmSettingsStorageLabel] = useState(
+    initialLlmSettings.storageLabel,
   );
   const [llmSettingsSaved, setLlmSettingsSaved] = useState(true);
   const [llmConnectionStatus, setLlmConnectionStatus] =
@@ -966,6 +971,7 @@ export const App = () => {
           <LlmSettingsPanel
             settings={llmSettings}
             saved={llmSettingsSaved}
+            storageLabel={llmSettingsStorageLabel}
             lastUsage={lastResolution?.llmUsage}
             lastDiagnostics={lastResolution?.llmDiagnostics}
             connectionStatus={llmConnectionStatus}
@@ -976,10 +982,12 @@ export const App = () => {
             }}
             onSave={() => {
               setLlmSettings(saveLlmSettings(llmSettings));
+              setLlmSettingsStorageLabel(CURRENT_LLM_SETTINGS_STORAGE_LABEL);
               setLlmSettingsSaved(true);
             }}
             onClear={() => {
               setLlmSettings(clearLlmSettings());
+              setLlmSettingsStorageLabel("未保存");
               setLlmSettingsSaved(true);
               setLlmConnectionStatus(undefined);
             }}
@@ -2216,6 +2224,7 @@ const FactionPlanPanel = ({
 const LlmSettingsPanel = ({
   settings,
   saved,
+  storageLabel,
   lastUsage,
   lastDiagnostics,
   connectionStatus,
@@ -2226,6 +2235,7 @@ const LlmSettingsPanel = ({
 }: {
   settings: LlmConfig;
   saved: boolean;
+  storageLabel: string;
   lastUsage: TurnResolution["llmUsage"] | undefined;
   lastDiagnostics: TurnResolution["llmDiagnostics"] | undefined;
   connectionStatus: LlmConnectionStatus | undefined;
@@ -2238,7 +2248,7 @@ const LlmSettingsPanel = ({
   const detectedProviderPreset = llmProviderPresets.find(
     (preset) => preset.id === detectedProviderPresetId,
   );
-  const runtimeSummary = buildLlmRuntimeSummary(settings, saved);
+  const runtimeSummary = buildLlmRuntimeSummary(settings, saved, storageLabel);
   const usageSummary = buildLlmUsageSummary(lastUsage, settings);
   const diagnosticsSummary = buildLlmDiagnosticsSummary(lastDiagnostics);
 
@@ -2403,6 +2413,10 @@ const LlmSettingsPanel = ({
       <div>
         <span>重试预算</span>
         <strong>{runtimeSummary.retryBudgetLabel}</strong>
+      </div>
+      <div>
+        <span>保存格式</span>
+        <strong>{runtimeSummary.storageLabel}</strong>
       </div>
       <div>
         <span>状态</span>

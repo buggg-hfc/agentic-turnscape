@@ -2,10 +2,13 @@ import { describe, expect, it } from "vitest";
 import {
   buildLlmDiagnosticsSummary,
   buildLlmUsageSummary,
+  LLM_SETTINGS_STORAGE_KEY,
+  LLM_SETTINGS_STORAGE_VERSION,
   applyLlmProviderPreset,
   buildLlmRuntimeSummary,
   clearLlmSettings,
   detectLlmProviderPresetId,
+  loadLlmSettingsWithMetadata,
   llmProviderPresets,
   loadLlmSettings,
   llmConnectionErrorStatus,
@@ -138,6 +141,67 @@ describe("LLM settings persistence", () => {
       jsonMode: "strict",
       jsonRetries: 3,
     });
+
+    const persisted = JSON.parse(
+      storage.getItem(LLM_SETTINGS_STORAGE_KEY) ?? "{}",
+    ) as {
+      version?: number;
+      settings?: unknown;
+    };
+    expect(persisted.version).toBe(LLM_SETTINGS_STORAGE_VERSION);
+    expect(persisted.settings).toMatchObject({
+      baseUrl: "https://llm.example.test/v1",
+      model: "story-agent",
+    });
+  });
+
+  it("migrates legacy local LLM settings without losing the browser-only key", () => {
+    const storage = new MemoryStorage();
+    storage.setItem(
+      LLM_SETTINGS_STORAGE_KEY,
+      JSON.stringify({
+        baseUrl: " https://api.deepseek.com/ ",
+        model: " deepseek-v4-pro ",
+        apiKey: "legacy-local-key",
+        timeoutMs: "30000",
+        maxTokens: "4096",
+        jsonMode: "auto",
+        jsonRetries: "1",
+      }),
+    );
+
+    const loaded = loadLlmSettingsWithMetadata(storage);
+
+    expect(loaded).toEqual({
+      settings: {
+        baseUrl: "https://api.deepseek.com",
+        model: "deepseek-v4-pro",
+        apiKey: "legacy-local-key",
+        timeoutMs: 30000,
+        maxTokens: 4096,
+        jsonMode: "auto",
+        jsonRetries: 1,
+      },
+      storageLabel: "旧版 V1，可保存升级",
+      migratedFromVersion: 1,
+    });
+
+    saveLlmSettings(loaded.settings, storage);
+    const upgraded = loadLlmSettingsWithMetadata(storage);
+
+    expect(upgraded).toEqual({
+      settings: loaded.settings,
+      storageLabel: "本地格式 V2",
+    });
+    expect(
+      JSON.parse(storage.getItem(LLM_SETTINGS_STORAGE_KEY) ?? "{}"),
+    ).toMatchObject({
+      version: LLM_SETTINGS_STORAGE_VERSION,
+      settings: {
+        apiKey: "legacy-local-key",
+        baseUrl: "https://api.deepseek.com",
+      },
+    });
   });
 
   it("returns defaults for missing or invalid local data", () => {
@@ -226,6 +290,7 @@ describe("LLM settings persistence", () => {
       jsonModeLabel: "自动兼容",
       retryBudgetLabel: "最多 2 次",
       savedLabel: "已保存",
+      storageLabel: "本地格式 V2",
     });
 
     const customSummary = buildLlmRuntimeSummary(
@@ -246,6 +311,7 @@ describe("LLM settings persistence", () => {
     expect(customSummary.jsonModeLabel).toBe("关闭格式参数");
     expect(customSummary.retryBudgetLabel).toBe("不重试");
     expect(customSummary.savedLabel).toBe("有未保存更改");
+    expect(customSummary.storageLabel).toBe("本地格式 V2");
     expect(JSON.stringify(customSummary)).not.toContain(secret);
   });
 

@@ -4,6 +4,17 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added tested browser-local LLM settings migration. Settings are now saved as a V2 envelope with `version`, `savedAt`, and sanitized config, while old V1 raw config still loads and can be saved forward without losing the local-only key. The Chinese GUI runtime summary now displays `保存格式：本地格式 V2`.
+- Captured a runtime screenshot after saving LLM settings from the GUI, showing the V2 save format and no rendered secret:
+
+![LLM settings storage migration](screenshots/llm-settings-storage-migration-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- apps/web/src/llmSettings.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added tested referee-result feedback for freeform method and boundary metadata. Custom actions with `方式` and `避免` now keep those choices visible after adjudication as `方式：...` and `底线：避免...`, while still not granting automatic dice leverage or direct state changes.
 - Captured a runtime screenshot after directly executing a freeform protection action, showing method and bottom-line feedback in narration, turn progress, and replay:
 

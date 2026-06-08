@@ -31,6 +31,8 @@ For gameplay work, tests should prove the rule invariant rather than a single lu
 
 ## Verified Slices
 
+- LLM settings local persistence now has tested save-format migration: the Chinese GUI saves a V2 envelope, shows `保存格式：本地格式 V2`, and still loads legacy V1 browser settings without leaking or dropping the local-only key.
+
 - Freeform method and boundary metadata now have tested referee-result feedback: `方式` and `避免` remain visible in public summaries, events, and replay as recorded player intent, without becoming automatic mechanical bonuses.
 
 - Freeform custom-target results now have tested referee feedback: public summaries and events mark player-authored targets as needing later referee confirmation, preserving unlimited intent without silently creating authoritative world objects.

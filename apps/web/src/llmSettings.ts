@@ -9,6 +9,8 @@ import {
 import type { LlmConnectionTestPayload } from "./api.js";
 
 export const LLM_SETTINGS_STORAGE_KEY = "agentic-turnscape.llmSettings.v1";
+export const LLM_SETTINGS_STORAGE_VERSION = 2;
+export const CURRENT_LLM_SETTINGS_STORAGE_LABEL = `本地格式 V${LLM_SETTINGS_STORAGE_VERSION}`;
 const SECRET_PATTERN = /sk-[A-Za-z0-9]+/g;
 
 export type StorageLike = Pick<Storage, "getItem" | "setItem" | "removeItem">;
@@ -37,6 +39,12 @@ export type LlmRuntimeSummary = {
   jsonModeLabel: string;
   retryBudgetLabel: string;
   savedLabel: string;
+  storageLabel: string;
+};
+export type LlmSettingsLoadResult = {
+  settings: LlmConfig;
+  storageLabel: string;
+  migratedFromVersion?: number;
 };
 export type LlmUsageSummary = {
   requestLabel: string;
@@ -182,6 +190,7 @@ const llmRetryBudgetLabelOf = (retries: number): string =>
 export const buildLlmRuntimeSummary = (
   settings: LlmConfig,
   saved: boolean,
+  storageLabel = CURRENT_LLM_SETTINGS_STORAGE_LABEL,
 ): LlmRuntimeSummary => {
   const sanitized = sanitizeLlmSettings(settings);
   const presetId = detectLlmProviderPresetId(sanitized);
@@ -199,6 +208,7 @@ export const buildLlmRuntimeSummary = (
     jsonModeLabel: llmJsonModeLabelOf(sanitized.jsonMode),
     retryBudgetLabel: llmRetryBudgetLabelOf(sanitized.jsonRetries),
     savedLabel: saved ? "已保存" : "有未保存更改",
+    storageLabel,
   };
 };
 
@@ -270,21 +280,73 @@ export const buildLlmDiagnosticsSummary = (
   };
 };
 
-export const loadLlmSettings = (storage: StorageLike | undefined = getBrowserStorage()): LlmConfig => {
-  if (!storage) return defaultLlmSettings();
+const isPlainRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+
+export const loadLlmSettingsWithMetadata = (
+  storage: StorageLike | undefined = getBrowserStorage(),
+): LlmSettingsLoadResult => {
+  if (!storage) {
+    return {
+      settings: defaultLlmSettings(),
+      storageLabel: "未保存",
+    };
+  }
   const raw = storage.getItem(LLM_SETTINGS_STORAGE_KEY);
-  if (!raw) return defaultLlmSettings();
+  if (!raw) {
+    return {
+      settings: defaultLlmSettings(),
+      storageLabel: "未保存",
+    };
+  }
 
   try {
-    return sanitizeLlmSettings(JSON.parse(raw));
+    const parsed = JSON.parse(raw) as unknown;
+    if (
+      isPlainRecord(parsed) &&
+      parsed.version === LLM_SETTINGS_STORAGE_VERSION
+    ) {
+      return {
+        settings: sanitizeLlmSettings(parsed.settings),
+        storageLabel: CURRENT_LLM_SETTINGS_STORAGE_LABEL,
+      };
+    }
+
+    const legacy = LlmConfigSchema.safeParse(parsed);
+    if (legacy.success) {
+      return {
+        settings: legacy.data,
+        storageLabel: "旧版 V1，可保存升级",
+        migratedFromVersion: 1,
+      };
+    }
+
+    return {
+      settings: defaultLlmSettings(),
+      storageLabel: "保存格式不兼容，已使用默认值",
+    };
   } catch {
-    return defaultLlmSettings();
+    return {
+      settings: defaultLlmSettings(),
+      storageLabel: "保存格式损坏，已使用默认值",
+    };
   }
 };
 
+export const loadLlmSettings = (
+  storage: StorageLike | undefined = getBrowserStorage(),
+): LlmConfig => loadLlmSettingsWithMetadata(storage).settings;
+
 export const saveLlmSettings = (settings: LlmConfig, storage: StorageLike | undefined = getBrowserStorage()): LlmConfig => {
   const sanitized = sanitizeLlmSettings(settings);
-  storage?.setItem(LLM_SETTINGS_STORAGE_KEY, JSON.stringify(sanitized));
+  storage?.setItem(
+    LLM_SETTINGS_STORAGE_KEY,
+    JSON.stringify({
+      version: LLM_SETTINGS_STORAGE_VERSION,
+      savedAt: new Date().toISOString(),
+      settings: sanitized,
+    }),
+  );
   return sanitized;
 };
 

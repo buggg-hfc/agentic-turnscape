@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - LLM Settings Storage Migration
+
+### Scope
+
+- Added TDD coverage for versioned browser-local LLM settings.
+- The web client now saves settings as a V2 envelope with `version`, `savedAt`, and sanitized `settings`, while still loading legacy V1 raw config objects without losing the browser-only API key.
+- The Chinese LLM panel now shows the local save format, so players and testers can see whether settings have been upgraded without exposing secrets.
+
+### Runtime Screenshot
+
+![LLM settings storage migration](screenshots/llm-settings-storage-migration-runtime-2026-06-08.png)
+
+The screenshot was captured from the local Web + API runtime after starting a Border Seven Days campaign and saving the LLM settings from the GUI. The runtime summary shows `保存格式 / 本地格式 V2`, the API key field remains blank, and the rendered text was checked for secret-shaped values.
+
+### Verification
+
+```bash
+npm test -- apps/web/src/llmSettings.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - Freeform Boundary Result Feedback
 
 ### Scope
