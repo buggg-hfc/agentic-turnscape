@@ -146,4 +146,60 @@ describe("OpenAI-compatible LLM client", () => {
     ]);
     expect(JSON.stringify(usageEvents)).not.toContain('"ok":true');
   });
+
+  it("reports JSON retry and fallback diagnostics without storing response text", async () => {
+    const diagnostics: unknown[] = [];
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          choices: [{ message: { content: JSON.stringify({ actorId: "npc" }) } }],
+        }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          choices: [{ message: { content: "{bad json" } }],
+        }),
+      });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const client = createOpenAICompatibleClient({
+      apiKey: "test-key",
+      model: "diagnostic-model",
+      jsonRetries: 1,
+      onDiagnostic: (event) => diagnostics.push(event),
+    });
+
+    await expect(
+      client.completeJson({
+        schema: z.object({
+          actorId: z.string(),
+          intent: z.string(),
+        }),
+        messages: [{ role: "user", content: "Return an action proposal." }],
+        fallback: () => ({ actorId: "fallback", intent: "fallback" }),
+      }),
+    ).resolves.toEqual({ actorId: "fallback", intent: "fallback" });
+
+    expect(diagnostics).toEqual([
+      { type: "json_attempt", channel: "json", attempt: 1 },
+      {
+        type: "json_retry",
+        channel: "json",
+        attempt: 1,
+        reason: "schema",
+      },
+      { type: "json_attempt", channel: "json", attempt: 2 },
+      {
+        type: "fallback",
+        channel: "json",
+        attempt: 2,
+        reason: "invalid_json",
+      },
+    ]);
+    expect(JSON.stringify(diagnostics)).not.toContain("actorId");
+    expect(JSON.stringify(diagnostics)).not.toContain("{bad json");
+  });
 });

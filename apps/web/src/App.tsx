@@ -73,8 +73,9 @@ import {
 } from "./freeformAction.js";
 import {
   applyLlmProviderPreset,
-  buildLlmUsageSummary,
+  buildLlmDiagnosticsSummary,
   buildLlmRuntimeSummary,
+  buildLlmUsageSummary,
   clearLlmSettings,
   detectLlmProviderPresetId,
   llmConnectionErrorStatus,
@@ -927,6 +928,7 @@ export const App = () => {
             settings={llmSettings}
             saved={llmSettingsSaved}
             lastUsage={lastResolution?.llmUsage}
+            lastDiagnostics={lastResolution?.llmDiagnostics}
             connectionStatus={llmConnectionStatus}
             onChange={(settings) => {
               setLlmSettings(settings);
@@ -2176,6 +2178,7 @@ const LlmSettingsPanel = ({
   settings,
   saved,
   lastUsage,
+  lastDiagnostics,
   connectionStatus,
   onChange,
   onSave,
@@ -2185,6 +2188,7 @@ const LlmSettingsPanel = ({
   settings: LlmConfig;
   saved: boolean;
   lastUsage: TurnResolution["llmUsage"] | undefined;
+  lastDiagnostics: TurnResolution["llmDiagnostics"] | undefined;
   connectionStatus: LlmConnectionStatus | undefined;
   onChange: (settings: LlmConfig) => void;
   onSave: () => void;
@@ -2197,6 +2201,7 @@ const LlmSettingsPanel = ({
   );
   const runtimeSummary = buildLlmRuntimeSummary(settings, saved);
   const usageSummary = buildLlmUsageSummary(lastUsage, settings);
+  const diagnosticsSummary = buildLlmDiagnosticsSummary(lastDiagnostics);
 
   return (
   <section className="module">
@@ -2341,6 +2346,33 @@ const LlmSettingsPanel = ({
           <span>预算压力</span>
           <strong>{usageSummary.pressureLabel}</strong>
           <small>{usageSummary.pressureDetailLabel}</small>
+        </div>
+      </div>
+    ) : null}
+    {diagnosticsSummary ? (
+      <div
+        className={`llm-runtime-summary diagnostics ${diagnosticsSummary.health}`}
+        aria-label="LLM 诊断"
+      >
+        <div>
+          <span>JSON 尝试</span>
+          <strong>{diagnosticsSummary.attemptsLabel}</strong>
+        </div>
+        <div>
+          <span>JSON 重试</span>
+          <strong>{diagnosticsSummary.retriesLabel}</strong>
+        </div>
+        <div>
+          <span>兜底次数</span>
+          <strong>{diagnosticsSummary.fallbackLabel}</strong>
+        </div>
+        <div>
+          <span>叙事兜底</span>
+          <strong>{diagnosticsSummary.textFallbackLabel}</strong>
+        </div>
+        <div className="usage-pressure">
+          <span>结构状态</span>
+          <strong>{diagnosticsSummary.healthLabel}</strong>
         </div>
       </div>
     ) : null}

@@ -244,6 +244,14 @@ export const LlmUsageSummarySchema = z.object({
 });
 export type LlmUsageSummary = z.infer<typeof LlmUsageSummarySchema>;
 
+export const LlmDiagnosticsSummarySchema = z.object({
+  jsonAttempts: z.number().int().min(0),
+  jsonRetries: z.number().int().min(0),
+  fallbacks: z.number().int().min(0),
+  textFallbacks: z.number().int().min(0)
+});
+export type LlmDiagnosticsSummary = z.infer<typeof LlmDiagnosticsSummarySchema>;
+
 export const PlayerActionSchema = z.object({
   id: z.string().optional(),
   actionType: z.enum(["investigate", "negotiate", "fight", "protect", "trade", "rest", "travel", "ignore", "custom"]),
@@ -264,6 +272,7 @@ export const TurnResolutionSchema = z.object({
   narration: z.string(),
   ending: EndingSummarySchema.optional(),
   llmUsage: LlmUsageSummarySchema.optional(),
+  llmDiagnostics: LlmDiagnosticsSummarySchema.optional(),
   availableActions: z.array(PlayerActionSchema)
 });
 export type TurnResolution = z.infer<typeof TurnResolutionSchema>;

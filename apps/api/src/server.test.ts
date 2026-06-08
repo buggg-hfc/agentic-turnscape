@@ -200,6 +200,88 @@ describe("campaign turn API", () => {
     });
   });
 
+  it("aggregates LLM retry and fallback diagnostics into completed turn resolutions", async () => {
+    const store = new InMemoryCampaignStore();
+    const fakeClient: LLMClient & {
+      reportDiagnostic?: OpenAICompatibleOptions["onDiagnostic"];
+    } = {
+      completeJson: async ({ fallback }) => {
+        fakeClient.reportDiagnostic?.({
+          type: "json_attempt",
+          channel: "json",
+          attempt: 1,
+        });
+        fakeClient.reportDiagnostic?.({
+          type: "json_retry",
+          channel: "json",
+          attempt: 1,
+          reason: "schema",
+        });
+        fakeClient.reportDiagnostic?.({
+          type: "fallback",
+          channel: "json",
+          attempt: 2,
+          reason: "invalid_json",
+        });
+        return fallback();
+      },
+      completeText: async ({ fallback }) => {
+        fakeClient.reportDiagnostic?.({
+          type: "fallback",
+          channel: "text",
+          attempt: 1,
+          reason: "request",
+        });
+        return fallback();
+      },
+    };
+    const app = buildServer({
+      store,
+      createLlmClient: (config) => {
+        fakeClient.reportDiagnostic = config.onDiagnostic;
+        return fakeClient;
+      },
+    });
+
+    const campaignResponse = await app.inject({
+      method: "POST",
+      url: "/campaigns",
+      headers: { "content-type": "application/json" },
+      payload: { scenarioId: "border-seven-days" },
+    });
+    const campaign = campaignResponse.json<{ campaignId: string }>();
+
+    const turnResponse = await app.inject({
+      method: "POST",
+      url: `/campaigns/${campaign.campaignId}/turns/run`,
+      headers: { "content-type": "application/json" },
+      payload: {
+        action: {
+          actionType: "negotiate",
+          label: "Coordinate the clinic line",
+          description: "Ask Rowan and Adele to keep the clinic open.",
+          targetId: "npc_rowan",
+          leverage: ["public_rumor"],
+          riskLevel: "medium",
+        },
+        seed: "api-llm-diagnostics-turn",
+      },
+    });
+
+    expect(turnResponse.statusCode).toBe(200);
+    expect(turnResponse.json()).toMatchObject({
+      resolution: {
+        llmDiagnostics: {
+          jsonAttempts: 6,
+          jsonRetries: 6,
+          fallbacks: 7,
+          textFallbacks: 1,
+        },
+      },
+    });
+    expect(JSON.stringify(turnResponse.json())).not.toContain("invalid_json");
+  });
+
   it("accepts freeform custom player actions and still records referee-owned patches", async () => {
     const store = new InMemoryCampaignStore();
     const app = buildServer({ store });

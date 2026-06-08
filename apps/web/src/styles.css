@@ -1262,6 +1262,21 @@ meter {
   background: rgba(226, 91, 91, 0.1);
 }
 
+.llm-runtime-summary.diagnostics.stable > div {
+  border-color: rgba(103, 160, 143, 0.28);
+  background: rgba(103, 160, 143, 0.09);
+}
+
+.llm-runtime-summary.diagnostics.retrying > div {
+  border-color: rgba(126, 167, 232, 0.3);
+  background: rgba(126, 167, 232, 0.09);
+}
+
+.llm-runtime-summary.diagnostics.fallback > div {
+  border-color: rgba(226, 91, 91, 0.34);
+  background: rgba(226, 91, 91, 0.1);
+}
+
 .llm-runtime-summary .usage-pressure {
   grid-column: 1 / -1;
 }

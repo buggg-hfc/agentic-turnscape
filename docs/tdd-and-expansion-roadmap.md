@@ -31,6 +31,8 @@ For gameplay work, tests should prove the rule invariant rather than a single lu
 
 ## Verified Slices
 
+- LLM calls now have tested retry/fallback diagnostics: JSON attempts, schema/JSON retries, deterministic fallback usage, and narration fallback usage aggregate into optional turn-level `resolution.llmDiagnostics` and surface in the Chinese GUI without storing raw model output.
+
 - LLM usage monitoring now includes tested budget pressure feedback: last-turn Token usage is classified as steady, near-budget, or over-budget against the local per-turn limit, and the Chinese GUI surfaces the pressure state without exposing API keys or changing authoritative world state.
 
 - LLM usage monitoring now has tested provider/API/UI coverage: OpenAI-compatible `usage` metadata is normalized per request, aggregated into optional turn-level `resolution.llmUsage`, kept outside `WorldState`, and displayed in the Chinese LLM settings panel without exposing local API keys.

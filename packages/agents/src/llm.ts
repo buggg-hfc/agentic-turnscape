@@ -20,6 +20,13 @@ export type LLMClient = {
   }): Promise<string>;
 };
 
+export type LlmDiagnosticEvent = {
+  type: "json_attempt" | "json_retry" | "fallback";
+  channel: "json" | "text";
+  attempt: number;
+  reason?: "schema" | "invalid_json" | "request" | "missing_content" | "empty_text";
+};
+
 export type OpenAICompatibleOptions = {
   baseUrl?: string | undefined;
   apiKey?: string | undefined;
@@ -28,6 +35,7 @@ export type OpenAICompatibleOptions = {
   maxTokens?: number | undefined;
   jsonRetries?: number | undefined;
   onUsage?: ((usage: LlmUsageSummary) => void) | undefined;
+  onDiagnostic?: ((event: LlmDiagnosticEvent) => void) | undefined;
 };
 
 const withTimeout = async <T>(
@@ -77,6 +85,7 @@ export const createOpenAICompatibleClient = ({
   maxTokens = 1024,
   jsonRetries = 1,
   onUsage,
+  onDiagnostic,
 }: OpenAICompatibleOptions): LLMClient => {
   const request = async (
     messages: LLMMessage[],
@@ -131,11 +140,69 @@ export const createOpenAICompatibleClient = ({
     }) {
       let retryMessages = messages;
       for (let attempt = 0; attempt <= jsonRetries; attempt += 1) {
+        const attemptNumber = attempt + 1;
+        onDiagnostic?.({
+          type: "json_attempt",
+          channel: "json",
+          attempt: attemptNumber,
+        });
         try {
           const content = await request(retryMessages, temperature, true);
-          if (!content) return fallback();
-          const parsed = schema.safeParse(JSON.parse(content));
+          if (!content) {
+            onDiagnostic?.({
+              type: "fallback",
+              channel: "json",
+              attempt: attemptNumber,
+              reason: "missing_content",
+            });
+            return fallback();
+          }
+          let raw: unknown;
+          try {
+            raw = JSON.parse(content);
+          } catch {
+            if (attempt < jsonRetries) {
+              onDiagnostic?.({
+                type: "json_retry",
+                channel: "json",
+                attempt: attemptNumber,
+                reason: "invalid_json",
+              });
+              retryMessages = [
+                ...messages,
+                {
+                  role: "user",
+                  content:
+                    "The previous response was not valid JSON. Return only valid JSON with all required fields.",
+                },
+              ];
+              continue;
+            }
+            onDiagnostic?.({
+              type: "fallback",
+              channel: "json",
+              attempt: attemptNumber,
+              reason: "invalid_json",
+            });
+            return fallback();
+          }
+          const parsed = schema.safeParse(raw);
           if (parsed.success) return parsed.data;
+          if (attempt >= jsonRetries) {
+            onDiagnostic?.({
+              type: "fallback",
+              channel: "json",
+              attempt: attemptNumber,
+              reason: "schema",
+            });
+            return fallback();
+          }
+          onDiagnostic?.({
+            type: "json_retry",
+            channel: "json",
+            attempt: attemptNumber,
+            reason: "schema",
+          });
           retryMessages = [
             ...messages,
             { role: "assistant", content },
@@ -150,14 +217,29 @@ export const createOpenAICompatibleClient = ({
             },
           ];
         } catch {
-          retryMessages = [
-            ...messages,
-            {
-              role: "user",
-              content:
-                "The previous response was not valid JSON. Return only valid JSON with all required fields.",
-            },
-          ];
+          if (attempt < jsonRetries) {
+            onDiagnostic?.({
+              type: "json_retry",
+              channel: "json",
+              attempt: attemptNumber,
+              reason: "request",
+            });
+            retryMessages = [
+              ...messages,
+              {
+                role: "user",
+                content:
+                  "The previous response was not valid JSON. Return only valid JSON with all required fields.",
+              },
+            ];
+          } else {
+            onDiagnostic?.({
+              type: "fallback",
+              channel: "json",
+              attempt: attemptNumber,
+              reason: "request",
+            });
+          }
         }
       }
       return fallback();
@@ -165,8 +247,22 @@ export const createOpenAICompatibleClient = ({
     async completeText({ messages, temperature, fallback }) {
       try {
         const content = await request(messages, temperature, false);
-        return content?.trim() || fallback();
+        const trimmed = content?.trim();
+        if (trimmed) return trimmed;
+        onDiagnostic?.({
+          type: "fallback",
+          channel: "text",
+          attempt: 1,
+          reason: "empty_text",
+        });
+        return fallback();
       } catch {
+        onDiagnostic?.({
+          type: "fallback",
+          channel: "text",
+          attempt: 1,
+          reason: "request",
+        });
         return fallback();
       }
     },

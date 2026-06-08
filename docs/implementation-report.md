@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - LLM Retry Diagnostics
+
+### Scope
+
+- Added TDD coverage for OpenAI-compatible JSON retry and fallback diagnostics. The client records attempts, schema/JSON retries, and fallback events without storing model response text.
+- Completed turn resolutions can now carry optional `llmDiagnostics` counts for JSON attempts, JSON retries, total fallback uses, and narration fallback uses.
+- The Chinese LLM settings panel now shows an `LLM 诊断` summary so operators can tell whether a completed turn used structured output cleanly, recovered after retries, or fell back to deterministic rules.
+
+### Runtime Screenshot
+
+![LLM retry diagnostics](screenshots/llm-retry-diagnostics-runtime-2026-06-08.png)
+
+The screenshot was captured from the local web GUI with mocked API payloads containing completed-turn diagnostics. The runtime check verified `LLM 诊断`, `JSON 尝试`, `JSON 重试`, `兜底次数`, `结构状态`, and `已启用兜底`, while rejecting API-key-shaped text and raw invalid JSON content.
+
+### Verification
+
+```bash
+npm test -- packages/agents/src/llm.test.ts apps/api/src/server.test.ts apps/web/src/llmSettings.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - LLM Budget Pressure
 
 ### Scope

@@ -1,4 +1,10 @@
-import { DEFAULT_LLM_CONFIG, LlmConfigSchema, type LlmConfig, type LlmUsageSummary as SharedLlmUsageSummary } from "@agentic-turnscape/shared";
+import {
+  DEFAULT_LLM_CONFIG,
+  LlmConfigSchema,
+  type LlmConfig,
+  type LlmDiagnosticsSummary as SharedLlmDiagnosticsSummary,
+  type LlmUsageSummary as SharedLlmUsageSummary,
+} from "@agentic-turnscape/shared";
 import type { LlmConnectionTestPayload } from "./api.js";
 
 export const LLM_SETTINGS_STORAGE_KEY = "agentic-turnscape.llmSettings.v1";
@@ -35,6 +41,14 @@ export type LlmUsageSummary = {
   pressure: "steady" | "warning" | "over";
   pressureLabel: string;
   pressureDetailLabel: string;
+};
+export type LlmDiagnosticsSummary = {
+  health: "stable" | "retrying" | "fallback";
+  attemptsLabel: string;
+  retriesLabel: string;
+  fallbackLabel: string;
+  textFallbackLabel: string;
+  healthLabel: string;
 };
 
 const defaultLlmProviderPreset: LlmProviderPreset = {
@@ -172,6 +186,41 @@ export const buildLlmUsageSummary = (
     pressure,
     pressureLabel,
     pressureDetailLabel: `已用约 ${usedPercent}%`,
+  };
+};
+
+export const buildLlmDiagnosticsSummary = (
+  diagnostics: SharedLlmDiagnosticsSummary | undefined,
+): LlmDiagnosticsSummary | undefined => {
+  if (
+    !diagnostics ||
+    diagnostics.jsonAttempts +
+      diagnostics.jsonRetries +
+      diagnostics.fallbacks +
+      diagnostics.textFallbacks <=
+      0
+  ) {
+    return undefined;
+  }
+  const health =
+    diagnostics.fallbacks > 0
+      ? "fallback"
+      : diagnostics.jsonRetries > 0
+        ? "retrying"
+        : "stable";
+  const healthLabel =
+    health === "fallback"
+      ? "已启用兜底"
+      : health === "retrying"
+        ? "已重试恢复"
+        : "结构稳定";
+  return {
+    health,
+    attemptsLabel: `${diagnostics.jsonAttempts} 次`,
+    retriesLabel: `${diagnostics.jsonRetries} 次`,
+    fallbackLabel: `${diagnostics.fallbacks} 次`,
+    textFallbackLabel: `${diagnostics.textFallbacks} 次叙事兜底`,
+    healthLabel,
   };
 };
 

@@ -4,6 +4,17 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added tested LLM retry and fallback diagnostics for real OpenAI-compatible calls. JSON attempts, JSON retries, deterministic fallback uses, and narration fallback uses now aggregate into `resolution.llmDiagnostics` without storing model response text, and the Chinese LLM settings panel shows the resulting `LLM 诊断` state.
+- Captured a runtime screenshot showing the fallback diagnostic state:
+
+![LLM retry diagnostics](screenshots/llm-retry-diagnostics-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- packages/agents/src/llm.test.ts apps/api/src/server.test.ts apps/web/src/llmSettings.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added tested LLM budget pressure feedback for the Chinese settings panel. Last-turn usage is now classified as `steady`, `warning`, or `over` against the configured Token limit, and the GUI shows `预算压力` without exposing local API keys.
 - Captured a runtime screenshot showing the near-budget warning state:
 

@@ -2,6 +2,7 @@ import cors from "@fastify/cors";
 import {
   createOpenAICompatibleClient,
   runTurn,
+  type LlmDiagnosticEvent,
   type LLMClient,
   type OpenAICompatibleOptions,
 } from "@agentic-turnscape/agents";
@@ -23,6 +24,7 @@ import {
   PlayerActionSchema,
   TransparencyModeSchema,
   type AgentActionProposal,
+  type LlmDiagnosticsSummary,
   type LlmUsageSummary,
   type StatePatch,
   type TransparencyMode,
@@ -100,6 +102,13 @@ const emptyLlmUsage = (): LlmUsageSummary => ({
   totalTokens: 0,
 });
 
+const emptyLlmDiagnostics = (): LlmDiagnosticsSummary => ({
+  jsonAttempts: 0,
+  jsonRetries: 0,
+  fallbacks: 0,
+  textFallbacks: 0,
+});
+
 const addLlmUsage = (
   total: LlmUsageSummary,
   usage: LlmUsageSummary,
@@ -110,6 +119,18 @@ const addLlmUsage = (
   total.totalTokens += usage.totalTokens;
 };
 
+const addLlmDiagnostic = (
+  total: LlmDiagnosticsSummary,
+  event: LlmDiagnosticEvent,
+): void => {
+  if (event.type === "json_attempt") total.jsonAttempts += 1;
+  if (event.type === "json_retry") total.jsonRetries += 1;
+  if (event.type === "fallback") {
+    total.fallbacks += 1;
+    if (event.channel === "text") total.textFallbacks += 1;
+  }
+};
+
 const withLlmUsage = (
   resolution: TurnResolution,
   usage: LlmUsageSummary,
@@ -118,6 +139,21 @@ const withLlmUsage = (
     ? {
         ...resolution,
         llmUsage: usage,
+      }
+    : resolution;
+
+const withLlmDiagnostics = (
+  resolution: TurnResolution,
+  diagnostics: LlmDiagnosticsSummary,
+): TurnResolution =>
+  diagnostics.jsonAttempts +
+    diagnostics.jsonRetries +
+    diagnostics.fallbacks +
+    diagnostics.textFallbacks >
+  0
+    ? {
+        ...resolution,
+        llmDiagnostics: diagnostics,
       }
     : resolution;
 
@@ -353,6 +389,7 @@ export const buildServer = (options: ServerOptions = {}) => {
   const llmOptionsForConfig = (
     config: NonNullable<TurnJobPayload["llmConfig"]>,
     onUsage?: OpenAICompatibleOptions["onUsage"],
+    onDiagnostic?: OpenAICompatibleOptions["onDiagnostic"],
   ): OpenAICompatibleOptions => ({
     baseUrl: config.baseUrl,
     model: config.model,
@@ -360,15 +397,17 @@ export const buildServer = (options: ServerOptions = {}) => {
     timeoutMs: config.timeoutMs,
     maxTokens: config.maxTokens,
     ...(onUsage ? { onUsage } : {}),
+    ...(onDiagnostic ? { onDiagnostic } : {}),
   });
   const llmForConfig = (
     config: TurnJobPayload["llmConfig"],
     onUsage?: OpenAICompatibleOptions["onUsage"],
+    onDiagnostic?: OpenAICompatibleOptions["onDiagnostic"],
   ): LLMClient =>
     config
-      ? createLlmClient(llmOptionsForConfig(config, onUsage))
-      : onUsage
-        ? createLlmClient({ ...envLlmConfig, onUsage })
+      ? createLlmClient(llmOptionsForConfig(config, onUsage, onDiagnostic))
+      : onUsage || onDiagnostic
+        ? createLlmClient({ ...envLlmConfig, onUsage, onDiagnostic })
         : envLlm;
 
   const settleTurnJob = async (job: TurnJobPayload) => {
@@ -377,11 +416,14 @@ export const buildServer = (options: ServerOptions = {}) => {
       if (!campaign) throw new Error(`Campaign not found: ${job.campaignId}`);
       const scenario = await requireAvailableScenario(campaign.scenario);
       const llmUsage = emptyLlmUsage();
+      const llmDiagnostics = emptyLlmDiagnostics();
       const { nextState, resolution } = await runTurn({
         state: campaign.state,
         playerAction: job.action,
-        llm: llmForConfig(job.llmConfig, (usage) =>
-          addLlmUsage(llmUsage, usage),
+        llm: llmForConfig(
+          job.llmConfig,
+          (usage) => addLlmUsage(llmUsage, usage),
+          (event) => addLlmDiagnostic(llmDiagnostics, event),
         ),
         turnId: job.turnId,
         seed: job.seed,
@@ -390,11 +432,15 @@ export const buildServer = (options: ServerOptions = {}) => {
         evaluateEnding: scenario.evaluateEnding,
       });
       const resolutionWithUsage = withLlmUsage(resolution, llmUsage);
+      const resolutionWithTelemetry = withLlmDiagnostics(
+        resolutionWithUsage,
+        llmDiagnostics,
+      );
       await store.completeTurn(
         job.campaignId,
         job.turnId,
         nextState,
-        resolutionWithUsage,
+        resolutionWithTelemetry,
       );
     } catch (caught) {
       const message =
@@ -721,11 +767,14 @@ export const buildServer = (options: ServerOptions = {}) => {
     }
 
     const llmUsage = emptyLlmUsage();
+    const llmDiagnostics = emptyLlmDiagnostics();
     const { nextState, resolution } = await runTurn({
       state: campaign.state,
       playerAction: action,
-      llm: llmForConfig(body.llmConfig, (usage) =>
-        addLlmUsage(llmUsage, usage),
+      llm: llmForConfig(
+        body.llmConfig,
+        (usage) => addLlmUsage(llmUsage, usage),
+        (event) => addLlmDiagnostic(llmDiagnostics, event),
       ),
       turnId: turn.id,
       seed: body.seed,
@@ -734,11 +783,15 @@ export const buildServer = (options: ServerOptions = {}) => {
       evaluateEnding: scenario.evaluateEnding,
     });
     const resolutionWithUsage = withLlmUsage(resolution, llmUsage);
+    const resolutionWithTelemetry = withLlmDiagnostics(
+      resolutionWithUsage,
+      llmDiagnostics,
+    );
     const completed = await store.completeTurn(
       campaign.id,
       turn.id,
       nextState,
-      resolutionWithUsage,
+      resolutionWithTelemetry,
     );
 
     return {
@@ -746,7 +799,7 @@ export const buildServer = (options: ServerOptions = {}) => {
       turnId: completed.id,
       status: completed.status,
       resolution: resolutionForTransparency(
-        resolutionWithUsage,
+        resolutionWithTelemetry,
         body.transparency,
       ),
       scenarioStatus: getScenarioStatus(nextState, scenario),

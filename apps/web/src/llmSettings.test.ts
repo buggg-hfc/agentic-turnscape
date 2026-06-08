@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  buildLlmDiagnosticsSummary,
   buildLlmUsageSummary,
   applyLlmProviderPreset,
   buildLlmRuntimeSummary,
@@ -272,6 +273,36 @@ describe("LLM settings persistence", () => {
       pressure: "over",
       pressureLabel: "已超预算",
       pressureDetailLabel: "已用约 105%",
+    });
+  });
+
+  it("builds a Chinese LLM diagnostic summary without response content", () => {
+    expect(
+      buildLlmDiagnosticsSummary({
+        jsonAttempts: 6,
+        jsonRetries: 2,
+        fallbacks: 1,
+        textFallbacks: 1,
+      }),
+    ).toEqual({
+      health: "fallback",
+      attemptsLabel: "6 次",
+      retriesLabel: "2 次",
+      fallbackLabel: "1 次",
+      textFallbackLabel: "1 次叙事兜底",
+      healthLabel: "已启用兜底",
+    });
+
+    expect(
+      buildLlmDiagnosticsSummary({
+        jsonAttempts: 6,
+        jsonRetries: 0,
+        fallbacks: 0,
+        textFallbacks: 0,
+      }),
+    ).toMatchObject({
+      health: "stable",
+      healthLabel: "结构稳定",
     });
   });
 });
