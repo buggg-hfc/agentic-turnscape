@@ -34,7 +34,11 @@ const playerSummary = (draft: ReturnType<typeof buildCreatorScenarioDraft>) => {
     player.resources.intel ?? 0
   }；技能：社交 ${player.skills.social ?? 0}，调查 ${
     player.skills.investigation ?? 0
-  }`;
+  }；属性：体魄 ${player.attributes.physique}，敏捷 ${
+    player.attributes.agility
+  }，知识 ${player.attributes.knowledge}，洞察 ${
+    player.attributes.insight
+  }，魅力 ${player.attributes.charm}，意志 ${player.attributes.will}`;
 };
 
 const riskLabel = {

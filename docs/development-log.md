@@ -4,6 +4,18 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added tested creator-authored player base attributes. Quick-create drafts can now edit physique, agility, knowledge, insight, charm, and will; generated worlds use those attributes, and the Chinese preview shows them inside the `玩家` card before import.
+- Captured a runtime screenshot after editing the creator form, showing the player attribute preview:
+
+![Creator player attributes](screenshots/creator-player-attributes-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- packages/shared/src/creatorScenarioDraft.test.ts --reporter=dot`
+  - `npm test -- apps/web/src/creatorScenarioPreview.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added tested creator-authored player start state. Quick-create drafts can now edit player health, stamina, money, intel, social skill, and investigation skill; generated worlds use those values, and the Chinese preview exposes them in a new `玩家` card before import.
 - Captured a runtime screenshot after editing the creator form, showing the player preview card:
 

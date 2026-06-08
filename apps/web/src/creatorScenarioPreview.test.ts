@@ -14,6 +14,12 @@ describe("creator scenario draft preview", () => {
       playerIntel: 2,
       playerSocialSkill: 4,
       playerInvestigationSkill: 3,
+      playerPhysique: 3,
+      playerAgility: 4,
+      playerKnowledge: 5,
+      playerInsight: 3,
+      playerCharm: 2,
+      playerWill: 4,
       startLocationName: "潮汐议事厅",
       startLocationDescription: "墙上挂着潮汐钟和维修账页。",
       startLocationPublicInfo: "船工愿意公开作证;潮汐记录还没被黑帆拿走",
@@ -86,7 +92,7 @@ describe("creator scenario draft preview", () => {
         title: "玩家",
         count: 1,
         items: [
-          "临时调停人：生命 4，体力 5，金钱 3，情报 2；技能：社交 4，调查 3",
+          "临时调停人：生命 4，体力 5，金钱 3，情报 2；技能：社交 4，调查 3；属性：体魄 3，敏捷 4，知识 5，洞察 3，魅力 2，意志 4",
         ],
       },
       {

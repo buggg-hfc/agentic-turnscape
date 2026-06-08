@@ -2,6 +2,30 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Creator Player Attributes
+
+### Scope
+
+- Added TDD coverage for creator-authored player base attributes.
+- The quick-create scenario draft now supports editable physique, agility, knowledge, insight, charm, and will values while remaining backward-compatible with older creator draft inputs.
+- The Chinese creator preview includes these attributes in the `玩家` card, so a scenario creator can verify the protagonist's starting build before import.
+
+### Runtime Screenshot
+
+![Creator player attributes](screenshots/creator-player-attributes-runtime-2026-06-08.png)
+
+The screenshot was captured from the local Web + API runtime after editing the creator form to set `临时调停人` with custom resources, skills, and base attributes. The generated `玩家` preview card shows `属性：体魄 3，敏捷 4，知识 5，洞察 3，魅力 2，意志 4`.
+
+### Verification
+
+```bash
+npm test -- packages/shared/src/creatorScenarioDraft.test.ts --reporter=dot
+npm test -- apps/web/src/creatorScenarioPreview.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - Creator Player Start State
 
 ### Scope

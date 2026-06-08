@@ -18,6 +18,12 @@ export type CreatorScenarioDraftInput = {
   playerIntel?: number;
   playerSocialSkill?: number;
   playerInvestigationSkill?: number;
+  playerPhysique?: number;
+  playerAgility?: number;
+  playerKnowledge?: number;
+  playerInsight?: number;
+  playerCharm?: number;
+  playerWill?: number;
   startLocationName: string;
   startLocationDescription: string;
   startLocationPublicInfo: string;
@@ -120,6 +126,12 @@ export const defaultCreatorScenarioDraftInput: CreatorScenarioDraftInput = {
   playerIntel: 1,
   playerSocialSkill: 2,
   playerInvestigationSkill: 2,
+  playerPhysique: 2,
+  playerAgility: 2,
+  playerKnowledge: 2,
+  playerInsight: 2,
+  playerCharm: 2,
+  playerWill: 2,
   startLocationName: "临时指挥所",
   startLocationDescription: "临时指挥所里挤满了等待消息的人，危机正在逼近公开爆发。",
   startLocationPublicInfo: "居民正在等待可信消息;向导愿意协助玩家先稳住局面",
@@ -300,6 +312,44 @@ export const buildCreatorScenarioDraft = (
       2,
     defaultCreatorScenarioDraftInput.playerInvestigationSkill ?? 2,
     0,
+    5,
+  );
+  const playerPhysique = boundedInt(
+    input.playerPhysique ?? defaultCreatorScenarioDraftInput.playerPhysique ?? 2,
+    defaultCreatorScenarioDraftInput.playerPhysique ?? 2,
+    1,
+    5,
+  );
+  const playerAgility = boundedInt(
+    input.playerAgility ?? defaultCreatorScenarioDraftInput.playerAgility ?? 2,
+    defaultCreatorScenarioDraftInput.playerAgility ?? 2,
+    1,
+    5,
+  );
+  const playerKnowledge = boundedInt(
+    input.playerKnowledge ??
+      defaultCreatorScenarioDraftInput.playerKnowledge ??
+      2,
+    defaultCreatorScenarioDraftInput.playerKnowledge ?? 2,
+    1,
+    5,
+  );
+  const playerInsight = boundedInt(
+    input.playerInsight ?? defaultCreatorScenarioDraftInput.playerInsight ?? 2,
+    defaultCreatorScenarioDraftInput.playerInsight ?? 2,
+    1,
+    5,
+  );
+  const playerCharm = boundedInt(
+    input.playerCharm ?? defaultCreatorScenarioDraftInput.playerCharm ?? 2,
+    defaultCreatorScenarioDraftInput.playerCharm ?? 2,
+    1,
+    5,
+  );
+  const playerWill = boundedInt(
+    input.playerWill ?? defaultCreatorScenarioDraftInput.playerWill ?? 2,
+    defaultCreatorScenarioDraftInput.playerWill ?? 2,
+    1,
     5,
   );
   const startLocationName = textOr(
@@ -560,12 +610,12 @@ export const buildCreatorScenarioDraft = (
       id: "player",
       name: playerName,
       attributes: {
-        physique: 2,
-        agility: 2,
-        knowledge: 2,
-        insight: 2,
-        charm: 2,
-        will: 2,
+        physique: playerPhysique,
+        agility: playerAgility,
+        knowledge: playerKnowledge,
+        insight: playerInsight,
+        charm: playerCharm,
+        will: playerWill,
       },
       skills: {
         social: playerSocialSkill,

@@ -170,6 +170,12 @@ const creatorRiskOptions: CreatorRiskOption[] = [
   { value: "high", label: "高" },
 ];
 
+const creatorDraftNumberValue = (
+  value: number | undefined,
+  fallback: number | undefined,
+  defaultValue: number,
+) => value ?? fallback ?? defaultValue;
+
 const clockTone = (clock: ClockState) => {
   const ratio = clock.progress / clock.max;
   if (ratio >= 0.75) return "danger";
@@ -1196,11 +1202,11 @@ const CreatorScenarioImportPanel = ({
           type="number"
           min={1}
           max={9}
-          value={
-            draft.playerHealth ??
-            defaultCreatorScenarioDraftInput.playerHealth ??
-            5
-          }
+          value={creatorDraftNumberValue(
+            draft.playerHealth,
+            defaultCreatorScenarioDraftInput.playerHealth,
+            5,
+          )}
           disabled={disabled}
           onChange={(event) =>
             onDraftChange("playerHealth", Number.parseInt(event.target.value, 10))
@@ -1213,11 +1219,11 @@ const CreatorScenarioImportPanel = ({
           type="number"
           min={1}
           max={9}
-          value={
-            draft.playerStamina ??
-            defaultCreatorScenarioDraftInput.playerStamina ??
-            3
-          }
+          value={creatorDraftNumberValue(
+            draft.playerStamina,
+            defaultCreatorScenarioDraftInput.playerStamina,
+            3,
+          )}
           disabled={disabled}
           onChange={(event) =>
             onDraftChange("playerStamina", Number.parseInt(event.target.value, 10))
@@ -1230,11 +1236,11 @@ const CreatorScenarioImportPanel = ({
           type="number"
           min={0}
           max={9}
-          value={
-            draft.playerMoney ??
-            defaultCreatorScenarioDraftInput.playerMoney ??
-            1
-          }
+          value={creatorDraftNumberValue(
+            draft.playerMoney,
+            defaultCreatorScenarioDraftInput.playerMoney,
+            1,
+          )}
           disabled={disabled}
           onChange={(event) =>
             onDraftChange("playerMoney", Number.parseInt(event.target.value, 10))
@@ -1247,11 +1253,11 @@ const CreatorScenarioImportPanel = ({
           type="number"
           min={0}
           max={9}
-          value={
-            draft.playerIntel ??
-            defaultCreatorScenarioDraftInput.playerIntel ??
-            1
-          }
+          value={creatorDraftNumberValue(
+            draft.playerIntel,
+            defaultCreatorScenarioDraftInput.playerIntel,
+            1,
+          )}
           disabled={disabled}
           onChange={(event) =>
             onDraftChange("playerIntel", Number.parseInt(event.target.value, 10))
@@ -1264,11 +1270,11 @@ const CreatorScenarioImportPanel = ({
           type="number"
           min={0}
           max={5}
-          value={
-            draft.playerSocialSkill ??
-            defaultCreatorScenarioDraftInput.playerSocialSkill ??
-            2
-          }
+          value={creatorDraftNumberValue(
+            draft.playerSocialSkill,
+            defaultCreatorScenarioDraftInput.playerSocialSkill,
+            2,
+          )}
           disabled={disabled}
           onChange={(event) =>
             onDraftChange(
@@ -1284,17 +1290,119 @@ const CreatorScenarioImportPanel = ({
           type="number"
           min={0}
           max={5}
-          value={
-            draft.playerInvestigationSkill ??
-            defaultCreatorScenarioDraftInput.playerInvestigationSkill ??
-            2
-          }
+          value={creatorDraftNumberValue(
+            draft.playerInvestigationSkill,
+            defaultCreatorScenarioDraftInput.playerInvestigationSkill,
+            2,
+          )}
           disabled={disabled}
           onChange={(event) =>
             onDraftChange(
               "playerInvestigationSkill",
               Number.parseInt(event.target.value, 10),
             )
+          }
+        />
+      </label>
+      <label className="creator-field">
+        <span>体魄属性</span>
+        <input
+          type="number"
+          min={1}
+          max={5}
+          value={creatorDraftNumberValue(
+            draft.playerPhysique,
+            defaultCreatorScenarioDraftInput.playerPhysique,
+            2,
+          )}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("playerPhysique", Number.parseInt(event.target.value, 10))
+          }
+        />
+      </label>
+      <label className="creator-field">
+        <span>敏捷属性</span>
+        <input
+          type="number"
+          min={1}
+          max={5}
+          value={creatorDraftNumberValue(
+            draft.playerAgility,
+            defaultCreatorScenarioDraftInput.playerAgility,
+            2,
+          )}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("playerAgility", Number.parseInt(event.target.value, 10))
+          }
+        />
+      </label>
+      <label className="creator-field">
+        <span>知识属性</span>
+        <input
+          type="number"
+          min={1}
+          max={5}
+          value={creatorDraftNumberValue(
+            draft.playerKnowledge,
+            defaultCreatorScenarioDraftInput.playerKnowledge,
+            2,
+          )}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("playerKnowledge", Number.parseInt(event.target.value, 10))
+          }
+        />
+      </label>
+      <label className="creator-field">
+        <span>洞察属性</span>
+        <input
+          type="number"
+          min={1}
+          max={5}
+          value={creatorDraftNumberValue(
+            draft.playerInsight,
+            defaultCreatorScenarioDraftInput.playerInsight,
+            2,
+          )}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("playerInsight", Number.parseInt(event.target.value, 10))
+          }
+        />
+      </label>
+      <label className="creator-field">
+        <span>魅力属性</span>
+        <input
+          type="number"
+          min={1}
+          max={5}
+          value={creatorDraftNumberValue(
+            draft.playerCharm,
+            defaultCreatorScenarioDraftInput.playerCharm,
+            2,
+          )}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("playerCharm", Number.parseInt(event.target.value, 10))
+          }
+        />
+      </label>
+      <label className="creator-field">
+        <span>意志属性</span>
+        <input
+          type="number"
+          min={1}
+          max={5}
+          value={creatorDraftNumberValue(
+            draft.playerWill,
+            defaultCreatorScenarioDraftInput.playerWill,
+            2,
+          )}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("playerWill", Number.parseInt(event.target.value, 10))
           }
         />
       </label>

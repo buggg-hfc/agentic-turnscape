@@ -27,6 +27,12 @@ describe("creator scenario draft builder", () => {
       playerIntel: 2,
       playerSocialSkill: 4,
       playerInvestigationSkill: 3,
+      playerPhysique: 3,
+      playerAgility: 4,
+      playerKnowledge: 5,
+      playerInsight: 3,
+      playerCharm: 2,
+      playerWill: 4,
       startLocationName: "长明巷口",
       startLocationDescription: "长明巷口贴满寻人启事，雨水从屋檐滴进临时取证箱。",
       startLocationPublicInfo: "居民愿意交换巡逻时间;巷口监控只剩半小时备份",
@@ -104,6 +110,14 @@ describe("creator scenario draft builder", () => {
     expect(draft.world.player.skills).toMatchObject({
       social: 4,
       investigation: 3,
+    });
+    expect(draft.world.player.attributes).toEqual({
+      physique: 3,
+      agility: 4,
+      knowledge: 5,
+      insight: 3,
+      charm: 2,
+      will: 4,
     });
     expect(Object.values(draft.world.characters).map((npc) => npc.name)).toEqual(
       expect.arrayContaining(["林姐", "周队"]),

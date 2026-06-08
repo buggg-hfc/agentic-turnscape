@@ -31,6 +31,8 @@ For gameplay work, tests should prove the rule invariant rather than a single lu
 
 ## Verified Slices
 
+- Creator tooling now supports tested editable player base attributes: physique, agility, knowledge, insight, charm, and will feed into generated `WorldState.player.attributes` and appear in the Chinese draft preview before import.
+
 - Creator tooling now supports tested editable player start state: health, stamina, money, intel, social skill, and investigation skill feed into generated `WorldState.player` values and appear in the Chinese draft preview before import.
 
 - LLM settings local persistence now has tested save-format migration: the Chinese GUI saves a V2 envelope, shows `保存格式：本地格式 V2`, and still loads legacy V1 browser settings without leaking or dropping the local-only key.
