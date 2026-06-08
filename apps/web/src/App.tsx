@@ -799,7 +799,7 @@ export const App = () => {
             </div>
             <textarea
               aria-label="自由行动"
-              placeholder="调查目标：东门水塔，寻找能看见哨卡的瞭望记录。"
+              placeholder="意图：保护；目标：诊所；方式：伪装成药材队；避免：伤害平民。"
               value={freeformActionText}
               maxLength={FREEFORM_ACTION_MAX_LENGTH}
               disabled={loadState === "running"}

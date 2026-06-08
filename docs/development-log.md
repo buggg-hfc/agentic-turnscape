@@ -4,6 +4,17 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added tested approach and avoidance parsing for freeform player actions. The GUI builder now preserves `方式：...` as `freeform:approachText:*` and `避免：...` as `freeform:constraintText:*`, then previews them as `方式` / `避开` chips so open-ended player intent can carry method and boundaries without bypassing referee adjudication.
+- Captured a runtime screenshot showing the in-game freeform composer with explicit approach and avoidance chips:
+
+![Freeform approach constraints](screenshots/freeform-approach-constraints-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- apps/web/src/freeformAction.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added tested JSON retry budget configuration for LLM calls. The shared `LlmConfig` now persists bounded `jsonRetries`, the API passes it into the OpenAI-compatible client, and the Chinese settings panel exposes `JSON 重试次数` plus a non-secret `重试预算` summary.
 - Captured a runtime screenshot showing the in-game LLM panel with `JSON 重试次数` set to `2` and the summary displaying `最多 2 次`:
 

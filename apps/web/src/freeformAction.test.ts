@@ -166,6 +166,45 @@ describe("freeform action builder", () => {
     ]);
   });
 
+  it("preserves explicit approach and avoidance constraints as referee-readable freeform tokens", () => {
+    const action = buildFreeformPlayerAction(
+      "意图：保护；风险：中；目标：诊所；方式：伪装成药材队；避免：伤害平民。护送病人穿过封锁线。",
+      {
+        locations: {
+          clinic: {
+            id: "clinic",
+            name: "诊所",
+            description: "边境小镇的临时救治点",
+            publicInfo: ["病人正在等待撤离"],
+            tags: ["医疗"],
+          },
+        },
+        characters: {},
+        factions: {},
+        clocks: {},
+      },
+    );
+
+    expect(action).toMatchObject({
+      actionType: "custom",
+      targetId: "clinic",
+      leverage: expect.arrayContaining([
+        "freeform:intent:protect",
+        "freeform:risk:medium",
+        "freeform:target:clinic",
+        "freeform:approachText:伪装成药材队",
+        "freeform:constraintText:伤害平民",
+      ]),
+    });
+    expect(buildFreeformActionPreview(action!)).toEqual([
+      "意图：保护",
+      "风险：中",
+      "目标：诊所",
+      "方式：伪装成药材队",
+      "避开：伤害平民",
+    ]);
+  });
+
   it("keeps direct freeform submission available without preselecting the action", () => {
     const action = buildFreeformPlayerAction("护送病人穿过封锁线。");
 

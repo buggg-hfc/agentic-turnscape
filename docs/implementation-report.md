@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Freeform Approach Constraints
+
+### Scope
+
+- Added TDD coverage for explicit freeform execution style and avoidance constraints. Player text such as `方式：伪装成药材队` and `避免：伤害平民` now becomes referee-readable `freeform:approachText:*` and `freeform:constraintText:*` leverage metadata.
+- The freeform composer placeholder now demonstrates intent, target, approach, and avoidance in one Chinese example, keeping the action surface open-ended instead of only card-like choices.
+- The GUI preview now renders `方式：...` and `避开：...` chips beside intent, risk, and target. These chips describe player intent; world-state changes still enter only through the referee-owned turn pipeline.
+
+### Runtime Screenshot
+
+![Freeform approach constraints](screenshots/freeform-approach-constraints-runtime-2026-06-08.png)
+
+The screenshot was captured from the local Web + API runtime after starting a Border Seven Days campaign and entering a freeform action with explicit approach and avoidance text. The runtime check verified `方式：伪装成药材队`, `避开：伤害平民`, and rejected API-key-shaped text.
+
+### Verification
+
+```bash
+npm test -- apps/web/src/freeformAction.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - LLM JSON Retry Budget
 
 ### Scope

@@ -290,6 +290,8 @@ const containsAny = (value: string, keywords: string[]): boolean =>
   keywords.some((keyword) => value.includes(keyword));
 
 const targetTextTokenPrefix = "freeform:targetText:";
+const approachTextTokenPrefix = "freeform:approachText:";
+const constraintTextTokenPrefix = "freeform:constraintText:";
 
 const explicitFieldOf = (description: string, labels: string[]): string | undefined => {
   const labelPattern = labels.join("|");
@@ -312,6 +314,27 @@ const explicitRiskOf = (description: string): PlayerAction["riskLevel"] | undefi
     aliases.some((alias) => label.includes(alias.toLocaleLowerCase()))
   )?.[0] as PlayerAction["riskLevel"] | undefined;
 };
+
+const explicitPhraseFieldOf = (
+  description: string,
+  labels: string[],
+  maxLength = 40,
+): string | undefined => {
+  const labelPattern = labels.join("|");
+  const match = description.match(
+    new RegExp(
+      `(?:${labelPattern})\\s*[:：]\\s*([^,.;!?，。；、！？\\n]{1,${maxLength}})`,
+      "iu",
+    ),
+  );
+  return match?.[1]?.trim();
+};
+
+const explicitApproachTextOf = (description: string): string | undefined =>
+  explicitPhraseFieldOf(description, ["方式", "做法", "approach", "method"]);
+
+const explicitConstraintTextOf = (description: string): string | undefined =>
+  explicitPhraseFieldOf(description, ["避免", "避开", "底线", "avoid", "constraint"]);
 
 const cleanKeyword = (value: string | undefined): string | undefined => {
   const keyword = value?.trim().toLocaleLowerCase();
@@ -448,6 +471,18 @@ const targetTextOf = (action: PlayerAction): string | undefined =>
     ?.slice(targetTextTokenPrefix.length)
     .trim();
 
+const approachTextOf = (action: PlayerAction): string | undefined =>
+  action.leverage
+    .find((item) => item.startsWith(approachTextTokenPrefix))
+    ?.slice(approachTextTokenPrefix.length)
+    .trim();
+
+const constraintTextOf = (action: PlayerAction): string | undefined =>
+  action.leverage
+    .find((item) => item.startsWith(constraintTextTokenPrefix))
+    ?.slice(constraintTextTokenPrefix.length)
+    .trim();
+
 const freeformTargetOf = (
   description: string,
   normalized: string,
@@ -497,6 +532,14 @@ export const analyzeFreeformAction = (
       leverage.push(`${targetTextTokenPrefix}${target.label}`);
     }
   }
+  const approachText = explicitApproachTextOf(description);
+  if (approachText) {
+    leverage.push(`${approachTextTokenPrefix}${approachText}`);
+  }
+  const constraintText = explicitConstraintTextOf(description);
+  if (constraintText) {
+    leverage.push(`${constraintTextTokenPrefix}${constraintText}`);
+  }
 
   return {
     intent,
@@ -519,12 +562,16 @@ export const buildFreeformActionPreview = (
     | undefined;
   const target = targetById(action.targetId, context);
   const targetText = targetTextOf(action);
+  const approachText = approachTextOf(action);
+  const constraintText = constraintTextOf(action);
   return [
     `意图：${intent ? intentLabels[intent] : "开放"}`,
     `风险：${risk ? riskLabels[risk] : "中"}`,
     ...(target || targetText
       ? [`目标：${target ? displayLabel(target.id, target.label) : targetText}`]
-      : [])
+      : []),
+    ...(approachText ? [`方式：${approachText}`] : []),
+    ...(constraintText ? [`避开：${constraintText}`] : [])
   ];
 };
 
