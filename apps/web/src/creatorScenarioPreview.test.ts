@@ -42,6 +42,7 @@ describe("creator scenario draft preview", () => {
       guideSocialSkill: 4,
       guideInvestigationSkill: 3,
       guideDefenseSkill: 2,
+      guideResources: "船工证词:3,备用灯芯:1",
       guideRelationshipTrust: 3,
       guideRelationshipInterest: 2,
       guideRelationshipSuspicion: 0,
@@ -53,6 +54,7 @@ describe("creator scenario draft preview", () => {
       pressureNpcSocialSkill: 5,
       pressureNpcInvestigationSkill: 1,
       pressureNpcDefenseSkill: 4,
+      pressureNpcResources: "巡逻船:3,封航令:2",
       pressureNpcRelationshipTrust: 0,
       pressureNpcRelationshipInterest: 3,
       pressureNpcRelationshipSuspicion: 4,
@@ -119,8 +121,8 @@ describe("creator scenario draft preview", () => {
         title: "NPC",
         count: 2,
         items: [
-          "林澈：码头调停人；公开：林澈握着潮汐账本，能让船工先坐下来。；目标：让维修时间表先被所有人承认。；技能：社交 4，调查 3，防卫 2；秘密：林澈知道备用灯芯发票藏在哪里。",
-          "黑帆船长：走私船队领袖；公开：黑帆船长把封航说成保护港口的唯一办法。；目标：控制旧灯塔机房并拖慢维修。；技能：社交 5，调查 1，防卫 4；秘密：黑帆船长提前换走了备用灯芯。",
+          "林澈：码头调停人；公开：林澈握着潮汐账本，能让船工先坐下来。；目标：让维修时间表先被所有人承认。；技能：社交 4，调查 3，防卫 2；资源：船工证词 3，备用灯芯 1；秘密：林澈知道备用灯芯发票藏在哪里。",
+          "黑帆船长：走私船队领袖；公开：黑帆船长把封航说成保护港口的唯一办法。；目标：控制旧灯塔机房并拖慢维修。；技能：社交 5，调查 1，防卫 4；资源：巡逻船 3，封航令 2；秘密：黑帆船长提前换走了备用灯芯。",
         ],
       },
       {

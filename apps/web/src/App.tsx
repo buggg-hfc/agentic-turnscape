@@ -1611,6 +1611,14 @@ const CreatorScenarioImportPanel = ({
           onChange={(event) => onDraftChange("guideSecret", event.target.value)}
         />
       </label>
+      <label className="creator-field wide">
+        <span>关键 NPC 资源</span>
+        <textarea
+          value={draft.guideResources}
+          disabled={disabled}
+          onChange={(event) => onDraftChange("guideResources", event.target.value)}
+        />
+      </label>
       <label className="creator-field">
         <span>关键 NPC 社交</span>
         <input
@@ -1772,6 +1780,16 @@ const CreatorScenarioImportPanel = ({
           disabled={disabled}
           onChange={(event) =>
             onDraftChange("pressureNpcSecret", event.target.value)
+          }
+        />
+      </label>
+      <label className="creator-field wide">
+        <span>对手 NPC 资源</span>
+        <textarea
+          value={draft.pressureNpcResources}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("pressureNpcResources", event.target.value)
           }
         />
       </label>

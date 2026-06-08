@@ -94,7 +94,7 @@ export const buildCreatorDraftPreview = (
         character.skills.social ?? 0
       }，调查 ${character.skills.investigation ?? 0}，防卫 ${
         character.skills.defense ?? 0
-      }；秘密：${character.secret}`,
+      }；资源：${resourceSummary(character.resources)}；秘密：${character.secret}`,
   );
   const factions = Object.values(draft.world.factions).map(
     (faction) =>

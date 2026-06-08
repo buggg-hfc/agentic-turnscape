@@ -2,6 +2,30 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Creator NPC Resources
+
+### Scope
+
+- Added TDD coverage for creator-authored NPC resource lists.
+- The quick-create scenario draft now supports editable resource text for the key NPC and opposing NPC while preserving the existing `resource:amount` parsing style used by faction resources.
+- The Chinese creator GUI exposes NPC resource controls, and the draft preview includes those resources inside each `NPC` card so scenario creators can define local leverage, evidence, tools, or coercive assets before import.
+
+### Runtime Screenshot
+
+![Creator NPC resources](screenshots/creator-npc-resources-runtime-2026-06-08.png)
+
+The screenshot was captured from the local Web + API runtime after editing the creator form to set `林澈` and `黑帆船长` with custom NPC resources. The generated `NPC` preview shows `资源：船工证词 3，备用灯芯 1` for the key NPC and `资源：巡逻船 3，封航令 2` for the opposing NPC.
+
+### Verification
+
+```bash
+npm test -- packages/shared/src/creatorScenarioDraft.test.ts --reporter=dot
+npm test -- apps/web/src/creatorScenarioPreview.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - Creator NPC Skills
 
 ### Scope

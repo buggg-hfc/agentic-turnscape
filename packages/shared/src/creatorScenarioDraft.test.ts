@@ -55,6 +55,7 @@ describe("creator scenario draft builder", () => {
       guideSocialSkill: 4,
       guideInvestigationSkill: 3,
       guideDefenseSkill: 2,
+      guideResources: "线人:3,旧钥匙:1",
       guideRelationshipTrust: 3,
       guideRelationshipInterest: 2,
       guideRelationshipSuspicion: 0,
@@ -66,6 +67,7 @@ describe("creator scenario draft builder", () => {
       pressureNpcSocialSkill: 5,
       pressureNpcInvestigationSkill: 1,
       pressureNpcDefenseSkill: 4,
+      pressureNpcResources: "围挡:4,文件:2",
       pressureNpcRelationshipTrust: 0,
       pressureNpcRelationshipInterest: 2,
       pressureNpcRelationshipSuspicion: 4,
@@ -153,6 +155,10 @@ describe("creator scenario draft builder", () => {
     expect(Object.values(draft.world.characters).map((npc) => npc.skills)).toEqual([
       { social: 4, investigation: 3, defense: 2 },
       { social: 5, investigation: 1, defense: 4 },
+    ]);
+    expect(Object.values(draft.world.characters).map((npc) => npc.resources)).toEqual([
+      { 线人: 3, 旧钥匙: 1 },
+      { 围挡: 4, 文件: 2 },
     ]);
     expect(draft.world.relationships["player:rain_alley_test_guide"]).toMatchObject({
       trust: 3,

@@ -46,6 +46,7 @@ export type CreatorScenarioDraftInput = {
   guideSocialSkill?: number;
   guideInvestigationSkill?: number;
   guideDefenseSkill?: number;
+  guideResources?: string;
   guideRelationshipTrust?: number;
   guideRelationshipInterest?: number;
   guideRelationshipSuspicion?: number;
@@ -57,6 +58,7 @@ export type CreatorScenarioDraftInput = {
   pressureNpcSocialSkill?: number;
   pressureNpcInvestigationSkill?: number;
   pressureNpcDefenseSkill?: number;
+  pressureNpcResources?: string;
   pressureNpcRelationshipTrust?: number;
   pressureNpcRelationshipInterest?: number;
   pressureNpcRelationshipSuspicion?: number;
@@ -166,6 +168,7 @@ export const defaultCreatorScenarioDraftInput: CreatorScenarioDraftInput = {
   guideSocialSkill: 2,
   guideInvestigationSkill: 2,
   guideDefenseSkill: 1,
+  guideResources: "favors:2,intel:1",
   guideRelationshipTrust: 1,
   guideRelationshipInterest: 1,
   guideRelationshipSuspicion: 0,
@@ -177,6 +180,7 @@ export const defaultCreatorScenarioDraftInput: CreatorScenarioDraftInput = {
   pressureNpcSocialSkill: 2,
   pressureNpcInvestigationSkill: 1,
   pressureNpcDefenseSkill: 2,
+  pressureNpcResources: "influence:2,money:1",
   pressureNpcRelationshipTrust: 0,
   pressureNpcRelationshipInterest: 1,
   pressureNpcRelationshipSuspicion: 1,
@@ -479,6 +483,10 @@ export const buildCreatorScenarioDraft = (
     0,
     5,
   );
+  const guideResources = resourcesOr(
+    input.guideResources ?? "",
+    defaultCreatorScenarioDraftInput.guideResources ?? "favors:2,intel:1",
+  );
   const guideRelationshipTrust = boundedInt(
     input.guideRelationshipTrust ??
       defaultCreatorScenarioDraftInput.guideRelationshipTrust ??
@@ -546,6 +554,10 @@ export const buildCreatorScenarioDraft = (
     defaultCreatorScenarioDraftInput.pressureNpcDefenseSkill ?? 2,
     0,
     5,
+  );
+  const pressureNpcResources = resourcesOr(
+    input.pressureNpcResources ?? "",
+    defaultCreatorScenarioDraftInput.pressureNpcResources ?? "influence:2,money:1",
   );
   const pressureNpcRelationshipTrust = boundedInt(
     input.pressureNpcRelationshipTrust ??
@@ -800,7 +812,7 @@ export const buildCreatorScenarioDraft = (
           investigation: guideInvestigationSkill,
           defense: guideDefenseSkill,
         },
-        resources: { favors: 2, intel: 1 },
+        resources: guideResources,
         conditions: [],
         knownFacts: [premise],
         memorySummary: "玩家刚进入创作者草稿剧本的第一场危机。",
@@ -832,7 +844,7 @@ export const buildCreatorScenarioDraft = (
           investigation: pressureNpcInvestigationSkill,
           defense: pressureNpcDefenseSkill,
         },
-        resources: { influence: 2, money: 1 },
+        resources: pressureNpcResources,
         conditions: [],
         knownFacts: [`${crisisName}已经被用来动员人群。`],
         memorySummary: "仍在观察玩家是否能真正改变局势。",

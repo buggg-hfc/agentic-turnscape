@@ -4,6 +4,18 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added tested creator-authored NPC resources. Quick-create drafts can now edit resource lists for the key NPC and opposing NPC; generated worlds use those resources, and the Chinese preview shows them inside the `NPC` card before import.
+- Captured a runtime screenshot after editing the creator form, showing the NPC resource preview:
+
+![Creator NPC resources](screenshots/creator-npc-resources-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- packages/shared/src/creatorScenarioDraft.test.ts --reporter=dot`
+  - `npm test -- apps/web/src/creatorScenarioPreview.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added tested creator-authored NPC skills. Quick-create drafts can now edit social, investigation, and defense skills for the key NPC and opposing NPC; generated worlds use those skill values, and the Chinese preview shows them inside the `NPC` card before import.
 - Captured a runtime screenshot after editing the creator form, showing the NPC skill preview:
 
