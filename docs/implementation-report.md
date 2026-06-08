@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Creator Faction Hidden Goals
+
+### Scope
+
+- Added TDD coverage for creator-authored faction hidden goals.
+- The quick-create scenario draft now accepts editable hidden goals for the support faction and pressure faction, writes them into `WorldState.factions[*].hiddenGoal`, and preserves the existing public-goal/current-plan/resource fields.
+- The Chinese creator GUI exposes two hidden-goal fields, and the draft preview shows `隐藏：...` in the `阵营` card before import so designers can check public plans against true agendas.
+
+### Runtime Screenshots
+
+![Creator faction hidden goal fields](screenshots/creator-faction-hidden-goals-runtime-2026-06-08.png)
+
+![Creator faction hidden goal preview](screenshots/creator-faction-hidden-goals-preview-runtime-2026-06-08.png)
+
+The screenshots were captured from the local Web + API runtime after editing the support faction hidden goal to `保住潮汐账本中的旧走私线。` and the pressure faction hidden goal to `趁灯塔停摆接管外海收费权。`. Runtime assertions confirmed the form labels, preview lines, and absence of secret-shaped rendered text.
+
+### Verification
+
+```bash
+npm test -- packages/shared/src/creatorScenarioDraft.test.ts apps/web/src/creatorScenarioPreview.test.ts --reporter=dot
+npm run typecheck
+```
+
 ## 2026-06-08 - Creator Scene Solutions
 
 ### Scope

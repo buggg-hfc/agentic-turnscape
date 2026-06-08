@@ -4,6 +4,19 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added tested creator-authored faction hidden goals. Quick-create drafts can now edit support and pressure faction `hiddenGoal` text; generated worlds store those agendas in `WorldState.factions`, and the Chinese preview shows `隐藏：...` inside the `阵营` card before import.
+- Captured runtime screenshots after editing the creator form, showing both hidden-goal fields and the faction preview:
+
+![Creator faction hidden goal fields](screenshots/creator-faction-hidden-goals-runtime-2026-06-08.png)
+
+![Creator faction hidden goal preview](screenshots/creator-faction-hidden-goals-preview-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- packages/shared/src/creatorScenarioDraft.test.ts apps/web/src/creatorScenarioPreview.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added tested creator-authored scene solutions. Quick-create drafts can now edit opening, pressure, and final scene solution hooks; Chinese or English entries such as `调查`, `交易`, `谈判`, `放弃`, `保护`, and `休整` are parsed into canonical `nonCombatSolutions`, and the Chinese preview reflects them in the `场景` card before import.
 - Captured a runtime screenshot after editing the creator form, showing the scene solution preview:
 

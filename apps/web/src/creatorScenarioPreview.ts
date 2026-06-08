@@ -132,7 +132,7 @@ export const buildCreatorDraftPreview = (
   );
   const factions = Object.values(draft.world.factions).map(
     (faction) =>
-      `${faction.name}：${faction.publicGoal}；计划：${faction.currentPlan}；资源：${resourceSummary(faction.resources)}`,
+      `${faction.name}：${faction.publicGoal}；隐藏：${faction.hiddenGoal}；计划：${faction.currentPlan}；资源：${resourceSummary(faction.resources)}`,
   );
   const relationships = relationshipSummary(draft);
   const clocks = Object.values(draft.world.clocks).map(

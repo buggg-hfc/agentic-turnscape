@@ -31,6 +31,8 @@ For gameplay work, tests should prove the rule invariant rather than a single lu
 
 ## Verified Slices
 
+- Creator tooling now supports tested editable faction hidden goals: support and pressure faction hidden-agenda fields feed generated `WorldState.factions[*].hiddenGoal`, while the Chinese draft preview exposes `隐藏：...` in the faction card before import.
+
 - Creator tooling now supports tested editable scene solution hooks: opening, pressure, and final solution fields parse Chinese or English entries into canonical `nonCombatSolutions`, while the Chinese draft preview reflects those hooks before import.
 
 - Creator tooling now supports tested editable scene types: opening, pressure, and final scene-kind controls feed generated draft scene `kind` values across `social`, `combat`, and `exploration`, while the Chinese draft preview reflects those authored types before import.

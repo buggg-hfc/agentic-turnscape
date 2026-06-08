@@ -2068,6 +2068,16 @@ const CreatorScenarioImportPanel = ({
         />
       </label>
       <label className="creator-field wide">
+        <span>支援阵营隐藏目标</span>
+        <textarea
+          value={draft.allyFactionHiddenGoal ?? ""}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("allyFactionHiddenGoal", event.target.value)
+          }
+        />
+      </label>
+      <label className="creator-field wide">
         <span>支援阵营计划</span>
         <textarea
           value={draft.allyFactionCurrentPlan}
@@ -2105,6 +2115,16 @@ const CreatorScenarioImportPanel = ({
           disabled={disabled}
           onChange={(event) =>
             onDraftChange("pressureFactionPublicGoal", event.target.value)
+          }
+        />
+      </label>
+      <label className="creator-field wide">
+        <span>施压阵营隐藏目标</span>
+        <textarea
+          value={draft.pressureFactionHiddenGoal ?? ""}
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("pressureFactionHiddenGoal", event.target.value)
           }
         />
       </label>

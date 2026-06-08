@@ -81,9 +81,11 @@ export type CreatorScenarioDraftInput = {
   allyFactionPublicGoal: string;
   allyFactionCurrentPlan: string;
   allyFactionResources: string;
+  allyFactionHiddenGoal?: string;
   pressureFactionPublicGoal: string;
   pressureFactionCurrentPlan: string;
   pressureFactionResources: string;
+  pressureFactionHiddenGoal?: string;
   mainQuestGoal: string;
   mainQuestRealBackground: string;
   mainQuestHiddenGoal: string;
@@ -203,9 +205,11 @@ export const defaultCreatorScenarioDraftInput: CreatorScenarioDraftInput = {
   allyFactionPublicGoal: "公开处理危机，让居民看到可执行的办法。",
   allyFactionCurrentPlan: "先把起始地点变成可信的协商点。",
   allyFactionResources: "志愿者:2,补给:2",
+  allyFactionHiddenGoal: "保护组织里曾经犯错的人不被立即清算。",
   pressureFactionPublicGoal: "要求立刻用强硬方式终止危机。",
   pressureFactionCurrentPlan: "把危机塑造成只能由自己解决的问题。",
   pressureFactionResources: "执行者:2,筹码:2",
+  pressureFactionHiddenGoal: "借危机后续规则获得长期控制权。",
   mainQuestGoal: "在三天内稳住危机并给出公开解释。",
   mainQuestRealBackground: "施压阵营正在遮掩一条能改变公众判断的关键证据。",
   mainQuestHiddenGoal: "找出谁在推动危机失控。",
@@ -679,6 +683,10 @@ export const buildCreatorScenarioDraft = (
     input.allyFactionResources ?? "",
     defaultCreatorScenarioDraftInput.allyFactionResources,
   );
+  const allyFactionHiddenGoal = textOr(
+    input.allyFactionHiddenGoal ?? "",
+    defaultCreatorScenarioDraftInput.allyFactionHiddenGoal ?? "",
+  );
   const pressureFactionPublicGoal = textOr(
     input.pressureFactionPublicGoal ?? "",
     defaultCreatorScenarioDraftInput.pressureFactionPublicGoal,
@@ -690,6 +698,10 @@ export const buildCreatorScenarioDraft = (
   const pressureFactionResources = resourcesOr(
     input.pressureFactionResources ?? "",
     defaultCreatorScenarioDraftInput.pressureFactionResources,
+  );
+  const pressureFactionHiddenGoal = textOr(
+    input.pressureFactionHiddenGoal ?? "",
+    defaultCreatorScenarioDraftInput.pressureFactionHiddenGoal ?? "",
   );
   const mainQuestGoal = textOr(
     input.mainQuestGoal,
@@ -970,7 +982,7 @@ export const buildCreatorScenarioDraft = (
         id: allyFactionId,
         name: allyFactionName,
         publicGoal: allyFactionPublicGoal,
-        hiddenGoal: "保护组织里曾经犯错的人不被立即清算。",
+        hiddenGoal: allyFactionHiddenGoal,
         leader: guideId,
         resources: allyFactionResources,
         baseId: startLocationId,
@@ -986,7 +998,7 @@ export const buildCreatorScenarioDraft = (
         id: pressureFactionId,
         name: pressureFactionName,
         publicGoal: pressureFactionPublicGoal,
-        hiddenGoal: "借危机后续规则获得长期控制权。",
+        hiddenGoal: pressureFactionHiddenGoal,
         leader: pressureNpcId,
         resources: pressureFactionResources,
         baseId: pressureLocationId,
