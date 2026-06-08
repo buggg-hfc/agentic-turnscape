@@ -269,10 +269,49 @@ const highRiskKeywords = [
 ];
 const lowRiskKeywords = ["quietly", "carefully", "observe", "rest", "wait", "\u6084\u6084", "\u5c0f\u5fc3", "\u89c2\u5bdf"];
 
+const explicitIntentAliases = {
+  investigate: ["investigate", "search", "scout", "调查", "侦查", "搜索", "询问"],
+  negotiate: ["negotiate", "talk", "persuade", "谈判", "协商", "说服", "沟通"],
+  fight: ["fight", "attack", "combat", "战斗", "攻击", "伏击", "压制"],
+  protect: ["protect", "rescue", "escort", "保护", "护送", "救援", "转移"],
+  trade: ["trade", "buy", "sell", "交易", "购买", "贿赂", "交换"],
+  rest: ["rest", "recover", "wait", "休整", "休息", "恢复", "等待"],
+  travel: ["travel", "move", "go", "移动", "前往", "旅行", "转移地点"],
+  ignore: ["ignore", "watch", "observe", "观望", "放弃", "不介入"]
+} satisfies Record<FreeformIntent, string[]>;
+
+const explicitRiskAliases = {
+  low: ["low", "safe", "careful", "低", "安全", "谨慎"],
+  medium: ["medium", "normal", "moderate", "中", "普通", "适中"],
+  high: ["high", "dangerous", "risky", "高", "危险", "冒险"]
+} satisfies Record<PlayerAction["riskLevel"], string[]>;
+
 const containsAny = (value: string, keywords: string[]): boolean =>
   keywords.some((keyword) => value.includes(keyword));
 
 const targetTextTokenPrefix = "freeform:targetText:";
+
+const explicitFieldOf = (description: string, labels: string[]): string | undefined => {
+  const labelPattern = labels.join("|");
+  const match = description.match(new RegExp(`(?:${labelPattern})\\s*[:：]\\s*([^\\s,.;!?，。；、]{1,24})`, "iu"));
+  return match?.[1]?.trim().toLocaleLowerCase();
+};
+
+const explicitIntentOf = (description: string): FreeformIntent | undefined => {
+  const label = explicitFieldOf(description, ["意图", "intent"]);
+  if (!label) return undefined;
+  return Object.entries(explicitIntentAliases).find(([, aliases]) =>
+    aliases.some((alias) => label.includes(alias.toLocaleLowerCase()))
+  )?.[0] as FreeformIntent | undefined;
+};
+
+const explicitRiskOf = (description: string): PlayerAction["riskLevel"] | undefined => {
+  const label = explicitFieldOf(description, ["风险", "risk"]);
+  if (!label) return undefined;
+  return Object.entries(explicitRiskAliases).find(([, aliases]) =>
+    aliases.some((alias) => label.includes(alias.toLocaleLowerCase()))
+  )?.[0] as PlayerAction["riskLevel"] | undefined;
+};
 
 const cleanKeyword = (value: string | undefined): string | undefined => {
   const keyword = value?.trim().toLocaleLowerCase();
@@ -436,16 +475,21 @@ export const analyzeFreeformAction = (
   if (!description) return undefined;
 
   const normalized = description.toLocaleLowerCase();
+  const explicitIntent = explicitIntentOf(description);
   const intent =
-    intentKeywords.find((candidate) => containsAny(normalized, candidate.keywords))?.intent ?? "investigate";
+    explicitIntent ??
+    intentKeywords.find((candidate) => containsAny(normalized, candidate.keywords))?.intent ??
+    "investigate";
   const target = freeformTargetOf(description, normalized, context);
-  const riskLevel: PlayerAction["riskLevel"] = containsAny(normalized, highRiskKeywords)
-    ? "high"
-    : containsAny(normalized, lowRiskKeywords)
-      ? "low"
-      : intent === "fight"
-        ? "high"
-        : "medium";
+  const riskLevel: PlayerAction["riskLevel"] =
+    explicitRiskOf(description) ??
+    (containsAny(normalized, highRiskKeywords)
+      ? "high"
+      : containsAny(normalized, lowRiskKeywords)
+        ? "low"
+        : intent === "fight"
+          ? "high"
+          : "medium");
   const leverage = ["freeform", `freeform:intent:${intent}`, `freeform:risk:${riskLevel}`];
   if (target) {
     leverage.push(`freeform:target:${target.id}`);

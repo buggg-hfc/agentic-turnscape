@@ -4,6 +4,17 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added tested explicit intent and risk labels for freeform player actions. When the player writes `意图：谈判；风险：低；目标：罗文`, the freeform builder now preserves those labels as `freeform:intent:negotiate`, `freeform:risk:low`, and `freeform:target:npc_rowan` instead of letting clinic/blockade keywords override them.
+- Captured a runtime screenshot showing the restored local draft and Chinese preview chips:
+
+![Explicit freeform intent and risk](screenshots/freeform-explicit-intent-risk-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- apps/web/src/freeformAction.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added tested narrator input redaction for referee-owned hidden events. A turn can still persist hidden `state_patch` entries such as `hiddenEvents`, but the narration request now receives only the public patch view so the narrative Agent cannot package hidden logs into prose.
 - Captured a runtime screenshot showing the clinic negotiation narration, replay card, and Agent inference panel in the Chinese GUI while the page-level check rejected `hiddenEvents` and a sentinel hidden reason:
 

@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Explicit Freeform Intent And Risk
+
+### Scope
+
+- Added TDD coverage for explicit player-authored freeform labels such as `意图：谈判`, `风险：低`, and `目标：罗文`.
+- The freeform action analyzer now treats explicit intent and risk fields as authoritative hints before falling back to keyword inference, so words like `诊所`, `封锁`, or `病人` no longer override a player-declared low-risk negotiation.
+- The generated `PlayerAction` still enters the same `custom` action pipeline with `freeform:intent:*`, `freeform:risk:*`, and `freeform:target:*` tokens; the referee remains the only component that can mutate world state.
+
+### Runtime Screenshot
+
+![Explicit freeform intent and risk](screenshots/freeform-explicit-intent-risk-runtime-2026-06-08.png)
+
+The screenshot was captured from the local web GUI with a browser-local freeform draft restored into the composer. The runtime check verified the textarea value, the preview chips `意图：谈判`, `风险：低`, and `目标：罗文`, and rejected the old keyword-guess output `意图：保护` / `风险：高`.
+
+### Verification
+
+```bash
+npm test -- apps/web/src/freeformAction.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - Narrator Public Patch Boundary
 
 ### Scope

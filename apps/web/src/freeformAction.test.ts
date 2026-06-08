@@ -130,6 +130,42 @@ describe("freeform action builder", () => {
     ]);
   });
 
+  it("honors explicit freeform intent and risk labels over keyword guesses", () => {
+    const action = buildFreeformPlayerAction(
+      "意图：谈判；风险：低；目标：罗文。先请求他只封锁诊所门口，不带走病人。",
+      {
+        locations: {},
+        characters: {
+          npc_rowan: {
+            id: "npc_rowan",
+            name: "罗文",
+            role: "城防队长",
+            publicImage: "谨慎但讲规则的军官",
+            knownFacts: ["负责诊所门口秩序"],
+          },
+        },
+        factions: {},
+        clocks: {},
+      },
+    );
+
+    expect(action).toMatchObject({
+      actionType: "custom",
+      targetId: "npc_rowan",
+      riskLevel: "low",
+      leverage: expect.arrayContaining([
+        "freeform:intent:negotiate",
+        "freeform:risk:low",
+        "freeform:target:npc_rowan",
+      ]),
+    });
+    expect(buildFreeformActionPreview(action!)).toEqual([
+      "意图：谈判",
+      "风险：低",
+      "目标：罗文",
+    ]);
+  });
+
   it("keeps direct freeform submission available without preselecting the action", () => {
     const action = buildFreeformPlayerAction("护送病人穿过封锁线。");
 
