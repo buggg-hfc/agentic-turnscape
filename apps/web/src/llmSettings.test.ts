@@ -10,6 +10,7 @@ import {
   loadLlmSettings,
   llmConnectionErrorStatus,
   llmConnectionSuccessStatus,
+  llmJsonModeOptions,
   redactLlmSecrets,
   saveLlmSettings,
   type StorageLike,
@@ -47,6 +48,7 @@ describe("LLM settings persistence", () => {
           apiKey: "keep-this-local-key",
           timeoutMs: 9000,
           maxTokens: 777,
+          jsonMode: "off",
         },
         "deepseek",
       ),
@@ -56,7 +58,27 @@ describe("LLM settings persistence", () => {
       apiKey: "keep-this-local-key",
       timeoutMs: 30000,
       maxTokens: 4096,
+      jsonMode: "auto",
     });
+
+    expect(
+      applyLlmProviderPreset(
+        {
+          baseUrl: "https://old.example.test/v1",
+          model: "old-model",
+          apiKey: "keep-this-local-key",
+          timeoutMs: 9000,
+          maxTokens: 777,
+          jsonMode: "auto",
+        },
+        "local",
+      ).jsonMode,
+    ).toBe("off");
+    expect(llmJsonModeOptions.map((option) => option.label)).toEqual([
+      "自动兼容",
+      "严格 JSON",
+      "关闭格式参数",
+    ]);
   });
 
   it("detects the selected provider preset from non-secret settings", () => {
@@ -67,6 +89,7 @@ describe("LLM settings persistence", () => {
         apiKey: "browser-only-secret",
         timeoutMs: 30000,
         maxTokens: 4096,
+        jsonMode: "auto",
       }),
     ).toBe("deepseek");
 
@@ -77,6 +100,7 @@ describe("LLM settings persistence", () => {
         apiKey: "browser-only-secret",
         timeoutMs: 30000,
         maxTokens: 4096,
+        jsonMode: "auto",
       }),
     ).toBe("");
   });
@@ -91,6 +115,7 @@ describe("LLM settings persistence", () => {
         apiKey: " secret-key ",
         timeoutMs: 25000,
         maxTokens: 2048,
+        jsonMode: "strict",
       },
       storage,
     );
@@ -101,6 +126,7 @@ describe("LLM settings persistence", () => {
       apiKey: "secret-key",
       timeoutMs: 25000,
       maxTokens: 2048,
+      jsonMode: "strict",
     });
   });
 
@@ -114,6 +140,7 @@ describe("LLM settings persistence", () => {
       apiKey: "",
       timeoutMs: 15000,
       maxTokens: 1024,
+      jsonMode: "auto",
     });
   });
 
@@ -126,6 +153,7 @@ describe("LLM settings persistence", () => {
         apiKey: "x",
         timeoutMs: 12000,
         maxTokens: 4096,
+        jsonMode: "off",
       },
       storage,
     );
@@ -172,6 +200,7 @@ describe("LLM settings persistence", () => {
           apiKey: secret,
           timeoutMs: 30000,
           maxTokens: 4096,
+          jsonMode: "auto",
         },
         true,
       ),
@@ -181,6 +210,7 @@ describe("LLM settings persistence", () => {
       modelLabel: "deepseek-v4-pro",
       secretLabel: "密钥已在本地配置",
       budgetLabel: "30 秒 / 4096 Token",
+      jsonModeLabel: "自动兼容",
       savedLabel: "已保存",
     });
 
@@ -191,12 +221,14 @@ describe("LLM settings persistence", () => {
         apiKey: "",
         timeoutMs: 15000,
         maxTokens: 2048,
+        jsonMode: "off",
       },
       false,
     );
 
     expect(customSummary.providerLabel).toBe("本地兼容");
     expect(customSummary.secretLabel).toBe("未配置密钥");
+    expect(customSummary.jsonModeLabel).toBe("关闭格式参数");
     expect(customSummary.savedLabel).toBe("有未保存更改");
     expect(JSON.stringify(customSummary)).not.toContain(secret);
   });
@@ -215,6 +247,7 @@ describe("LLM settings persistence", () => {
         apiKey: "sk-localSecretOnly123",
         timeoutMs: 30000,
         maxTokens: 4096,
+        jsonMode: "auto",
       },
     );
 
@@ -245,6 +278,7 @@ describe("LLM settings persistence", () => {
           apiKey: "",
           timeoutMs: 30000,
           maxTokens: 4096,
+          jsonMode: "auto",
         },
       ),
     ).toMatchObject({
@@ -267,6 +301,7 @@ describe("LLM settings persistence", () => {
           apiKey: "",
           timeoutMs: 15000,
           maxTokens: 4096,
+          jsonMode: "off",
         },
       ),
     ).toMatchObject({

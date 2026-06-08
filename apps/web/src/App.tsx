@@ -80,6 +80,7 @@ import {
   detectLlmProviderPresetId,
   llmConnectionErrorStatus,
   llmConnectionSuccessStatus,
+  llmJsonModeOptions,
   llmProviderPresets,
   loadLlmSettings,
   saveLlmSettings,
@@ -2294,6 +2295,31 @@ const LlmSettingsPanel = ({
           }
         />
       </label>
+      <label>
+        <span>JSON 模式</span>
+        <select
+          value={settings.jsonMode}
+          onChange={(event) =>
+            onChange({
+              ...settings,
+              jsonMode: event.target.value as LlmConfig["jsonMode"],
+            })
+          }
+        >
+          {llmJsonModeOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+        <small className="settings-hint">
+          {
+            llmJsonModeOptions.find(
+              (option) => option.value === settings.jsonMode,
+            )?.description
+          }
+        </small>
+      </label>
     </div>
     <div className="llm-runtime-summary" aria-label="LLM 运行摘要">
       <div>
@@ -2315,6 +2341,10 @@ const LlmSettingsPanel = ({
       <div>
         <span>预算</span>
         <strong>{runtimeSummary.budgetLabel}</strong>
+      </div>
+      <div>
+        <span>JSON 模式</span>
+        <strong>{runtimeSummary.jsonModeLabel}</strong>
       </div>
       <div>
         <span>状态</span>

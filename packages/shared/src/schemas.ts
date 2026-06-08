@@ -9,12 +9,16 @@ export type RiskLevel = z.infer<typeof RiskLevelSchema>;
 export const TransparencyModeSchema = z.enum(["immersive", "inference", "debug"]);
 export type TransparencyMode = z.infer<typeof TransparencyModeSchema>;
 
+export const LlmJsonModeSchema = z.enum(["auto", "strict", "off"]);
+export type LlmJsonMode = z.infer<typeof LlmJsonModeSchema>;
+
 export const DEFAULT_LLM_CONFIG = {
   baseUrl: "https://api.openai.com/v1",
   model: "gpt-4.1-mini",
   apiKey: "",
   timeoutMs: 15000,
-  maxTokens: 1024
+  maxTokens: 1024,
+  jsonMode: "auto" as LlmJsonMode
 } as const;
 
 export const LlmConfigSchema = z.object({
@@ -27,7 +31,8 @@ export const LlmConfigSchema = z.object({
   model: z.string().trim().min(1).default(DEFAULT_LLM_CONFIG.model),
   apiKey: z.string().trim().default(DEFAULT_LLM_CONFIG.apiKey),
   timeoutMs: z.coerce.number().int().min(1000).max(120000).default(DEFAULT_LLM_CONFIG.timeoutMs),
-  maxTokens: z.coerce.number().int().min(1).max(128000).default(DEFAULT_LLM_CONFIG.maxTokens)
+  maxTokens: z.coerce.number().int().min(1).max(128000).default(DEFAULT_LLM_CONFIG.maxTokens),
+  jsonMode: LlmJsonModeSchema.default(DEFAULT_LLM_CONFIG.jsonMode)
 });
 export type LlmConfig = z.infer<typeof LlmConfigSchema>;
 

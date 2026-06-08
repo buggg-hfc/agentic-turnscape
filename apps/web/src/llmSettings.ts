@@ -3,6 +3,7 @@ import {
   LlmConfigSchema,
   type LlmConfig,
   type LlmDiagnosticsSummary as SharedLlmDiagnosticsSummary,
+  type LlmJsonMode,
   type LlmUsageSummary as SharedLlmUsageSummary,
 } from "@agentic-turnscape/shared";
 import type { LlmConnectionTestPayload } from "./api.js";
@@ -24,6 +25,7 @@ export type LlmProviderPreset = {
   model: string;
   timeoutMs: number;
   maxTokens: number;
+  jsonMode: LlmJsonMode;
 };
 export type LlmRuntimeSummary = {
   providerLabel: string;
@@ -31,6 +33,7 @@ export type LlmRuntimeSummary = {
   modelLabel: string;
   secretLabel: string;
   budgetLabel: string;
+  jsonModeLabel: string;
   savedLabel: string;
 };
 export type LlmUsageSummary = {
@@ -51,6 +54,28 @@ export type LlmDiagnosticsSummary = {
   healthLabel: string;
 };
 
+export const llmJsonModeOptions: Array<{
+  value: LlmJsonMode;
+  label: string;
+  description: string;
+}> = [
+  {
+    value: "auto",
+    label: "自动兼容",
+    description: "优先请求 JSON mode，不支持时自动改用普通 JSON 提示",
+  },
+  {
+    value: "strict",
+    label: "严格 JSON",
+    description: "始终发送 OpenAI response_format 参数",
+  },
+  {
+    value: "off",
+    label: "关闭格式参数",
+    description: "不发送 response_format，适合部分本地兼容服务",
+  },
+];
+
 const defaultLlmProviderPreset: LlmProviderPreset = {
   id: "openai",
   label: "OpenAI",
@@ -59,6 +84,7 @@ const defaultLlmProviderPreset: LlmProviderPreset = {
   model: DEFAULT_LLM_CONFIG.model,
   timeoutMs: DEFAULT_LLM_CONFIG.timeoutMs,
   maxTokens: DEFAULT_LLM_CONFIG.maxTokens,
+  jsonMode: DEFAULT_LLM_CONFIG.jsonMode,
 };
 
 export const llmProviderPresets: LlmProviderPreset[] = [
@@ -70,6 +96,7 @@ export const llmProviderPresets: LlmProviderPreset[] = [
     model: DEFAULT_LLM_CONFIG.model,
     timeoutMs: DEFAULT_LLM_CONFIG.timeoutMs,
     maxTokens: DEFAULT_LLM_CONFIG.maxTokens,
+    jsonMode: "auto",
   },
   {
     id: "deepseek",
@@ -79,6 +106,7 @@ export const llmProviderPresets: LlmProviderPreset[] = [
     model: "deepseek-v4-pro",
     timeoutMs: 30000,
     maxTokens: 4096,
+    jsonMode: "auto",
   },
   {
     id: "local",
@@ -88,6 +116,7 @@ export const llmProviderPresets: LlmProviderPreset[] = [
     model: "local-story-model",
     timeoutMs: 15000,
     maxTokens: 4096,
+    jsonMode: "off",
   },
 ];
 
@@ -116,6 +145,7 @@ export const applyLlmProviderPreset = (
     model: preset.model,
     timeoutMs: preset.timeoutMs,
     maxTokens: preset.maxTokens,
+    jsonMode: preset.jsonMode,
   });
 };
 
@@ -128,12 +158,17 @@ export const detectLlmProviderPresetId = (
       candidate.baseUrl === sanitized.baseUrl &&
       candidate.model === sanitized.model &&
       candidate.timeoutMs === sanitized.timeoutMs &&
-      candidate.maxTokens === sanitized.maxTokens,
+      candidate.maxTokens === sanitized.maxTokens &&
+      candidate.jsonMode === sanitized.jsonMode,
   );
   return preset?.id ?? "";
 };
 
 const localEndpointPattern = /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(?::\d+)?(?:\/|$)/i;
+const llmJsonModeLabelOf = (mode: LlmJsonMode): string =>
+  llmJsonModeOptions.find((option) => option.value === mode)?.label ??
+  llmJsonModeOptions[0]?.label ??
+  mode;
 
 export const buildLlmRuntimeSummary = (
   settings: LlmConfig,
@@ -152,6 +187,7 @@ export const buildLlmRuntimeSummary = (
     modelLabel: sanitized.model,
     secretLabel: sanitized.apiKey ? "密钥已在本地配置" : "未配置密钥",
     budgetLabel: `${Math.max(1, Math.round(sanitized.timeoutMs / 1000))} 秒 / ${sanitized.maxTokens} Token`,
+    jsonModeLabel: llmJsonModeLabelOf(sanitized.jsonMode),
     savedLabel: saved ? "已保存" : "有未保存更改",
   };
 };

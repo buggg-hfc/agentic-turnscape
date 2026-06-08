@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - LLM JSON Mode Compatibility
+
+### Scope
+
+- Added TDD coverage for request-level LLM JSON mode configuration with `auto`, `strict`, and `off` modes shared by API, Agent, and Web layers.
+- OpenAI-compatible JSON calls now prefer `response_format` in automatic mode, but retry the same structured request without that parameter when a provider reports `response_format` / `json_object` incompatibility. Strict mode keeps sending the parameter, and off mode never sends it.
+- The Chinese LLM settings panel now exposes `JSON 模式`, applies provider-aware defaults, and shows the active mode in the non-secret runtime summary. The local-compatible preset defaults to `关闭格式参数`.
+
+### Runtime Screenshot
+
+![LLM JSON mode compatibility](screenshots/llm-json-mode-runtime-2026-06-08.png)
+
+The screenshot was captured from the local Web + API runtime after entering a Border Seven Days campaign with browser-local settings for a local OpenAI-compatible endpoint. The runtime check verified `JSON 模式`, `关闭格式参数`, the explanatory hint, and the runtime summary while rejecting API-key-shaped text.
+
+### Verification
+
+```bash
+npm test -- --run packages/shared/src/schemas.test.ts packages/agents/src/llm.test.ts apps/web/src/llmSettings.test.ts apps/web/src/api.test.ts apps/api/src/server.test.ts
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - LLM Retry Diagnostics
 
 ### Scope

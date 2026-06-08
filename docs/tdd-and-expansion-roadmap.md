@@ -31,6 +31,8 @@ For gameplay work, tests should prove the rule invariant rather than a single lu
 
 ## Verified Slices
 
+- LLM JSON mode compatibility now has tested provider/API/UI coverage: request-level settings support `auto`, `strict`, and `off`; automatic mode retries without OpenAI `response_format` when a compatible provider rejects it; and the Chinese GUI saves and displays the active mode without exposing secrets.
+
 - LLM calls now have tested retry/fallback diagnostics: JSON attempts, schema/JSON retries, deterministic fallback usage, and narration fallback usage aggregate into optional turn-level `resolution.llmDiagnostics` and surface in the Chinese GUI without storing raw model output.
 
 - LLM usage monitoring now includes tested budget pressure feedback: last-turn Token usage is classified as steady, near-budget, or over-budget against the local per-turn limit, and the Chinese GUI surfaces the pressure state without exposing API keys or changing authoritative world state.

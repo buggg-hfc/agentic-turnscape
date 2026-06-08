@@ -4,6 +4,17 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added tested LLM JSON mode compatibility across shared schema, Agent client, API passthrough, Web settings persistence, and the Chinese GUI. `auto` mode retries without OpenAI `response_format` when a provider rejects it, `strict` keeps the parameter, and `off` supports local compatible services that need plain JSON prompts.
+- Captured a runtime screenshot showing the in-game LLM panel with `JSON 模式` set to `关闭格式参数`:
+
+![LLM JSON mode compatibility](screenshots/llm-json-mode-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- --run packages/shared/src/schemas.test.ts packages/agents/src/llm.test.ts apps/web/src/llmSettings.test.ts apps/web/src/api.test.ts apps/api/src/server.test.ts`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added tested LLM retry and fallback diagnostics for real OpenAI-compatible calls. JSON attempts, JSON retries, deterministic fallback uses, and narration fallback uses now aggregate into `resolution.llmDiagnostics` without storing model response text, and the Chinese LLM settings panel shows the resulting `LLM 诊断` state.
 - Captured a runtime screenshot showing the fallback diagnostic state:
 

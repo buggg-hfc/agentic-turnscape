@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { LlmUsageSummary } from "@agentic-turnscape/shared";
+import type { LlmJsonMode, LlmUsageSummary } from "@agentic-turnscape/shared";
 
 export type LLMMessage = {
   role: "system" | "user" | "assistant";
@@ -24,7 +24,7 @@ export type LlmDiagnosticEvent = {
   type: "json_attempt" | "json_retry" | "fallback";
   channel: "json" | "text";
   attempt: number;
-  reason?: "schema" | "invalid_json" | "request" | "missing_content" | "empty_text";
+  reason?: "schema" | "invalid_json" | "request" | "missing_content" | "empty_text" | "response_format";
 };
 
 export type OpenAICompatibleOptions = {
@@ -33,6 +33,7 @@ export type OpenAICompatibleOptions = {
   model?: string | undefined;
   timeoutMs?: number | undefined;
   maxTokens?: number | undefined;
+  jsonMode?: LlmJsonMode | undefined;
   jsonRetries?: number | undefined;
   onUsage?: ((usage: LlmUsageSummary) => void) | undefined;
   onDiagnostic?: ((event: LlmDiagnosticEvent) => void) | undefined;
@@ -77,12 +78,26 @@ const openAiUsageOf = (usage: unknown): LlmUsageSummary | undefined => {
   };
 };
 
+const isResponseFormatUnsupported = (caught: unknown): boolean => {
+  if (!(caught instanceof Error)) return false;
+  const message = caught.message.toLowerCase();
+  return (
+    (message.includes("response_format") || message.includes("json_object")) &&
+    (message.includes("unsupported") ||
+      message.includes("not supported") ||
+      message.includes("not support") ||
+      message.includes("invalid") ||
+      message.includes("unknown"))
+  );
+};
+
 export const createOpenAICompatibleClient = ({
   baseUrl = "https://api.openai.com/v1",
   apiKey,
   model = "gpt-4.1-mini",
   timeoutMs = 15000,
   maxTokens = 1024,
+  jsonMode = "auto",
   jsonRetries = 1,
   onUsage,
   onDiagnostic,
@@ -147,7 +162,25 @@ export const createOpenAICompatibleClient = ({
           attempt: attemptNumber,
         });
         try {
-          const content = await request(retryMessages, temperature, true);
+          let content: string | undefined;
+          try {
+            content = await request(
+              retryMessages,
+              temperature,
+              jsonMode !== "off",
+            );
+          } catch (caught) {
+            if (jsonMode !== "auto" || !isResponseFormatUnsupported(caught)) {
+              throw caught;
+            }
+            onDiagnostic?.({
+              type: "json_retry",
+              channel: "json",
+              attempt: attemptNumber,
+              reason: "response_format",
+            });
+            content = await request(retryMessages, temperature, false);
+          }
           if (!content) {
             onDiagnostic?.({
               type: "fallback",

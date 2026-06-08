@@ -1,5 +1,28 @@
 import { describe, expect, it } from "vitest";
-import { PlayerActionSchema } from "./schemas.js";
+import { LlmConfigSchema, PlayerActionSchema } from "./schemas.js";
+
+describe("LLM config schema", () => {
+  it("defaults to automatic JSON mode compatibility and accepts explicit modes", () => {
+    expect(
+      LlmConfigSchema.parse({
+        baseUrl: "https://api.deepseek.com/",
+        model: "deepseek-v4-pro",
+      }),
+    ).toMatchObject({
+      baseUrl: "https://api.deepseek.com",
+      model: "deepseek-v4-pro",
+      jsonMode: "auto",
+    });
+
+    expect(
+      LlmConfigSchema.parse({
+        baseUrl: "http://localhost:11434/v1",
+        model: "local-story-model",
+        jsonMode: "off",
+      }).jsonMode,
+    ).toBe("off");
+  });
+});
 
 describe("player action schema", () => {
   it("accepts freeform custom actions as first-class player intent", () => {

@@ -1282,6 +1282,7 @@ describe("campaign turn API", () => {
         apiKey: "local-secret",
         timeoutMs: 6000,
         maxTokens: 128,
+        jsonMode: "strict",
       },
     });
 
@@ -1300,6 +1301,7 @@ describe("campaign turn API", () => {
       apiKey: "local-secret",
       timeoutMs: 6000,
       maxTokens: 128,
+      jsonMode: "strict",
     });
 
     await app.close();
@@ -1404,6 +1406,7 @@ describe("campaign turn API", () => {
           apiKey: "local-secret",
           timeoutMs: 5000,
           maxTokens: 2048,
+          jsonMode: "off",
         },
       },
     });
@@ -1416,6 +1419,7 @@ describe("campaign turn API", () => {
       apiKey: "local-secret",
       timeoutMs: 5000,
       maxTokens: 2048,
+      jsonMode: "off",
     });
     expect(JSON.stringify(body.state)).not.toContain("local-secret");
     expect(body.resolution.proposals.length).toBeGreaterThan(0);

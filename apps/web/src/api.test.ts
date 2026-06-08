@@ -38,6 +38,7 @@ describe("web API client", () => {
         apiKey: "secret",
         timeoutMs: 5000,
         maxTokens: 2048,
+        jsonMode: "off",
       },
       { queued: true },
     );
@@ -59,6 +60,7 @@ describe("web API client", () => {
         apiKey: "secret",
         timeoutMs: 5000,
         maxTokens: 2048,
+        jsonMode: "off",
       },
     });
   });
@@ -211,6 +213,7 @@ describe("web API client", () => {
         apiKey: "local-secret",
         timeoutMs: 6000,
         maxTokens: 128,
+        jsonMode: "strict",
       }),
     ).resolves.toEqual({
       ok: true,
@@ -230,6 +233,7 @@ describe("web API client", () => {
       apiKey: "local-secret",
       timeoutMs: 6000,
       maxTokens: 128,
+      jsonMode: "strict",
     });
   });
 
@@ -252,6 +256,7 @@ describe("web API client", () => {
         apiKey: "",
         timeoutMs: 6000,
         maxTokens: 128,
+        jsonMode: "auto",
       }),
     ).rejects.toThrow("请输入 API Key 后再测试连接。");
   });

@@ -21,6 +21,7 @@ import {
 } from "@agentic-turnscape/core";
 import {
   LlmConfigSchema,
+  LlmJsonModeSchema,
   PlayerActionSchema,
   TransparencyModeSchema,
   type AgentActionProposal,
@@ -374,6 +375,7 @@ export const buildServer = (options: ServerOptions = {}) => {
     if (!scenario) throw new Error(`Unknown scenario package: ${id}`);
     return scenario;
   };
+  const envJsonMode = LlmJsonModeSchema.safeParse(process.env.LLM_JSON_MODE);
   const envLlmConfig: OpenAICompatibleOptions = {
     baseUrl: process.env.LLM_BASE_URL,
     apiKey: process.env.LLM_API_KEY,
@@ -384,6 +386,7 @@ export const buildServer = (options: ServerOptions = {}) => {
     maxTokens: process.env.LLM_MAX_TOKENS
       ? Number(process.env.LLM_MAX_TOKENS)
       : undefined,
+    jsonMode: envJsonMode.success ? envJsonMode.data : undefined,
   };
   const envLlm = createLlmClient(envLlmConfig);
   const llmOptionsForConfig = (
@@ -396,6 +399,7 @@ export const buildServer = (options: ServerOptions = {}) => {
     apiKey: config.apiKey || undefined,
     timeoutMs: config.timeoutMs,
     maxTokens: config.maxTokens,
+    jsonMode: config.jsonMode,
     ...(onUsage ? { onUsage } : {}),
     ...(onDiagnostic ? { onDiagnostic } : {}),
   });

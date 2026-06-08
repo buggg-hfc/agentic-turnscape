@@ -109,6 +109,79 @@ describe("OpenAI-compatible LLM client", () => {
     });
   });
 
+  it("falls back to plain JSON prompts when a provider rejects response_format", async () => {
+    const diagnostics: unknown[] = [];
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 400,
+        text: async () => "response_format json_object is not supported",
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          choices: [{ message: { content: JSON.stringify({ ok: true }) } }],
+        }),
+      });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const client = createOpenAICompatibleClient({
+      apiKey: "test-key",
+      model: "local-json-model",
+      jsonMode: "auto",
+      onDiagnostic: (event) => diagnostics.push(event),
+    });
+
+    await expect(
+      client.completeJson({
+        schema: z.object({ ok: z.boolean() }),
+        messages: [{ role: "user", content: "Return JSON." }],
+        fallback: () => ({ ok: false }),
+      }),
+    ).resolves.toEqual({ ok: true });
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body))).toMatchObject({
+      response_format: { type: "json_object" },
+    });
+    expect(JSON.parse(String(fetchMock.mock.calls[1]?.[1]?.body))).not.toHaveProperty(
+      "response_format",
+    );
+    expect(diagnostics).toContainEqual({
+      type: "json_retry",
+      channel: "json",
+      attempt: 1,
+      reason: "response_format",
+    });
+  });
+
+  it("can disable response_format for local OpenAI-compatible providers", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        choices: [{ message: { content: JSON.stringify({ ok: true }) } }],
+      }),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const client = createOpenAICompatibleClient({
+      apiKey: "test-key",
+      model: "local-json-model",
+      jsonMode: "off",
+    });
+
+    await client.completeJson({
+      schema: z.object({ ok: z.boolean() }),
+      messages: [{ role: "user", content: "Return JSON." }],
+      fallback: () => ({ ok: false }),
+    });
+
+    expect(JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body))).not.toHaveProperty(
+      "response_format",
+    );
+  });
+
   it("reports OpenAI-compatible token usage without exposing response text", async () => {
     const usageEvents: unknown[] = [];
     const fetchMock = vi.fn().mockResolvedValue({
