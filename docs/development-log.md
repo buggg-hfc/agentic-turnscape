@@ -4,6 +4,15 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added tested Chinese summaries for queued turn progress. The action column now translates turn status, Agent proposal counts, referee output, narration, and completion into player-facing Chinese rows, redacts secret-shaped text, and fetches final events after queued completion so the panel does not get stuck on `turn_waiting_for_worker`.
+- Captured a runtime screenshot showing completed turn progress in the Chinese GUI:
+
+![Chinese turn progress summary](screenshots/turn-progress-cn-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- apps/web/src/turnProgress.test.ts apps/web/src/api.test.ts --reporter=dot`
+  - `npm run typecheck`
+
 - Added tested local draft persistence for freeform player actions. The composer now restores unfinished open-ended text from browser storage, auto-saves edits under the same 500-character limit, clears the draft after a successful custom turn, and exposes a Chinese `清空草稿` control.
 - Captured a runtime screenshot showing a restored freeform draft, local-save status, clear control, and rebuilt intent/risk/target preview:
 

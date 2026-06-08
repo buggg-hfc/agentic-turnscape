@@ -2,6 +2,27 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Chinese Turn Progress Summary
+
+### Scope
+
+- Added TDD coverage for player-facing turn progress rows: queued work, turn status, Agent proposal counts, referee summaries, narration text, completion, and secret-looking token redaction.
+- The web GUI now renders turn progress through a tested summary builder instead of raw event payloads, translating internal statuses like `pending` into Chinese labels such as `状态：排队中`.
+- Fixed the queued-turn completion race by fetching final turn events once the state reports completion and adding a safe completion fallback when needed.
+
+### Runtime Screenshot
+
+![Chinese turn progress summary](screenshots/turn-progress-cn-runtime-2026-06-08.png)
+
+The screenshot was captured from a local Border Seven Days runtime session after executing a turn and verifying the action column showed `回合任务`, `智能体提案`, `规则裁判`, `叙事输出`, and `完成` without exposing internal worker tokens or API-key-shaped strings. The in-app Browser runtime was unavailable because its local kernel assets path could not be created, so the same local page was verified with Playwright.
+
+### Verification
+
+```bash
+npm test -- apps/web/src/turnProgress.test.ts apps/web/src/api.test.ts --reporter=dot
+npm run typecheck
+```
+
 ## 2026-06-08 - Freeform Draft Persistence
 
 ### Scope

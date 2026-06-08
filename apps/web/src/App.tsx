@@ -103,6 +103,10 @@ import {
   buildScenarioSelection,
   type ScenarioOption,
 } from "./scenarioSelection.js";
+import {
+  buildCompletedTurnProgressEvents,
+  buildTurnProgressRows,
+} from "./turnProgress.js";
 import type {
   CampaignPayload,
   CampaignSummary,
@@ -537,22 +541,36 @@ export const App = () => {
         llmSettings,
         { queued: true },
       );
-      setTurnProgress([
+      let latestProgress: TurnProgressEvent[] = [
         { event: "pending", data: { message: "turn_waiting_for_worker" } },
-      ]);
+      ];
+      setTurnProgress(latestProgress);
       for (let attempt = 0; attempt < 30; attempt += 1) {
         const events = await api.turnEvents(
           campaignId,
           queued.turnId,
           transparency,
         );
-        if (events.length > 0) setTurnProgress(events);
+        if (events.length > 0) {
+          latestProgress = events;
+          setTurnProgress(latestProgress);
+        }
         const payload = await api.getState(campaignId, transparency);
         if (
           payload.lastTurn?.id === queued.turnId &&
           payload.lastTurn.status === "complete" &&
           payload.lastTurn.resolution
         ) {
+          const finalEvents = await api.turnEvents(
+            campaignId,
+            queued.turnId,
+            transparency,
+          );
+          latestProgress = buildCompletedTurnProgressEvents(
+            finalEvents.length > 0 ? finalEvents : latestProgress,
+            payload.lastTurn.resolution.publicSummary,
+          );
+          setTurnProgress(latestProgress);
           setState(payload.state);
           setScenarioStatus(payload.scenarioStatus);
           setActions(payload.availableActions);
@@ -930,28 +948,6 @@ export const App = () => {
   );
 };
 
-const progressTitle: Record<string, string> = {
-  turn: "回合任务",
-  pending: "队列等待",
-  campaign_progress: "战役推进",
-  agent_proposals: "智能体提案",
-  referee: "规则裁判",
-  narration: "叙事输出",
-  done: "完成",
-  error: "错误",
-};
-
-const progressDetail = (event: TurnProgressEvent) => {
-  const data = event.data as Record<string, unknown> | null;
-  if (!data) return "";
-  if (typeof data.message === "string") return data.message;
-  if (typeof data.status === "string") return data.status;
-  if (typeof data.publicSummary === "string") return data.publicSummary;
-  if (typeof data.text === "string") return data.text;
-  if (Array.isArray(data)) return `${data.length} 条提案`;
-  return "";
-};
-
 const TurnProgressPanel = ({
   events,
   running,
@@ -959,7 +955,9 @@ const TurnProgressPanel = ({
   events: TurnProgressEvent[];
   running: boolean;
 }) => {
-  if (!running && events.length === 0) return null;
+  const rows = buildTurnProgressRows(events, running);
+  if (rows.length === 0) return null;
+
   return (
     <section className="turn-progress">
       <div className="panel-heading compact">
@@ -967,13 +965,10 @@ const TurnProgressPanel = ({
         <h3>回合进度</h3>
       </div>
       <div className="progress-list">
-        {(events.length > 0
-          ? events
-          : [{ event: "pending", data: { message: "turn_waiting_for_worker" } }]
-        ).map((event, index) => (
-          <div key={`${event.event}-${index}`} className="progress-row">
-            <strong>{progressTitle[event.event] ?? event.event}</strong>
-            <span>{progressDetail(event)}</span>
+        {rows.map((row, index) => (
+          <div key={`${row.title}-${index}`} className="progress-row">
+            <strong>{row.title}</strong>
+            <span>{row.detail}</span>
           </div>
         ))}
       </div>
