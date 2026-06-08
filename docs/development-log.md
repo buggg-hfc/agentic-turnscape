@@ -4,6 +4,18 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added tested creator-authored player start state. Quick-create drafts can now edit player health, stamina, money, intel, social skill, and investigation skill; generated worlds use those values, and the Chinese preview exposes them in a new `玩家` card before import.
+- Captured a runtime screenshot after editing the creator form, showing the player preview card:
+
+![Creator player start state](screenshots/creator-player-start-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- packages/shared/src/creatorScenarioDraft.test.ts --reporter=dot`
+  - `npm test -- apps/web/src/creatorScenarioPreview.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added tested browser-local LLM settings migration. Settings are now saved as a V2 envelope with `version`, `savedAt`, and sanitized config, while old V1 raw config still loads and can be saved forward without losing the local-only key. The Chinese GUI runtime summary now displays `保存格式：本地格式 V2`.
 - Captured a runtime screenshot after saving LLM settings from the GUI, showing the V2 save format and no rendered secret:
 

@@ -2,6 +2,30 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Creator Player Start State
+
+### Scope
+
+- Added TDD coverage for creator-authored player start state.
+- The quick-create scenario draft now supports editable player health, stamina, money, intel, social skill, and investigation skill while remaining backward-compatible with older creator draft inputs.
+- The Chinese creator preview now includes a `玩家` section, making the playable protagonist's starting resources and key skills visible before import.
+
+### Runtime Screenshot
+
+![Creator player start state](screenshots/creator-player-start-runtime-2026-06-08.png)
+
+The screenshot was captured from the local Web + API runtime after editing the creator form to set `临时调停人` with custom health, stamina, money, intel, social, and investigation values. The draft preview shows the generated `玩家` card before import.
+
+### Verification
+
+```bash
+npm test -- packages/shared/src/creatorScenarioDraft.test.ts --reporter=dot
+npm test -- apps/web/src/creatorScenarioPreview.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - LLM Settings Storage Migration
 
 ### Scope

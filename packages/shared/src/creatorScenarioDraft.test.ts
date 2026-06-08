@@ -21,6 +21,12 @@ describe("creator scenario draft builder", () => {
       title: "雨巷试作",
       premise: "旧城区的雨声里混入了失踪者的敲门声。",
       playerName: "临时调查员",
+      playerHealth: 4,
+      playerStamina: 5,
+      playerMoney: 3,
+      playerIntel: 2,
+      playerSocialSkill: 4,
+      playerInvestigationSkill: 3,
       startLocationName: "长明巷口",
       startLocationDescription: "长明巷口贴满寻人启事，雨水从屋檐滴进临时取证箱。",
       startLocationPublicInfo: "居民愿意交换巡逻时间;巷口监控只剩半小时备份",
@@ -89,6 +95,16 @@ describe("creator scenario draft builder", () => {
     expect(WorldStateSchema.parse(draft.world).player.name).toBe(
       "临时调查员",
     );
+    expect(draft.world.player.resources).toMatchObject({
+      health: 4,
+      stamina: 5,
+      money: 3,
+      intel: 2,
+    });
+    expect(draft.world.player.skills).toMatchObject({
+      social: 4,
+      investigation: 3,
+    });
     expect(Object.values(draft.world.characters).map((npc) => npc.name)).toEqual(
       expect.arrayContaining(["林姐", "周队"]),
     );

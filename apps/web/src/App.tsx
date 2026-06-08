@@ -1191,6 +1191,114 @@ const CreatorScenarioImportPanel = ({
         />
       </label>
       <label className="creator-field">
+        <span>玩家生命</span>
+        <input
+          type="number"
+          min={1}
+          max={9}
+          value={
+            draft.playerHealth ??
+            defaultCreatorScenarioDraftInput.playerHealth ??
+            5
+          }
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("playerHealth", Number.parseInt(event.target.value, 10))
+          }
+        />
+      </label>
+      <label className="creator-field">
+        <span>玩家体力</span>
+        <input
+          type="number"
+          min={1}
+          max={9}
+          value={
+            draft.playerStamina ??
+            defaultCreatorScenarioDraftInput.playerStamina ??
+            3
+          }
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("playerStamina", Number.parseInt(event.target.value, 10))
+          }
+        />
+      </label>
+      <label className="creator-field">
+        <span>起始金钱</span>
+        <input
+          type="number"
+          min={0}
+          max={9}
+          value={
+            draft.playerMoney ??
+            defaultCreatorScenarioDraftInput.playerMoney ??
+            1
+          }
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("playerMoney", Number.parseInt(event.target.value, 10))
+          }
+        />
+      </label>
+      <label className="creator-field">
+        <span>起始情报</span>
+        <input
+          type="number"
+          min={0}
+          max={9}
+          value={
+            draft.playerIntel ??
+            defaultCreatorScenarioDraftInput.playerIntel ??
+            1
+          }
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange("playerIntel", Number.parseInt(event.target.value, 10))
+          }
+        />
+      </label>
+      <label className="creator-field">
+        <span>社交技能</span>
+        <input
+          type="number"
+          min={0}
+          max={5}
+          value={
+            draft.playerSocialSkill ??
+            defaultCreatorScenarioDraftInput.playerSocialSkill ??
+            2
+          }
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange(
+              "playerSocialSkill",
+              Number.parseInt(event.target.value, 10),
+            )
+          }
+        />
+      </label>
+      <label className="creator-field">
+        <span>调查技能</span>
+        <input
+          type="number"
+          min={0}
+          max={5}
+          value={
+            draft.playerInvestigationSkill ??
+            defaultCreatorScenarioDraftInput.playerInvestigationSkill ??
+            2
+          }
+          disabled={disabled}
+          onChange={(event) =>
+            onDraftChange(
+              "playerInvestigationSkill",
+              Number.parseInt(event.target.value, 10),
+            )
+          }
+        />
+      </label>
+      <label className="creator-field">
         <span>起始地点</span>
         <input
           value={draft.startLocationName}

@@ -8,6 +8,12 @@ describe("creator scenario draft preview", () => {
       title: "港口试作",
       premise: "风暴夜后，港务厅和走私者都想控制唯一的灯塔。",
       playerName: "临时调停人",
+      playerHealth: 4,
+      playerStamina: 5,
+      playerMoney: 3,
+      playerIntel: 2,
+      playerSocialSkill: 4,
+      playerInvestigationSkill: 3,
       startLocationName: "潮汐议事厅",
       startLocationDescription: "墙上挂着潮汐钟和维修账页。",
       startLocationPublicInfo: "船工愿意公开作证;潮汐记录还没被黑帆拿走",
@@ -76,6 +82,13 @@ describe("creator scenario draft preview", () => {
         "3 天 / 3 场景 / 2 地点 / 2 NPC / 2 阵营 / 1 任务 / 3 行动 / 2 结局",
     });
     expect(preview.sections).toEqual([
+      {
+        title: "玩家",
+        count: 1,
+        items: [
+          "临时调停人：生命 4，体力 5，金钱 3，情报 2；技能：社交 4，调查 3",
+        ],
+      },
       {
         title: "地点",
         count: 2,

@@ -12,6 +12,12 @@ export type CreatorScenarioDraftInput = {
   title: string;
   premise: string;
   playerName: string;
+  playerHealth?: number;
+  playerStamina?: number;
+  playerMoney?: number;
+  playerIntel?: number;
+  playerSocialSkill?: number;
+  playerInvestigationSkill?: number;
   startLocationName: string;
   startLocationDescription: string;
   startLocationPublicInfo: string;
@@ -108,6 +114,12 @@ export const defaultCreatorScenarioDraftInput: CreatorScenarioDraftInput = {
   title: "我的剧本",
   premise: "一个小镇在三天内必须处理突然爆发的危机。",
   playerName: "调查者",
+  playerHealth: 5,
+  playerStamina: 3,
+  playerMoney: 1,
+  playerIntel: 1,
+  playerSocialSkill: 2,
+  playerInvestigationSkill: 2,
   startLocationName: "临时指挥所",
   startLocationDescription: "临时指挥所里挤满了等待消息的人，危机正在逼近公开爆发。",
   startLocationPublicInfo: "居民正在等待可信消息;向导愿意协助玩家先稳住局面",
@@ -249,6 +261,46 @@ export const buildCreatorScenarioDraft = (
   const playerName = textOr(
     input.playerName,
     defaultCreatorScenarioDraftInput.playerName,
+  );
+  const playerHealth = boundedInt(
+    input.playerHealth ?? defaultCreatorScenarioDraftInput.playerHealth ?? 5,
+    defaultCreatorScenarioDraftInput.playerHealth ?? 5,
+    1,
+    9,
+  );
+  const playerStamina = boundedInt(
+    input.playerStamina ?? defaultCreatorScenarioDraftInput.playerStamina ?? 3,
+    defaultCreatorScenarioDraftInput.playerStamina ?? 3,
+    1,
+    9,
+  );
+  const playerMoney = boundedInt(
+    input.playerMoney ?? defaultCreatorScenarioDraftInput.playerMoney ?? 1,
+    defaultCreatorScenarioDraftInput.playerMoney ?? 1,
+    0,
+    9,
+  );
+  const playerIntel = boundedInt(
+    input.playerIntel ?? defaultCreatorScenarioDraftInput.playerIntel ?? 1,
+    defaultCreatorScenarioDraftInput.playerIntel ?? 1,
+    0,
+    9,
+  );
+  const playerSocialSkill = boundedInt(
+    input.playerSocialSkill ??
+      defaultCreatorScenarioDraftInput.playerSocialSkill ??
+      2,
+    defaultCreatorScenarioDraftInput.playerSocialSkill ?? 2,
+    0,
+    5,
+  );
+  const playerInvestigationSkill = boundedInt(
+    input.playerInvestigationSkill ??
+      defaultCreatorScenarioDraftInput.playerInvestigationSkill ??
+      2,
+    defaultCreatorScenarioDraftInput.playerInvestigationSkill ?? 2,
+    0,
+    5,
   );
   const startLocationName = textOr(
     input.startLocationName,
@@ -516,19 +568,19 @@ export const buildCreatorScenarioDraft = (
         will: 2,
       },
       skills: {
-        social: 2,
-        investigation: 2,
+        social: playerSocialSkill,
+        investigation: playerInvestigationSkill,
         defense: 1,
         survival: 1,
         melee: 1,
         insight: 1,
       },
       resources: {
-        health: 5,
-        stamina: 3,
+        health: playerHealth,
+        stamina: playerStamina,
         pressure: 0,
-        money: 1,
-        intel: 1,
+        money: playerMoney,
+        intel: playerIntel,
       },
       conditions: [],
       reputationTags: ["creator_draft"],

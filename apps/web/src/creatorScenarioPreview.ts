@@ -26,6 +26,17 @@ const resourceSummary = (resources: Record<string, number>) =>
     .map(([name, amount]) => `${name} ${amount}`)
     .join("，") || "无";
 
+const playerSummary = (draft: ReturnType<typeof buildCreatorScenarioDraft>) => {
+  const { player } = draft.world;
+  return `${player.name}：生命 ${player.resources.health ?? 0}，体力 ${
+    player.resources.stamina ?? 0
+  }，金钱 ${player.resources.money ?? 0}，情报 ${
+    player.resources.intel ?? 0
+  }；技能：社交 ${player.skills.social ?? 0}，调查 ${
+    player.skills.investigation ?? 0
+  }`;
+};
+
 const riskLabel = {
   low: "低",
   medium: "中",
@@ -101,6 +112,7 @@ export const buildCreatorDraftPreview = (
       `${endings.length} 结局`,
     ].join(" / "),
     sections: [
+      { title: "玩家", count: 1, items: [playerSummary(draft)] },
       { title: "地点", count: locations.length, items: locations },
       { title: "NPC", count: characters.length, items: characters },
       { title: "阵营", count: factions.length, items: factions },
