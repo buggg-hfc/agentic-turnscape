@@ -23,6 +23,7 @@ import {
   PlayerActionSchema,
   TransparencyModeSchema,
   type AgentActionProposal,
+  type LlmUsageSummary,
   type StatePatch,
   type TransparencyMode,
   type TurnResolution,
@@ -91,6 +92,34 @@ const getScenarioStatus = (state: WorldState, scenario: ScenarioPackage) => {
 
 const cloneJson = (value: unknown): unknown =>
   JSON.parse(JSON.stringify(value));
+
+const emptyLlmUsage = (): LlmUsageSummary => ({
+  requests: 0,
+  promptTokens: 0,
+  completionTokens: 0,
+  totalTokens: 0,
+});
+
+const addLlmUsage = (
+  total: LlmUsageSummary,
+  usage: LlmUsageSummary,
+): void => {
+  total.requests += usage.requests;
+  total.promptTokens += usage.promptTokens;
+  total.completionTokens += usage.completionTokens;
+  total.totalTokens += usage.totalTokens;
+};
+
+const withLlmUsage = (
+  resolution: TurnResolution,
+  usage: LlmUsageSummary,
+): TurnResolution =>
+  usage.requests > 0
+    ? {
+        ...resolution,
+        llmUsage: usage,
+      }
+    : resolution;
 
 type VisibleTurnResolution = Omit<TurnResolution, "hiddenSummary"> & {
   hiddenSummary?: string;
@@ -323,36 +352,49 @@ export const buildServer = (options: ServerOptions = {}) => {
   const envLlm = createLlmClient(envLlmConfig);
   const llmOptionsForConfig = (
     config: NonNullable<TurnJobPayload["llmConfig"]>,
+    onUsage?: OpenAICompatibleOptions["onUsage"],
   ): OpenAICompatibleOptions => ({
     baseUrl: config.baseUrl,
     model: config.model,
     apiKey: config.apiKey || undefined,
     timeoutMs: config.timeoutMs,
     maxTokens: config.maxTokens,
+    ...(onUsage ? { onUsage } : {}),
   });
-  const llmForConfig = (config: TurnJobPayload["llmConfig"]): LLMClient =>
-    config ? createLlmClient(llmOptionsForConfig(config)) : envLlm;
+  const llmForConfig = (
+    config: TurnJobPayload["llmConfig"],
+    onUsage?: OpenAICompatibleOptions["onUsage"],
+  ): LLMClient =>
+    config
+      ? createLlmClient(llmOptionsForConfig(config, onUsage))
+      : onUsage
+        ? createLlmClient({ ...envLlmConfig, onUsage })
+        : envLlm;
 
   const settleTurnJob = async (job: TurnJobPayload) => {
     try {
       const campaign = await store.get(job.campaignId);
       if (!campaign) throw new Error(`Campaign not found: ${job.campaignId}`);
       const scenario = await requireAvailableScenario(campaign.scenario);
+      const llmUsage = emptyLlmUsage();
       const { nextState, resolution } = await runTurn({
         state: campaign.state,
         playerAction: job.action,
-        llm: llmForConfig(job.llmConfig),
+        llm: llmForConfig(job.llmConfig, (usage) =>
+          addLlmUsage(llmUsage, usage),
+        ),
         turnId: job.turnId,
         seed: job.seed,
         transparency: job.transparency,
         getAvailableActions: scenario.getActions,
         evaluateEnding: scenario.evaluateEnding,
       });
+      const resolutionWithUsage = withLlmUsage(resolution, llmUsage);
       await store.completeTurn(
         job.campaignId,
         job.turnId,
         nextState,
-        resolution,
+        resolutionWithUsage,
       );
     } catch (caught) {
       const message =
@@ -678,28 +720,35 @@ export const buildServer = (options: ServerOptions = {}) => {
       });
     }
 
+    const llmUsage = emptyLlmUsage();
     const { nextState, resolution } = await runTurn({
       state: campaign.state,
       playerAction: action,
-      llm: llmForConfig(body.llmConfig),
+      llm: llmForConfig(body.llmConfig, (usage) =>
+        addLlmUsage(llmUsage, usage),
+      ),
       turnId: turn.id,
       seed: body.seed,
       transparency: body.transparency,
       getAvailableActions: scenario.getActions,
       evaluateEnding: scenario.evaluateEnding,
     });
+    const resolutionWithUsage = withLlmUsage(resolution, llmUsage);
     const completed = await store.completeTurn(
       campaign.id,
       turn.id,
       nextState,
-      resolution,
+      resolutionWithUsage,
     );
 
     return {
       campaignId: campaign.id,
       turnId: completed.id,
       status: completed.status,
-      resolution: resolutionForTransparency(resolution, body.transparency),
+      resolution: resolutionForTransparency(
+        resolutionWithUsage,
+        body.transparency,
+      ),
       scenarioStatus: getScenarioStatus(nextState, scenario),
       state: toPlayerVisibleState(nextState),
       availableActions: scenario.getActions(nextState),

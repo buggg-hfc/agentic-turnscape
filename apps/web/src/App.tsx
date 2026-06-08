@@ -73,6 +73,7 @@ import {
 } from "./freeformAction.js";
 import {
   applyLlmProviderPreset,
+  buildLlmUsageSummary,
   buildLlmRuntimeSummary,
   clearLlmSettings,
   detectLlmProviderPresetId,
@@ -925,6 +926,7 @@ export const App = () => {
           <LlmSettingsPanel
             settings={llmSettings}
             saved={llmSettingsSaved}
+            lastUsage={lastResolution?.llmUsage}
             connectionStatus={llmConnectionStatus}
             onChange={(settings) => {
               setLlmSettings(settings);
@@ -2173,6 +2175,7 @@ const FactionPlanPanel = ({
 const LlmSettingsPanel = ({
   settings,
   saved,
+  lastUsage,
   connectionStatus,
   onChange,
   onSave,
@@ -2181,6 +2184,7 @@ const LlmSettingsPanel = ({
 }: {
   settings: LlmConfig;
   saved: boolean;
+  lastUsage: TurnResolution["llmUsage"] | undefined;
   connectionStatus: LlmConnectionStatus | undefined;
   onChange: (settings: LlmConfig) => void;
   onSave: () => void;
@@ -2192,6 +2196,7 @@ const LlmSettingsPanel = ({
     (preset) => preset.id === detectedProviderPresetId,
   );
   const runtimeSummary = buildLlmRuntimeSummary(settings, saved);
+  const usageSummary = buildLlmUsageSummary(lastUsage, settings);
 
   return (
   <section className="module">
@@ -2311,6 +2316,26 @@ const LlmSettingsPanel = ({
         <strong>{runtimeSummary.savedLabel}</strong>
       </div>
     </div>
+    {usageSummary ? (
+      <div className="llm-runtime-summary usage" aria-label="LLM 用量监控">
+        <div>
+          <span>上回合请求</span>
+          <strong>{usageSummary.requestLabel}</strong>
+        </div>
+        <div>
+          <span>输入 Token</span>
+          <strong>{usageSummary.promptLabel}</strong>
+        </div>
+        <div>
+          <span>输出 Token</span>
+          <strong>{usageSummary.completionLabel}</strong>
+        </div>
+        <div>
+          <span>总消耗</span>
+          <strong>{usageSummary.totalLabel}</strong>
+        </div>
+      </div>
+    ) : null}
     <div className="settings-actions">
       <button className="secondary-button" onClick={onSave}>
         <Save size={15} />

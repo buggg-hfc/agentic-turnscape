@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - LLM Usage Monitoring
+
+### Scope
+
+- Added TDD coverage for extracting OpenAI-compatible `usage` metadata from real JSON/text LLM calls without storing model response text in the usage event.
+- Completed turn resolutions can now carry an optional `llmUsage` summary with request count, prompt tokens, completion tokens, and total tokens. The API aggregates the data per turn and keeps it outside `WorldState`.
+- The Chinese LLM settings panel now shows last-turn usage beside the existing non-secret runtime configuration summary, so players can see cost pressure without exposing local API keys.
+
+### Runtime Screenshot
+
+![LLM usage monitor](screenshots/llm-usage-monitor-runtime-2026-06-08.png)
+
+The screenshot was captured from the local web GUI with mocked API payloads containing a completed turn usage summary. The runtime check verified the usage panel displayed `6`, `78`, `39`, and `117 / 1024 Token`, and rejected any API-key-shaped secret in rendered text.
+
+### Verification
+
+```bash
+npm test -- packages/agents/src/llm.test.ts apps/api/src/server.test.ts apps/web/src/llmSettings.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - Explicit Freeform Intent And Risk
 
 ### Scope

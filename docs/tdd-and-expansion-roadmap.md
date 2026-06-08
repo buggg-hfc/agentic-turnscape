@@ -31,6 +31,8 @@ For gameplay work, tests should prove the rule invariant rather than a single lu
 
 ## Verified Slices
 
+- LLM usage monitoring now has tested provider/API/UI coverage: OpenAI-compatible `usage` metadata is normalized per request, aggregated into optional turn-level `resolution.llmUsage`, kept outside `WorldState`, and displayed in the Chinese LLM settings panel without exposing local API keys.
+
 - Freeform player actions now support tested explicit labels inside the prose: `意图：...`, `风险：...`, and `目标：...` override keyword guesses in the GUI analysis while still entering the referee-owned custom action pipeline as structured `freeform:*` tokens.
 
 - Narrator prompts now receive a tested public-only view of referee patches: hidden persistence entries such as `hiddenEvents`, hidden info, secrets, hidden goals, and true-background paths remain in the authoritative patch but are filtered before the narrative Agent can write prose.

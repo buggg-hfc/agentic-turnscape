@@ -130,6 +130,76 @@ const creatorScenarioDefinition = () => {
 };
 
 describe("campaign turn API", () => {
+  it("aggregates LLM token usage into completed turn resolutions", async () => {
+    const store = new InMemoryCampaignStore();
+    const usageEvents = [
+      { requests: 1, promptTokens: 8, completionTokens: 4, totalTokens: 12 },
+      { requests: 1, promptTokens: 10, completionTokens: 5, totalTokens: 15 },
+      { requests: 1, promptTokens: 12, completionTokens: 6, totalTokens: 18 },
+      { requests: 1, promptTokens: 14, completionTokens: 7, totalTokens: 21 },
+      { requests: 1, promptTokens: 16, completionTokens: 8, totalTokens: 24 },
+      { requests: 1, promptTokens: 18, completionTokens: 9, totalTokens: 27 },
+    ];
+    const fakeClient: LLMClient & {
+      reportUsage?: OpenAICompatibleOptions["onUsage"];
+    } = {
+      completeJson: async ({ fallback }) => {
+        const usage = usageEvents.shift();
+        if (usage) fakeClient.reportUsage?.(usage);
+        return fallback();
+      },
+      completeText: async ({ fallback }) => {
+        const usage = usageEvents.shift();
+        if (usage) fakeClient.reportUsage?.(usage);
+        return fallback();
+      },
+    };
+    const app = buildServer({
+      store,
+      createLlmClient: (config) => {
+        fakeClient.reportUsage = config.onUsage;
+        return fakeClient;
+      },
+    });
+
+    const campaignResponse = await app.inject({
+      method: "POST",
+      url: "/campaigns",
+      headers: { "content-type": "application/json" },
+      payload: { scenarioId: "border-seven-days" },
+    });
+    const campaign = campaignResponse.json<{ campaignId: string }>();
+
+    const turnResponse = await app.inject({
+      method: "POST",
+      url: `/campaigns/${campaign.campaignId}/turns/run`,
+      headers: { "content-type": "application/json" },
+      payload: {
+        action: {
+          actionType: "negotiate",
+          label: "Coordinate the clinic line",
+          description: "Ask Rowan and Adele to keep the clinic open.",
+          targetId: "npc_rowan",
+          leverage: ["public_rumor"],
+          riskLevel: "medium",
+        },
+        seed: "api-llm-usage-turn",
+      },
+    });
+
+    expect(turnResponse.statusCode).toBe(200);
+    expect(turnResponse.json()).toMatchObject({
+      resolution: {
+        llmUsage: {
+          requests: 6,
+          promptTokens: 78,
+          completionTokens: 39,
+          totalTokens: 117,
+        },
+      },
+    });
+  });
+
   it("accepts freeform custom player actions and still records referee-owned patches", async () => {
     const store = new InMemoryCampaignStore();
     const app = buildServer({ store });

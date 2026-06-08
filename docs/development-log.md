@@ -4,6 +4,17 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added tested LLM usage monitoring for real OpenAI-compatible calls. The client now extracts provider `usage` metadata, the API aggregates it into `resolution.llmUsage` per completed turn without touching `WorldState`, and the Chinese LLM settings panel shows last-turn request/input/output/total token usage without rendering secrets.
+- Captured a runtime screenshot showing the new usage monitor in the right-side LLM panel:
+
+![LLM usage monitor](screenshots/llm-usage-monitor-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- packages/agents/src/llm.test.ts apps/api/src/server.test.ts apps/web/src/llmSettings.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added tested explicit intent and risk labels for freeform player actions. When the player writes `意图：谈判；风险：低；目标：罗文`, the freeform builder now preserves those labels as `freeform:intent:negotiate`, `freeform:risk:low`, and `freeform:target:npc_rowan` instead of letting clinic/blockade keywords override them.
 - Captured a runtime screenshot showing the restored local draft and Chinese preview chips:
 

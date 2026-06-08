@@ -1,4 +1,4 @@
-import { DEFAULT_LLM_CONFIG, LlmConfigSchema, type LlmConfig } from "@agentic-turnscape/shared";
+import { DEFAULT_LLM_CONFIG, LlmConfigSchema, type LlmConfig, type LlmUsageSummary as SharedLlmUsageSummary } from "@agentic-turnscape/shared";
 import type { LlmConnectionTestPayload } from "./api.js";
 
 export const LLM_SETTINGS_STORAGE_KEY = "agentic-turnscape.llmSettings.v1";
@@ -26,6 +26,12 @@ export type LlmRuntimeSummary = {
   secretLabel: string;
   budgetLabel: string;
   savedLabel: string;
+};
+export type LlmUsageSummary = {
+  requestLabel: string;
+  promptLabel: string;
+  completionLabel: string;
+  totalLabel: string;
 };
 
 const defaultLlmProviderPreset: LlmProviderPreset = {
@@ -130,6 +136,20 @@ export const buildLlmRuntimeSummary = (
     secretLabel: sanitized.apiKey ? "密钥已在本地配置" : "未配置密钥",
     budgetLabel: `${Math.max(1, Math.round(sanitized.timeoutMs / 1000))} 秒 / ${sanitized.maxTokens} Token`,
     savedLabel: saved ? "已保存" : "有未保存更改",
+  };
+};
+
+export const buildLlmUsageSummary = (
+  usage: SharedLlmUsageSummary | undefined,
+  settings: LlmConfig,
+): LlmUsageSummary | undefined => {
+  if (!usage || usage.requests <= 0) return undefined;
+  const sanitized = sanitizeLlmSettings(settings);
+  return {
+    requestLabel: `${usage.requests} 次`,
+    promptLabel: `${usage.promptTokens} 输入`,
+    completionLabel: `${usage.completionTokens} 输出`,
+    totalLabel: `${usage.totalTokens} / ${sanitized.maxTokens} Token`,
   };
 };
 

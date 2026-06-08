@@ -236,6 +236,14 @@ export const EndingSummarySchema = z.object({
 });
 export type EndingSummary = z.infer<typeof EndingSummarySchema>;
 
+export const LlmUsageSummarySchema = z.object({
+  requests: z.number().int().min(0),
+  promptTokens: z.number().int().min(0),
+  completionTokens: z.number().int().min(0),
+  totalTokens: z.number().int().min(0)
+});
+export type LlmUsageSummary = z.infer<typeof LlmUsageSummarySchema>;
+
 export const PlayerActionSchema = z.object({
   id: z.string().optional(),
   actionType: z.enum(["investigate", "negotiate", "fight", "protect", "trade", "rest", "travel", "ignore", "custom"]),
@@ -255,6 +263,7 @@ export const TurnResolutionSchema = z.object({
   hiddenSummary: z.string(),
   narration: z.string(),
   ending: EndingSummarySchema.optional(),
+  llmUsage: LlmUsageSummarySchema.optional(),
   availableActions: z.array(PlayerActionSchema)
 });
 export type TurnResolution = z.infer<typeof TurnResolutionSchema>;

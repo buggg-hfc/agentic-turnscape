@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { LlmUsageSummary } from "@agentic-turnscape/shared";
 
 export type LLMMessage = {
   role: "system" | "user" | "assistant";
@@ -26,6 +27,7 @@ export type OpenAICompatibleOptions = {
   timeoutMs?: number | undefined;
   maxTokens?: number | undefined;
   jsonRetries?: number | undefined;
+  onUsage?: ((usage: LlmUsageSummary) => void) | undefined;
 };
 
 const withTimeout = async <T>(
@@ -41,6 +43,32 @@ const withTimeout = async <T>(
   }
 };
 
+const usageNumber = (value: unknown): number =>
+  typeof value === "number" && Number.isFinite(value) && value > 0
+    ? Math.round(value)
+    : 0;
+
+const openAiUsageOf = (usage: unknown): LlmUsageSummary | undefined => {
+  if (!usage || typeof usage !== "object") return undefined;
+  const record = usage as Record<string, unknown>;
+  const promptTokens = usageNumber(
+    record.prompt_tokens ?? record.promptTokens,
+  );
+  const completionTokens = usageNumber(
+    record.completion_tokens ?? record.completionTokens,
+  );
+  const totalTokens =
+    usageNumber(record.total_tokens ?? record.totalTokens) ||
+    promptTokens + completionTokens;
+  if (promptTokens + completionTokens + totalTokens <= 0) return undefined;
+  return {
+    requests: 1,
+    promptTokens,
+    completionTokens,
+    totalTokens,
+  };
+};
+
 export const createOpenAICompatibleClient = ({
   baseUrl = "https://api.openai.com/v1",
   apiKey,
@@ -48,6 +76,7 @@ export const createOpenAICompatibleClient = ({
   timeoutMs = 15000,
   maxTokens = 1024,
   jsonRetries = 1,
+  onUsage,
 }: OpenAICompatibleOptions): LLMClient => {
   const request = async (
     messages: LLMMessage[],
@@ -81,7 +110,10 @@ export const createOpenAICompatibleClient = ({
     }
     const body = (await response.json()) as {
       choices?: Array<{ message?: { content?: string } }>;
+      usage?: unknown;
     };
+    const usage = openAiUsageOf(body.usage);
+    if (usage) onUsage?.(usage);
     return body.choices?.[0]?.message?.content;
   };
 
@@ -132,30 +164,8 @@ export const createOpenAICompatibleClient = ({
     },
     async completeText({ messages, temperature, fallback }) {
       try {
-        if (!apiKey) return fallback();
-        const response = await withTimeout(
-          (signal) =>
-            fetch(`${baseUrl.replace(/\/$/, "")}/chat/completions`, {
-              method: "POST",
-              signal,
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${apiKey}`,
-              },
-              body: JSON.stringify({
-                model,
-                temperature,
-                max_tokens: maxTokens,
-                messages,
-              }),
-            }),
-          timeoutMs,
-        );
-        if (!response.ok) return fallback();
-        const body = (await response.json()) as {
-          choices?: Array<{ message?: { content?: string } }>;
-        };
-        return body.choices?.[0]?.message?.content?.trim() || fallback();
+        const content = await request(messages, temperature, false);
+        return content?.trim() || fallback();
       } catch {
         return fallback();
       }

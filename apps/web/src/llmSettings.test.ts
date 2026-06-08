@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  buildLlmUsageSummary,
   applyLlmProviderPreset,
   buildLlmRuntimeSummary,
   clearLlmSettings,
@@ -197,5 +198,31 @@ describe("LLM settings persistence", () => {
     expect(customSummary.secretLabel).toBe("未配置密钥");
     expect(customSummary.savedLabel).toBe("有未保存更改");
     expect(JSON.stringify(customSummary)).not.toContain(secret);
+  });
+
+  it("builds a Chinese LLM usage summary for the last completed turn", () => {
+    const summary = buildLlmUsageSummary(
+      {
+        requests: 6,
+        promptTokens: 78,
+        completionTokens: 39,
+        totalTokens: 117,
+      },
+      {
+        baseUrl: "https://api.deepseek.com",
+        model: "deepseek-v4-pro",
+        apiKey: "sk-localSecretOnly123",
+        timeoutMs: 30000,
+        maxTokens: 4096,
+      },
+    );
+
+    expect(summary).toEqual({
+      requestLabel: "6 次",
+      promptLabel: "78 输入",
+      completionLabel: "39 输出",
+      totalLabel: "117 / 4096 Token",
+    });
+    expect(JSON.stringify(summary)).not.toContain("sk-localSecretOnly123");
   });
 });

@@ -1242,6 +1242,11 @@ meter {
   background: rgba(103, 160, 143, 0.08);
 }
 
+.llm-runtime-summary.usage > div {
+  border-color: rgba(240, 201, 119, 0.24);
+  background: rgba(240, 201, 119, 0.08);
+}
+
 .llm-runtime-summary span,
 .llm-runtime-summary strong {
   display: block;

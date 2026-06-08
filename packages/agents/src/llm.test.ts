@@ -108,4 +108,42 @@ describe("OpenAI-compatible LLM client", () => {
       response_format: { type: "json_object" },
     });
   });
+
+  it("reports OpenAI-compatible token usage without exposing response text", async () => {
+    const usageEvents: unknown[] = [];
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        choices: [{ message: { content: JSON.stringify({ ok: true }) } }],
+        usage: {
+          prompt_tokens: 21,
+          completion_tokens: 7,
+          total_tokens: 28,
+        },
+      }),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const client = createOpenAICompatibleClient({
+      apiKey: "test-key",
+      model: "usage-model",
+      onUsage: (usage) => usageEvents.push(usage),
+    });
+
+    await client.completeJson({
+      schema: z.object({ ok: z.boolean() }),
+      messages: [{ role: "user", content: "Return JSON." }],
+      fallback: () => ({ ok: false }),
+    });
+
+    expect(usageEvents).toEqual([
+      {
+        requests: 1,
+        promptTokens: 21,
+        completionTokens: 7,
+        totalTokens: 28,
+      },
+    ]);
+    expect(JSON.stringify(usageEvents)).not.toContain('"ok":true');
+  });
 });
