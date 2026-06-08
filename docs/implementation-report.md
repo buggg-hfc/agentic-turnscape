@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Narrator Public Patch Boundary
+
+### Scope
+
+- Added TDD coverage proving a referee patch can still contain hidden events for persistence while the narrator prompt receives only the public, player-visible patch view.
+- The Agent orchestrator now filters `hiddenEvents`, hidden-info fields, secrets, true-personality fields, hidden goals, and true-background paths before building the narration request.
+- The full `resolution.statePatch` remains unchanged for rule-owned state updates and replay persistence; only the narrative Agent input is narrowed so narration can package confirmed public outcomes without seeing hidden logs.
+
+### Runtime Screenshot
+
+![Narrator public patch boundary](screenshots/narrator-public-patch-runtime-2026-06-08.png)
+
+The screenshot was captured from the local web GUI after a deterministic clinic negotiation result. The mocked runtime page checked that neither `hiddenEvents` nor a sentinel hidden reason appeared in visible UI text while the narration, replay card, and Agent inference panel continued to show public Chinese outcome information.
+
+### Verification
+
+```bash
+npm test -- packages/agents/src/orchestrator.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - Resumed Failure Turn Progress
 
 ### Scope

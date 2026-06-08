@@ -31,6 +31,8 @@ For gameplay work, tests should prove the rule invariant rather than a single lu
 
 ## Verified Slices
 
+- Narrator prompts now receive a tested public-only view of referee patches: hidden persistence entries such as `hiddenEvents`, hidden info, secrets, hidden goals, and true-background paths remain in the authoritative patch but are filtered before the narrative Agent can write prose.
+
 - Resumed campaigns now preserve recoverable turn progress in the main GUI: pending and failed last turns rebuild Chinese `回合进度` rows after hydrate, so players can see failed background settlement and continue choosing actions from the normal turn loop.
 - Failed queued turns now remain recoverable in persistent resume flows: Prisma `failTurn` records failure events and hidden memory, refreshes campaign activity ordering, and the Chinese resume list labels failed or pending campaigns before the player re-enters them.
 - Turn progress feedback now has tested Chinese display rows: queued work, status, Agent proposal counts, referee summaries, narration, completion, and secret-shaped text redaction are rendered through a shared helper, with a final-event fetch/fallback preventing completed queued turns from staying on internal worker tokens.

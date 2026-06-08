@@ -4,6 +4,7 @@ import {
   type AgentActionProposal,
   type EndingSummary,
   type PlayerAction,
+  type StatePatch,
   type TransparencyMode,
   type TurnResolution,
   type WorldState
@@ -73,6 +74,24 @@ const validationRetryPrompt = (issues: string[], observation: LimitedObservation
   ].join(" ");
 };
 
+const hiddenPatchPathParts = [
+  "hiddenEvents",
+  "hiddenInfo",
+  "hiddenGoal",
+  "hiddenSummary",
+  "realBackground",
+  "secret",
+  "truePersonality"
+];
+
+const isNarratorVisiblePatchChange = (change: StatePatch["changes"][number]): boolean =>
+  !hiddenPatchPathParts.some((part) => change.path.split(".").includes(part));
+
+const narratorVisiblePatch = (patch: StatePatch): StatePatch => ({
+  ...patch,
+  changes: patch.changes.filter(isNarratorVisiblePatchChange)
+});
+
 const decide = async (actorId: string, state: WorldState, playerAction: PlayerAction, llm: LLMClient): Promise<AgentActionProposal> => {
   const observation = buildLimitedObservation(actorId, state, playerAction);
   const fallback = () => scriptedProposal(actorId, state, playerAction);
@@ -132,7 +151,7 @@ export const runTurn = async ({
           {
             publicSummary: referee.publicSummary,
             roll: referee.roll,
-            statePatch: referee.patch,
+            statePatch: narratorVisiblePatch(referee.patch),
             nextVisibleClocks: Object.values(nextState.clocks).filter((clock) => clock.visible)
           },
           null,

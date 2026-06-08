@@ -4,6 +4,17 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added tested narrator input redaction for referee-owned hidden events. A turn can still persist hidden `state_patch` entries such as `hiddenEvents`, but the narration request now receives only the public patch view so the narrative Agent cannot package hidden logs into prose.
+- Captured a runtime screenshot showing the clinic negotiation narration, replay card, and Agent inference panel in the Chinese GUI while the page-level check rejected `hiddenEvents` and a sentinel hidden reason:
+
+![Narrator public patch boundary](screenshots/narrator-public-patch-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- packages/agents/src/orchestrator.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added tested recovery progress for resumed failed or pending turns. When a campaign opens with a failed last turn, the main action column now keeps the player-facing `回合进度` panel visible with `状态：失败` and `后台结算失败。可以选择其他行动继续推进。` instead of clearing the state after resume.
 - Captured a runtime screenshot showing the recovered failed-turn progress panel inside the campaign GUI:
 

@@ -208,4 +208,44 @@ describe("turn orchestrator", () => {
     });
     expect(JSON.stringify(resolution.proposals)).not.toContain("orbital_cannon");
   });
+
+  it("keeps hidden referee events out of narrator prompts", async () => {
+    const scenario = requireScenarioPackage("border-seven-days");
+    const state = scenario.createWorld();
+    state.player.attributes.charm = 5;
+    state.player.skills.social = 5;
+
+    let narratorPayload: {
+      statePatch?: { changes?: Array<{ path?: string }> };
+    } = {};
+    const observingNarratorLlm: LLMClient = {
+      completeJson: async ({ fallback }) => fallback(),
+      completeText: async ({ messages, fallback }) => {
+        narratorPayload = JSON.parse(messages[1]?.content ?? "{}");
+        return fallback();
+      }
+    };
+
+    const { resolution } = await runTurn({
+      state,
+      llm: observingNarratorLlm,
+      turnId: "turn-narrator-redaction",
+      seed: "turn-narrator-redaction",
+      playerAction: {
+        actionType: "negotiate",
+        label: "协调诊所冲突",
+        description: "说服城防军给诊所半天时间建立隔离线。",
+        targetId: "npc_rowan",
+        leverage: ["public_rumor", "zhou_jin_help"],
+        riskLevel: "medium"
+      },
+      getAvailableActions: scenario.getActions,
+      evaluateEnding: scenario.evaluateEnding
+    });
+
+    expect(resolution.statePatch.changes.some((change) => change.path === "hiddenEvents")).toBe(true);
+    expect(narratorPayload.statePatch?.changes?.some((change) => change.path === "publicEvents")).toBe(true);
+    expect(narratorPayload.statePatch?.changes?.some((change) => change.path === "hiddenEvents")).toBe(false);
+    expect(JSON.stringify(narratorPayload)).not.toContain("hiddenEvents");
+  });
 });
