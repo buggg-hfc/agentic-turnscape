@@ -4,6 +4,18 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added a tested RPG relationship graph to the main GUI. The old meter list is now a player-centered network with NPC nodes, relationship tone colors, visible score labels, detail chips, and `交谈` / `协助` buttons that write editable Chinese intent text into the normal freeform composer.
+- Captured a runtime screenshot after selecting `阿黛尔` and writing a relationship-driven conversation draft:
+
+![RPG relationship graph runtime](screenshots/relationship-graph-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- apps/web/src/relationshipGraph.test.ts apps/web/src/worldMap.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+  - Runtime screenshot automation asserted `5` relationship nodes, `5` relationship links, a non-empty freeform draft, and no secret-shaped rendered text.
+
 - Added tested interactive RPG map actions. Map nodes can now be selected to show a location detail panel with public facts, and `写入前往` / `写入调查` fills the normal Chinese freeform composer with editable intent text instead of forcing the player into fixed choices.
 - Captured a runtime screenshot after selecting `黑石矿区` and writing a map-driven investigation draft:
 

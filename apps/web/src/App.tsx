@@ -2,7 +2,6 @@ import {
   buildCreatorScenarioDraft,
   defaultCreatorScenarioDraftInput,
   type CreatorActionTarget,
-  type CharacterState,
   type ClockState,
   type CreatorActionType,
   type CreatorScenarioDraftInput,
@@ -103,6 +102,14 @@ import {
   type WorldMapView,
 } from "./worldMap.js";
 import {
+  buildRelationshipActionDraft,
+  buildRelationshipGraph,
+  getSelectedRelationshipNode,
+  type RelationshipActionDraftKind,
+  type RelationshipGraphNode,
+  type RelationshipGraphView,
+} from "./relationshipGraph.js";
+import {
   formatCreatorScenarioDefinition,
   getSavedCreatorScenarioDefinition,
   listSavedCreatorScenarioSummaries,
@@ -137,12 +144,6 @@ type CreatorActionTypeOption = { value: CreatorActionType; label: string };
 type CreatorActionTargetOption = { value: CreatorActionTarget; label: string };
 type CreatorSceneKindOption = { value: CreatorSceneKind; label: string };
 type CreatorRiskOption = { value: RiskLevel; label: string };
-
-type RelationshipEntry = {
-  id: string;
-  character: CharacterState;
-  score: number;
-};
 
 const phaseLabel: Record<WorldState["time"]["phase"], string> = {
   morning: "清晨",
@@ -229,6 +230,8 @@ export const App = () => {
     useState<TransparencyMode>("inference");
   const [selectedAction, setSelectedAction] = useState<PlayerAction>();
   const [selectedMapNodeId, setSelectedMapNodeId] = useState<string>();
+  const [selectedRelationshipNodeId, setSelectedRelationshipNodeId] =
+    useState<string>();
   const [freeformActionText, setFreeformActionText] = useState(() =>
     loadFreeformActionDraft(),
   );
@@ -410,8 +413,7 @@ export const App = () => {
     } catch (caught) {
       setScenarioImportStatus({
         kind: "error",
-        message:
-          caught instanceof Error ? caught.message : "生成导入剧本失败",
+        message: caught instanceof Error ? caught.message : "生成导入剧本失败",
       });
       setLoadState("selecting");
     }
@@ -487,38 +489,36 @@ export const App = () => {
   }, [freeformActionText]);
 
   const location = state ? state.locations[state.currentLocationId] : undefined;
-  const worldMap = useMemo(() => (state ? buildWorldMap(state) : undefined), [state]);
+  const worldMap = useMemo(
+    () => (state ? buildWorldMap(state) : undefined),
+    [state],
+  );
   const selectedMapNode = useMemo(
-    () => (worldMap ? getSelectedWorldMapNode(worldMap, selectedMapNodeId) : undefined),
+    () =>
+      worldMap
+        ? getSelectedWorldMapNode(worldMap, selectedMapNodeId)
+        : undefined,
     [selectedMapNodeId, worldMap],
+  );
+  const relationshipGraph = useMemo(
+    () => (state ? buildRelationshipGraph(state) : undefined),
+    [state],
+  );
+  const selectedRelationshipNode = useMemo(
+    () =>
+      relationshipGraph
+        ? getSelectedRelationshipNode(
+            relationshipGraph,
+            selectedRelationshipNodeId,
+          )
+        : undefined,
+    [relationshipGraph, selectedRelationshipNodeId],
   );
   const visibleClocks = useMemo(
     () =>
       state ? Object.values(state.clocks).filter((clock) => clock.visible) : [],
     [state],
   );
-  const topRelationships = useMemo(() => {
-    if (!state) return [];
-    return Object.entries(state.relationships)
-      .flatMap(([id, relationship]): RelationshipEntry[] => {
-        const npcId = id.split(":")[1] ?? "";
-        const character = state.characters[npcId];
-        if (!character) return [];
-        return [
-          {
-            id,
-            character,
-            score:
-              relationship.trust +
-              relationship.affinity +
-              relationship.respect -
-              relationship.suspicion,
-          },
-        ];
-      })
-      .sort((a, b) => Math.abs(b.score) - Math.abs(a.score))
-      .slice(0, 5);
-  }, [state]);
   const factionPlanSummaries = useMemo(
     () => (state ? buildFactionPlanSummaries(state) : []),
     [state],
@@ -667,6 +667,14 @@ export const App = () => {
     setSelectedAction(undefined);
   };
 
+  const writeRelationshipActionDraft = (
+    node: RelationshipGraphNode,
+    kind: RelationshipActionDraftKind,
+  ) => {
+    setFreeformActionText(buildRelationshipActionDraft(node, kind));
+    setSelectedAction(undefined);
+  };
+
   const testLlmConnection = async () => {
     setLlmConnectionStatus({
       kind: "running",
@@ -674,9 +682,7 @@ export const App = () => {
     });
     try {
       setLlmConnectionStatus(
-        llmConnectionSuccessStatus(
-          await api.testLlmConnection(llmSettings),
-        ),
+        llmConnectionSuccessStatus(await api.testLlmConnection(llmSettings)),
       );
     } catch (caught) {
       setLlmConnectionStatus(llmConnectionErrorStatus(caught));
@@ -1013,7 +1019,15 @@ export const App = () => {
         </aside>
 
         <aside className="side-panel">
-          <RelationshipPanel entries={topRelationships} />
+          {relationshipGraph ? (
+            <RelationshipPanel
+              graph={relationshipGraph}
+              selectedNode={selectedRelationshipNode}
+              disabled={loadState === "running"}
+              onSelectNode={setSelectedRelationshipNodeId}
+              onWriteDraft={writeRelationshipActionDraft}
+            />
+          ) : null}
           <FactionPlanPanel summaries={factionPlanSummaries} />
           <LlmSettingsPanel
             settings={llmSettings}
@@ -1132,7 +1146,9 @@ const ScenarioPicker = ({
       >
         <span>{option.title}</span>
         <small>{option.summary}</small>
-        {option.arcSummary ? <small className="scenario-arc">{option.arcSummary}</small> : null}
+        {option.arcSummary ? (
+          <small className="scenario-arc">{option.arcSummary}</small>
+        ) : null}
       </button>
     ))}
   </div>
@@ -1250,7 +1266,9 @@ const CreatorScenarioImportPanel = ({
         <textarea
           value={draft.dayThreeEvent ?? ""}
           disabled={disabled}
-          onChange={(event) => onDraftChange("dayThreeEvent", event.target.value)}
+          onChange={(event) =>
+            onDraftChange("dayThreeEvent", event.target.value)
+          }
         />
       </label>
       <label className="creator-field">
@@ -1258,7 +1276,9 @@ const CreatorScenarioImportPanel = ({
         <input
           value={draft.openingSceneName ?? ""}
           disabled={disabled}
-          onChange={(event) => onDraftChange("openingSceneName", event.target.value)}
+          onChange={(event) =>
+            onDraftChange("openingSceneName", event.target.value)
+          }
         />
       </label>
       <label className="creator-field">
@@ -1267,7 +1287,10 @@ const CreatorScenarioImportPanel = ({
           value={draft.openingSceneKind ?? "social"}
           disabled={disabled}
           onChange={(event) =>
-            onDraftChange("openingSceneKind", event.target.value as CreatorSceneKind)
+            onDraftChange(
+              "openingSceneKind",
+              event.target.value as CreatorSceneKind,
+            )
           }
         >
           {creatorSceneKindOptions.map((option) => (
@@ -1292,7 +1315,9 @@ const CreatorScenarioImportPanel = ({
         <input
           value={draft.pressureSceneName ?? ""}
           disabled={disabled}
-          onChange={(event) => onDraftChange("pressureSceneName", event.target.value)}
+          onChange={(event) =>
+            onDraftChange("pressureSceneName", event.target.value)
+          }
         />
       </label>
       <label className="creator-field">
@@ -1301,7 +1326,10 @@ const CreatorScenarioImportPanel = ({
           value={draft.pressureSceneKind ?? "combat"}
           disabled={disabled}
           onChange={(event) =>
-            onDraftChange("pressureSceneKind", event.target.value as CreatorSceneKind)
+            onDraftChange(
+              "pressureSceneKind",
+              event.target.value as CreatorSceneKind,
+            )
           }
         >
           {creatorSceneKindOptions.map((option) => (
@@ -1326,7 +1354,9 @@ const CreatorScenarioImportPanel = ({
         <input
           value={draft.finalSceneName ?? ""}
           disabled={disabled}
-          onChange={(event) => onDraftChange("finalSceneName", event.target.value)}
+          onChange={(event) =>
+            onDraftChange("finalSceneName", event.target.value)
+          }
         />
       </label>
       <label className="creator-field">
@@ -1335,7 +1365,10 @@ const CreatorScenarioImportPanel = ({
           value={draft.finalSceneKind ?? "exploration"}
           disabled={disabled}
           onChange={(event) =>
-            onDraftChange("finalSceneKind", event.target.value as CreatorSceneKind)
+            onDraftChange(
+              "finalSceneKind",
+              event.target.value as CreatorSceneKind,
+            )
           }
         >
           {creatorSceneKindOptions.map((option) => (
@@ -1376,7 +1409,10 @@ const CreatorScenarioImportPanel = ({
           )}
           disabled={disabled}
           onChange={(event) =>
-            onDraftChange("playerHealth", Number.parseInt(event.target.value, 10))
+            onDraftChange(
+              "playerHealth",
+              Number.parseInt(event.target.value, 10),
+            )
           }
         />
       </label>
@@ -1393,7 +1429,10 @@ const CreatorScenarioImportPanel = ({
           )}
           disabled={disabled}
           onChange={(event) =>
-            onDraftChange("playerStamina", Number.parseInt(event.target.value, 10))
+            onDraftChange(
+              "playerStamina",
+              Number.parseInt(event.target.value, 10),
+            )
           }
         />
       </label>
@@ -1410,7 +1449,10 @@ const CreatorScenarioImportPanel = ({
           )}
           disabled={disabled}
           onChange={(event) =>
-            onDraftChange("playerMoney", Number.parseInt(event.target.value, 10))
+            onDraftChange(
+              "playerMoney",
+              Number.parseInt(event.target.value, 10),
+            )
           }
         />
       </label>
@@ -1427,7 +1469,10 @@ const CreatorScenarioImportPanel = ({
           )}
           disabled={disabled}
           onChange={(event) =>
-            onDraftChange("playerIntel", Number.parseInt(event.target.value, 10))
+            onDraftChange(
+              "playerIntel",
+              Number.parseInt(event.target.value, 10),
+            )
           }
         />
       </label>
@@ -1484,7 +1529,10 @@ const CreatorScenarioImportPanel = ({
           )}
           disabled={disabled}
           onChange={(event) =>
-            onDraftChange("playerPhysique", Number.parseInt(event.target.value, 10))
+            onDraftChange(
+              "playerPhysique",
+              Number.parseInt(event.target.value, 10),
+            )
           }
         />
       </label>
@@ -1501,7 +1549,10 @@ const CreatorScenarioImportPanel = ({
           )}
           disabled={disabled}
           onChange={(event) =>
-            onDraftChange("playerAgility", Number.parseInt(event.target.value, 10))
+            onDraftChange(
+              "playerAgility",
+              Number.parseInt(event.target.value, 10),
+            )
           }
         />
       </label>
@@ -1518,7 +1569,10 @@ const CreatorScenarioImportPanel = ({
           )}
           disabled={disabled}
           onChange={(event) =>
-            onDraftChange("playerKnowledge", Number.parseInt(event.target.value, 10))
+            onDraftChange(
+              "playerKnowledge",
+              Number.parseInt(event.target.value, 10),
+            )
           }
         />
       </label>
@@ -1535,7 +1589,10 @@ const CreatorScenarioImportPanel = ({
           )}
           disabled={disabled}
           onChange={(event) =>
-            onDraftChange("playerInsight", Number.parseInt(event.target.value, 10))
+            onDraftChange(
+              "playerInsight",
+              Number.parseInt(event.target.value, 10),
+            )
           }
         />
       </label>
@@ -1552,7 +1609,10 @@ const CreatorScenarioImportPanel = ({
           )}
           disabled={disabled}
           onChange={(event) =>
-            onDraftChange("playerCharm", Number.parseInt(event.target.value, 10))
+            onDraftChange(
+              "playerCharm",
+              Number.parseInt(event.target.value, 10),
+            )
           }
         />
       </label>
@@ -1783,7 +1843,9 @@ const CreatorScenarioImportPanel = ({
         <textarea
           value={draft.guideResources}
           disabled={disabled}
-          onChange={(event) => onDraftChange("guideResources", event.target.value)}
+          onChange={(event) =>
+            onDraftChange("guideResources", event.target.value)
+          }
         />
       </label>
       <label className="creator-field">
@@ -1799,7 +1861,10 @@ const CreatorScenarioImportPanel = ({
           )}
           disabled={disabled}
           onChange={(event) =>
-            onDraftChange("guideSocialSkill", Number.parseInt(event.target.value, 10))
+            onDraftChange(
+              "guideSocialSkill",
+              Number.parseInt(event.target.value, 10),
+            )
           }
         />
       </label>
@@ -1836,7 +1901,10 @@ const CreatorScenarioImportPanel = ({
           )}
           disabled={disabled}
           onChange={(event) =>
-            onDraftChange("guideDefenseSkill", Number.parseInt(event.target.value, 10))
+            onDraftChange(
+              "guideDefenseSkill",
+              Number.parseInt(event.target.value, 10),
+            )
           }
         />
       </label>
@@ -2894,7 +2962,9 @@ const CampaignProgressionPanel = ({
       <strong>{summary.baseLabel}</strong>
       <div className="tag-row compact">
         {summary.facilities.length > 0 ? (
-          summary.facilities.map((facility) => <span key={facility}>{facility}</span>)
+          summary.facilities.map((facility) => (
+            <span key={facility}>{facility}</span>
+          ))
         ) : (
           <span>暂无设施</span>
         )}
@@ -2921,7 +2991,9 @@ const CampaignProgressionPanel = ({
       ))}
     </div>
     {summary.legacyFlags.length > 0 ? (
-      <small className="legacy-flags">{summary.legacyFlags.length} 条传承记录</small>
+      <small className="legacy-flags">
+        {summary.legacyFlags.length} 条传承记录
+      </small>
     ) : null}
   </section>
 );
@@ -3003,23 +3075,129 @@ const ChroniclePanel = ({ items }: { items: ChronicleTimelineItem[] }) => (
   </section>
 );
 
-const RelationshipPanel = ({ entries }: { entries: RelationshipEntry[] }) => (
-  <section className="module">
+const RelationshipPanel = ({
+  graph,
+  selectedNode,
+  disabled,
+  onSelectNode,
+  onWriteDraft,
+}: {
+  graph: RelationshipGraphView;
+  selectedNode: RelationshipGraphNode | undefined;
+  disabled: boolean;
+  onSelectNode: (nodeId: string) => void;
+  onWriteDraft: (
+    node: RelationshipGraphNode,
+    kind: RelationshipActionDraftKind,
+  ) => void;
+}) => (
+  <section className="module relationship-module">
     <div className="panel-heading compact">
       <Users size={17} />
       <h3>关系图谱</h3>
     </div>
-    <div className="relation-list">
-      {entries.map((entry) => (
-        <div key={entry.id} className="relation-row">
-          <div>
-            <strong>{entry.character.name}</strong>
-            <span>{entry.character.role}</span>
+    {graph.nodes.length > 0 ? (
+      <>
+        <div className="relationship-graph-canvas" aria-label="人物关系网">
+          <svg
+            className="relationship-graph-lines"
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+            aria-hidden="true"
+          >
+            {graph.edges.map((edge) => {
+              const node = graph.nodes.find((item) => item.id === edge.to);
+              if (!node) return null;
+              return (
+                <line
+                  key={edge.to}
+                  className={`relationship-edge ${edge.tone}`}
+                  x1={graph.center.x}
+                  y1={graph.center.y}
+                  x2={node.x}
+                  y2={node.y}
+                  strokeWidth={1 + edge.strength / 44}
+                />
+              );
+            })}
+          </svg>
+          <div
+            className="relationship-center"
+            style={{
+              left: `${graph.center.x}%`,
+              top: `${graph.center.y}%`,
+            }}
+          >
+            <Users size={16} />
+            <strong>{graph.center.name}</strong>
+            <span>玩家</span>
           </div>
-          <meter min={-10} max={10} value={entry.score} />
+          {graph.nodes.map((node) => (
+            <button
+              key={node.id}
+              className={`relationship-node ${node.tone}${
+                selectedNode?.id === node.id ? " selected" : ""
+              }`}
+              data-relationship-node-id={node.id}
+              disabled={disabled}
+              title={`查看 ${node.name} 关系`}
+              style={{
+                left: `${node.x}%`,
+                top: `${node.y}%`,
+              }}
+              onClick={() => onSelectNode(node.id)}
+            >
+              <span>{node.name}</span>
+              <small>
+                {node.label} · {node.score > 0 ? "+" : ""}
+                {node.score}
+              </small>
+            </button>
+          ))}
         </div>
-      ))}
-    </div>
+        {selectedNode ? (
+          <div className={`relationship-detail ${selectedNode.tone}`}>
+            <div className="relationship-detail-head">
+              <div>
+                <strong>{selectedNode.name}</strong>
+                <span>
+                  {selectedNode.role} · {selectedNode.factionName}
+                </span>
+              </div>
+              <small>
+                {selectedNode.label} {selectedNode.score > 0 ? "+" : ""}
+                {selectedNode.score}
+              </small>
+            </div>
+            <div className="relationship-detail-facts">
+              {selectedNode.details.map((detail) => (
+                <span key={`${selectedNode.id}-${detail}`}>{detail}</span>
+              ))}
+            </div>
+            <div className="relationship-detail-actions">
+              <button
+                data-relationship-draft="talk"
+                disabled={disabled}
+                onClick={() => onWriteDraft(selectedNode, "talk")}
+              >
+                <MessageSquare size={14} />
+                交谈
+              </button>
+              <button
+                data-relationship-draft="support"
+                disabled={disabled}
+                onClick={() => onWriteDraft(selectedNode, "support")}
+              >
+                <HeartPulse size={14} />
+                协助
+              </button>
+            </div>
+          </div>
+        ) : null}
+      </>
+    ) : (
+      <p className="muted">暂无可视关系。</p>
+    )}
   </section>
 );
 
@@ -3087,254 +3265,254 @@ const LlmSettingsPanel = ({
   const diagnosticsSummary = buildLlmDiagnosticsSummary(lastDiagnostics);
 
   return (
-  <section className="module">
-    <div className="panel-heading compact">
-      <Settings size={17} />
-      <h3>LLM 接口</h3>
-    </div>
-    <div className="settings-grid">
-      <label>
-        <span>供应商预设</span>
-        <select
-          value={detectedProviderPresetId}
-          onChange={(event) => {
-            if (!event.target.value) return;
-            onChange(
-              applyLlmProviderPreset(
-                settings,
-                event.target.value as LlmProviderPresetId,
-              ),
-            );
-          }}
-        >
-          <option value="">自定义配置</option>
-          {llmProviderPresets.map((preset) => (
-            <option key={preset.id} value={preset.id}>
-              {preset.label}
-            </option>
-          ))}
-        </select>
-        <small className="settings-hint">
-          {detectedProviderPreset?.description ??
-            "手动配置接口、模型与运行参数"}
-        </small>
-      </label>
-      <label>
-        <span>接口地址</span>
-        <input
-          value={settings.baseUrl}
-          onChange={(event) =>
-            onChange({ ...settings, baseUrl: event.target.value })
-          }
-        />
-      </label>
-      <label>
-        <span>模型</span>
-        <input
-          value={settings.model}
-          onChange={(event) =>
-            onChange({ ...settings, model: event.target.value })
-          }
-        />
-      </label>
-      <label>
-        <span>API 密钥</span>
-        <div className="secret-input">
-          <KeyRound size={15} />
+    <section className="module">
+      <div className="panel-heading compact">
+        <Settings size={17} />
+        <h3>LLM 接口</h3>
+      </div>
+      <div className="settings-grid">
+        <label>
+          <span>供应商预设</span>
+          <select
+            value={detectedProviderPresetId}
+            onChange={(event) => {
+              if (!event.target.value) return;
+              onChange(
+                applyLlmProviderPreset(
+                  settings,
+                  event.target.value as LlmProviderPresetId,
+                ),
+              );
+            }}
+          >
+            <option value="">自定义配置</option>
+            {llmProviderPresets.map((preset) => (
+              <option key={preset.id} value={preset.id}>
+                {preset.label}
+              </option>
+            ))}
+          </select>
+          <small className="settings-hint">
+            {detectedProviderPreset?.description ??
+              "手动配置接口、模型与运行参数"}
+          </small>
+        </label>
+        <label>
+          <span>接口地址</span>
           <input
-            type="password"
-            value={settings.apiKey}
-            autoComplete="off"
+            value={settings.baseUrl}
             onChange={(event) =>
-              onChange({ ...settings, apiKey: event.target.value })
+              onChange({ ...settings, baseUrl: event.target.value })
             }
           />
+        </label>
+        <label>
+          <span>模型</span>
+          <input
+            value={settings.model}
+            onChange={(event) =>
+              onChange({ ...settings, model: event.target.value })
+            }
+          />
+        </label>
+        <label>
+          <span>API 密钥</span>
+          <div className="secret-input">
+            <KeyRound size={15} />
+            <input
+              type="password"
+              value={settings.apiKey}
+              autoComplete="off"
+              onChange={(event) =>
+                onChange({ ...settings, apiKey: event.target.value })
+              }
+            />
+          </div>
+        </label>
+        <label>
+          <span>超时时间</span>
+          <input
+            type="number"
+            min={1000}
+            max={120000}
+            step={1000}
+            value={settings.timeoutMs}
+            onChange={(event) =>
+              onChange({ ...settings, timeoutMs: Number(event.target.value) })
+            }
+          />
+        </label>
+        <label>
+          <span>最大 Token</span>
+          <input
+            type="number"
+            min={1}
+            max={128000}
+            step={256}
+            value={settings.maxTokens}
+            onChange={(event) =>
+              onChange({ ...settings, maxTokens: Number(event.target.value) })
+            }
+          />
+        </label>
+        <label>
+          <span>JSON 模式</span>
+          <select
+            value={settings.jsonMode}
+            onChange={(event) =>
+              onChange({
+                ...settings,
+                jsonMode: event.target.value as LlmConfig["jsonMode"],
+              })
+            }
+          >
+            {llmJsonModeOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+          <small className="settings-hint">
+            {
+              llmJsonModeOptions.find(
+                (option) => option.value === settings.jsonMode,
+              )?.description
+            }
+          </small>
+        </label>
+        <label>
+          <span>JSON 重试次数</span>
+          <input
+            type="number"
+            min={0}
+            max={5}
+            step={1}
+            value={settings.jsonRetries}
+            onChange={(event) =>
+              onChange({ ...settings, jsonRetries: Number(event.target.value) })
+            }
+          />
+          <small className="settings-hint">
+            结构化输出校验失败后最多重试 5 次
+          </small>
+        </label>
+      </div>
+      <div className="llm-runtime-summary" aria-label="LLM 运行摘要">
+        <div>
+          <span>本回合配置</span>
+          <strong>{runtimeSummary.providerLabel}</strong>
         </div>
-      </label>
-      <label>
-        <span>超时时间</span>
-        <input
-          type="number"
-          min={1000}
-          max={120000}
-          step={1000}
-          value={settings.timeoutMs}
-          onChange={(event) =>
-            onChange({ ...settings, timeoutMs: Number(event.target.value) })
-          }
-        />
-      </label>
-      <label>
-        <span>最大 Token</span>
-        <input
-          type="number"
-          min={1}
-          max={128000}
-          step={256}
-          value={settings.maxTokens}
-          onChange={(event) =>
-            onChange({ ...settings, maxTokens: Number(event.target.value) })
-          }
-        />
-      </label>
-      <label>
-        <span>JSON 模式</span>
-        <select
-          value={settings.jsonMode}
-          onChange={(event) =>
-            onChange({
-              ...settings,
-              jsonMode: event.target.value as LlmConfig["jsonMode"],
-            })
-          }
+        <div>
+          <span>模型</span>
+          <strong>{runtimeSummary.modelLabel}</strong>
+        </div>
+        <div>
+          <span>接口</span>
+          <strong>{runtimeSummary.endpointLabel}</strong>
+        </div>
+        <div>
+          <span>密钥</span>
+          <strong>{runtimeSummary.secretLabel}</strong>
+        </div>
+        <div>
+          <span>预算</span>
+          <strong>{runtimeSummary.budgetLabel}</strong>
+        </div>
+        <div>
+          <span>JSON 模式</span>
+          <strong>{runtimeSummary.jsonModeLabel}</strong>
+        </div>
+        <div>
+          <span>重试预算</span>
+          <strong>{runtimeSummary.retryBudgetLabel}</strong>
+        </div>
+        <div>
+          <span>保存格式</span>
+          <strong>{runtimeSummary.storageLabel}</strong>
+        </div>
+        <div>
+          <span>状态</span>
+          <strong>{runtimeSummary.savedLabel}</strong>
+        </div>
+      </div>
+      {usageSummary ? (
+        <div
+          className={`llm-runtime-summary usage ${usageSummary.pressure}`}
+          aria-label="LLM 用量监控"
         >
-          {llmJsonModeOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-        <small className="settings-hint">
-          {
-            llmJsonModeOptions.find(
-              (option) => option.value === settings.jsonMode,
-            )?.description
-          }
-        </small>
-      </label>
-      <label>
-        <span>JSON 重试次数</span>
-        <input
-          type="number"
-          min={0}
-          max={5}
-          step={1}
-          value={settings.jsonRetries}
-          onChange={(event) =>
-            onChange({ ...settings, jsonRetries: Number(event.target.value) })
-          }
-        />
-        <small className="settings-hint">
-          结构化输出校验失败后最多重试 5 次
-        </small>
-      </label>
-    </div>
-    <div className="llm-runtime-summary" aria-label="LLM 运行摘要">
-      <div>
-        <span>本回合配置</span>
-        <strong>{runtimeSummary.providerLabel}</strong>
-      </div>
-      <div>
-        <span>模型</span>
-        <strong>{runtimeSummary.modelLabel}</strong>
-      </div>
-      <div>
-        <span>接口</span>
-        <strong>{runtimeSummary.endpointLabel}</strong>
-      </div>
-      <div>
-        <span>密钥</span>
-        <strong>{runtimeSummary.secretLabel}</strong>
-      </div>
-      <div>
-        <span>预算</span>
-        <strong>{runtimeSummary.budgetLabel}</strong>
-      </div>
-      <div>
-        <span>JSON 模式</span>
-        <strong>{runtimeSummary.jsonModeLabel}</strong>
-      </div>
-      <div>
-        <span>重试预算</span>
-        <strong>{runtimeSummary.retryBudgetLabel}</strong>
-      </div>
-      <div>
-        <span>保存格式</span>
-        <strong>{runtimeSummary.storageLabel}</strong>
-      </div>
-      <div>
-        <span>状态</span>
-        <strong>{runtimeSummary.savedLabel}</strong>
-      </div>
-    </div>
-    {usageSummary ? (
-      <div
-        className={`llm-runtime-summary usage ${usageSummary.pressure}`}
-        aria-label="LLM 用量监控"
-      >
-        <div>
-          <span>上回合请求</span>
-          <strong>{usageSummary.requestLabel}</strong>
+          <div>
+            <span>上回合请求</span>
+            <strong>{usageSummary.requestLabel}</strong>
+          </div>
+          <div>
+            <span>输入 Token</span>
+            <strong>{usageSummary.promptLabel}</strong>
+          </div>
+          <div>
+            <span>输出 Token</span>
+            <strong>{usageSummary.completionLabel}</strong>
+          </div>
+          <div>
+            <span>总消耗</span>
+            <strong>{usageSummary.totalLabel}</strong>
+          </div>
+          <div className="usage-pressure">
+            <span>预算压力</span>
+            <strong>{usageSummary.pressureLabel}</strong>
+            <small>{usageSummary.pressureDetailLabel}</small>
+          </div>
         </div>
-        <div>
-          <span>输入 Token</span>
-          <strong>{usageSummary.promptLabel}</strong>
+      ) : null}
+      {diagnosticsSummary ? (
+        <div
+          className={`llm-runtime-summary diagnostics ${diagnosticsSummary.health}`}
+          aria-label="LLM 诊断"
+        >
+          <div>
+            <span>JSON 尝试</span>
+            <strong>{diagnosticsSummary.attemptsLabel}</strong>
+          </div>
+          <div>
+            <span>JSON 重试</span>
+            <strong>{diagnosticsSummary.retriesLabel}</strong>
+          </div>
+          <div>
+            <span>兜底次数</span>
+            <strong>{diagnosticsSummary.fallbackLabel}</strong>
+          </div>
+          <div>
+            <span>叙事兜底</span>
+            <strong>{diagnosticsSummary.textFallbackLabel}</strong>
+          </div>
+          <div className="usage-pressure">
+            <span>结构状态</span>
+            <strong>{diagnosticsSummary.healthLabel}</strong>
+          </div>
         </div>
-        <div>
-          <span>输出 Token</span>
-          <strong>{usageSummary.completionLabel}</strong>
-        </div>
-        <div>
-          <span>总消耗</span>
-          <strong>{usageSummary.totalLabel}</strong>
-        </div>
-        <div className="usage-pressure">
-          <span>预算压力</span>
-          <strong>{usageSummary.pressureLabel}</strong>
-          <small>{usageSummary.pressureDetailLabel}</small>
-        </div>
-      </div>
-    ) : null}
-    {diagnosticsSummary ? (
-      <div
-        className={`llm-runtime-summary diagnostics ${diagnosticsSummary.health}`}
-        aria-label="LLM 诊断"
-      >
-        <div>
-          <span>JSON 尝试</span>
-          <strong>{diagnosticsSummary.attemptsLabel}</strong>
-        </div>
-        <div>
-          <span>JSON 重试</span>
-          <strong>{diagnosticsSummary.retriesLabel}</strong>
-        </div>
-        <div>
-          <span>兜底次数</span>
-          <strong>{diagnosticsSummary.fallbackLabel}</strong>
-        </div>
-        <div>
-          <span>叙事兜底</span>
-          <strong>{diagnosticsSummary.textFallbackLabel}</strong>
-        </div>
-        <div className="usage-pressure">
-          <span>结构状态</span>
-          <strong>{diagnosticsSummary.healthLabel}</strong>
-        </div>
-      </div>
-    ) : null}
-    <div className="settings-actions">
-      <button className="secondary-button" onClick={onSave}>
-        <Save size={15} />
-        {saved ? "已保存" : "保存"}
-      </button>
-      <button
-        className="secondary-button"
-        disabled={connectionStatus?.kind === "running"}
-        onClick={onTest}
-      >
+      ) : null}
+      <div className="settings-actions">
+        <button className="secondary-button" onClick={onSave}>
+          <Save size={15} />
+          {saved ? "已保存" : "保存"}
+        </button>
+        <button
+          className="secondary-button"
+          disabled={connectionStatus?.kind === "running"}
+          onClick={onTest}
+        >
           <Activity size={15} />
           {connectionStatus?.kind === "running" ? "测试中" : "测试"}
         </button>
-      <button className="icon-button" title="清除 LLM 设置" onClick={onClear}>
-        <Trash2 size={16} />
-      </button>
-    </div>
-    {connectionStatus ? (
-      <div className={`llm-test-status ${connectionStatus.kind}`}>
-        {connectionStatus.message}
+        <button className="icon-button" title="清除 LLM 设置" onClick={onClear}>
+          <Trash2 size={16} />
+        </button>
       </div>
-    ) : null}
-  </section>
+      {connectionStatus ? (
+        <div className={`llm-test-status ${connectionStatus.kind}`}>
+          {connectionStatus.message}
+        </div>
+      ) : null}
+    </section>
   );
 };
 

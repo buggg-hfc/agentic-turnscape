@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - RPG Relationship Graph GUI
+
+### Scope
+
+- Added TDD coverage for converting player-visible relationship state into a stable RPG relationship graph view model.
+- Replaced the right-side relationship meter list with a player-centered network: NPC nodes show tone, score, faction role, and relationship detail chips.
+- Added `交谈` and `协助` commands on the selected relationship node. These commands write editable Chinese freeform action drafts, keeping the rule-owned adjudication pipeline intact while making social play more visual.
+
+### Runtime Screenshot
+
+![RPG relationship graph runtime](screenshots/relationship-graph-runtime-2026-06-08.png)
+
+The screenshot was captured from the local Web + API runtime after starting `边境七日`, selecting `阿黛尔`, and writing a relationship-driven conversation draft into the freeform composer. Runtime assertions confirmed `5` relationship nodes, `5` relationship links, a non-empty freeform draft, and absence of secret-shaped rendered text.
+
+### Verification
+
+```bash
+npm test -- apps/web/src/relationshipGraph.test.ts apps/web/src/worldMap.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - Interactive RPG Map Actions
 
 ### Scope
