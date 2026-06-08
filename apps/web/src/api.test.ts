@@ -39,6 +39,7 @@ describe("web API client", () => {
         timeoutMs: 5000,
         maxTokens: 2048,
         jsonMode: "off",
+        jsonRetries: 0,
       },
       { queued: true },
     );
@@ -61,6 +62,7 @@ describe("web API client", () => {
         timeoutMs: 5000,
         maxTokens: 2048,
         jsonMode: "off",
+        jsonRetries: 0,
       },
     });
   });
@@ -214,6 +216,7 @@ describe("web API client", () => {
         timeoutMs: 6000,
         maxTokens: 128,
         jsonMode: "strict",
+        jsonRetries: 3,
       }),
     ).resolves.toEqual({
       ok: true,
@@ -234,6 +237,7 @@ describe("web API client", () => {
       timeoutMs: 6000,
       maxTokens: 128,
       jsonMode: "strict",
+      jsonRetries: 3,
     });
   });
 
@@ -257,6 +261,7 @@ describe("web API client", () => {
         timeoutMs: 6000,
         maxTokens: 128,
         jsonMode: "auto",
+        jsonRetries: 1,
       }),
     ).rejects.toThrow("请输入 API Key 后再测试连接。");
   });

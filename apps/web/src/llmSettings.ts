@@ -26,6 +26,7 @@ export type LlmProviderPreset = {
   timeoutMs: number;
   maxTokens: number;
   jsonMode: LlmJsonMode;
+  jsonRetries: number;
 };
 export type LlmRuntimeSummary = {
   providerLabel: string;
@@ -34,6 +35,7 @@ export type LlmRuntimeSummary = {
   secretLabel: string;
   budgetLabel: string;
   jsonModeLabel: string;
+  retryBudgetLabel: string;
   savedLabel: string;
 };
 export type LlmUsageSummary = {
@@ -85,6 +87,7 @@ const defaultLlmProviderPreset: LlmProviderPreset = {
   timeoutMs: DEFAULT_LLM_CONFIG.timeoutMs,
   maxTokens: DEFAULT_LLM_CONFIG.maxTokens,
   jsonMode: DEFAULT_LLM_CONFIG.jsonMode,
+  jsonRetries: DEFAULT_LLM_CONFIG.jsonRetries,
 };
 
 export const llmProviderPresets: LlmProviderPreset[] = [
@@ -97,6 +100,7 @@ export const llmProviderPresets: LlmProviderPreset[] = [
     timeoutMs: DEFAULT_LLM_CONFIG.timeoutMs,
     maxTokens: DEFAULT_LLM_CONFIG.maxTokens,
     jsonMode: "auto",
+    jsonRetries: DEFAULT_LLM_CONFIG.jsonRetries,
   },
   {
     id: "deepseek",
@@ -107,6 +111,7 @@ export const llmProviderPresets: LlmProviderPreset[] = [
     timeoutMs: 30000,
     maxTokens: 4096,
     jsonMode: "auto",
+    jsonRetries: 1,
   },
   {
     id: "local",
@@ -117,6 +122,7 @@ export const llmProviderPresets: LlmProviderPreset[] = [
     timeoutMs: 15000,
     maxTokens: 4096,
     jsonMode: "off",
+    jsonRetries: 0,
   },
 ];
 
@@ -146,6 +152,7 @@ export const applyLlmProviderPreset = (
     timeoutMs: preset.timeoutMs,
     maxTokens: preset.maxTokens,
     jsonMode: preset.jsonMode,
+    jsonRetries: preset.jsonRetries,
   });
 };
 
@@ -169,6 +176,8 @@ const llmJsonModeLabelOf = (mode: LlmJsonMode): string =>
   llmJsonModeOptions.find((option) => option.value === mode)?.label ??
   llmJsonModeOptions[0]?.label ??
   mode;
+const llmRetryBudgetLabelOf = (retries: number): string =>
+  retries <= 0 ? "不重试" : `最多 ${retries} 次`;
 
 export const buildLlmRuntimeSummary = (
   settings: LlmConfig,
@@ -188,6 +197,7 @@ export const buildLlmRuntimeSummary = (
     secretLabel: sanitized.apiKey ? "密钥已在本地配置" : "未配置密钥",
     budgetLabel: `${Math.max(1, Math.round(sanitized.timeoutMs / 1000))} 秒 / ${sanitized.maxTokens} Token`,
     jsonModeLabel: llmJsonModeLabelOf(sanitized.jsonMode),
+    retryBudgetLabel: llmRetryBudgetLabelOf(sanitized.jsonRetries),
     savedLabel: saved ? "已保存" : "有未保存更改",
   };
 };

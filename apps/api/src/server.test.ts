@@ -1283,6 +1283,7 @@ describe("campaign turn API", () => {
         timeoutMs: 6000,
         maxTokens: 128,
         jsonMode: "strict",
+        jsonRetries: 3,
       },
     });
 
@@ -1302,6 +1303,7 @@ describe("campaign turn API", () => {
       timeoutMs: 6000,
       maxTokens: 128,
       jsonMode: "strict",
+      jsonRetries: 3,
     });
 
     await app.close();
@@ -1407,6 +1409,7 @@ describe("campaign turn API", () => {
           timeoutMs: 5000,
           maxTokens: 2048,
           jsonMode: "off",
+          jsonRetries: 0,
         },
       },
     });
@@ -1420,6 +1423,7 @@ describe("campaign turn API", () => {
       timeoutMs: 5000,
       maxTokens: 2048,
       jsonMode: "off",
+      jsonRetries: 0,
     });
     expect(JSON.stringify(body.state)).not.toContain("local-secret");
     expect(body.resolution.proposals.length).toBeGreaterThan(0);

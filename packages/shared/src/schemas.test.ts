@@ -12,6 +12,7 @@ describe("LLM config schema", () => {
       baseUrl: "https://api.deepseek.com",
       model: "deepseek-v4-pro",
       jsonMode: "auto",
+      jsonRetries: 1,
     });
 
     expect(
@@ -19,8 +20,12 @@ describe("LLM config schema", () => {
         baseUrl: "http://localhost:11434/v1",
         model: "local-story-model",
         jsonMode: "off",
-      }).jsonMode,
-    ).toBe("off");
+        jsonRetries: "3",
+      }),
+    ).toMatchObject({
+      jsonMode: "off",
+      jsonRetries: 3,
+    });
   });
 });
 

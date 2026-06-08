@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - LLM JSON Retry Budget
+
+### Scope
+
+- Added TDD coverage for request-level JSON retry budget settings across shared schema, Web persistence, API payloads, and API-to-Agent client options.
+- `LlmConfig` now carries `jsonRetries` with a bounded 0-5 range. The default remains 1, while the local-compatible preset uses 0 to avoid repeated local provider calls unless the player opts in.
+- The Chinese LLM settings panel now exposes `JSON 重试次数` and shows `重试预算` in the non-secret runtime summary, so operators can tune structured-output recovery without exposing API keys or changing game state.
+
+### Runtime Screenshot
+
+![LLM JSON retry budget](screenshots/llm-json-retry-budget-runtime-2026-06-08.png)
+
+The screenshot was captured from the local Web + API runtime after entering a Border Seven Days campaign with browser-local DeepSeek-compatible settings. The runtime check verified `JSON 重试次数`, `最多 2 次`, `JSON 模式`, and rejected API-key-shaped text.
+
+### Verification
+
+```bash
+npm test -- --run packages/shared/src/schemas.test.ts apps/web/src/llmSettings.test.ts apps/web/src/api.test.ts apps/api/src/server.test.ts
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - LLM JSON Mode Compatibility
 
 ### Scope

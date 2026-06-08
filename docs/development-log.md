@@ -4,6 +4,17 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added tested JSON retry budget configuration for LLM calls. The shared `LlmConfig` now persists bounded `jsonRetries`, the API passes it into the OpenAI-compatible client, and the Chinese settings panel exposes `JSON 重试次数` plus a non-secret `重试预算` summary.
+- Captured a runtime screenshot showing the in-game LLM panel with `JSON 重试次数` set to `2` and the summary displaying `最多 2 次`:
+
+![LLM JSON retry budget](screenshots/llm-json-retry-budget-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- --run packages/shared/src/schemas.test.ts apps/web/src/llmSettings.test.ts apps/web/src/api.test.ts apps/api/src/server.test.ts`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added tested LLM JSON mode compatibility across shared schema, Agent client, API passthrough, Web settings persistence, and the Chinese GUI. `auto` mode retries without OpenAI `response_format` when a provider rejects it, `strict` keeps the parameter, and `off` supports local compatible services that need plain JSON prompts.
 - Captured a runtime screenshot showing the in-game LLM panel with `JSON 模式` set to `关闭格式参数`:
 

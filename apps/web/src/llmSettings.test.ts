@@ -49,6 +49,7 @@ describe("LLM settings persistence", () => {
           timeoutMs: 9000,
           maxTokens: 777,
           jsonMode: "off",
+          jsonRetries: 2,
         },
         "deepseek",
       ),
@@ -59,6 +60,7 @@ describe("LLM settings persistence", () => {
       timeoutMs: 30000,
       maxTokens: 4096,
       jsonMode: "auto",
+      jsonRetries: 1,
     });
 
     expect(
@@ -70,10 +72,14 @@ describe("LLM settings persistence", () => {
           timeoutMs: 9000,
           maxTokens: 777,
           jsonMode: "auto",
+          jsonRetries: 2,
         },
         "local",
-      ).jsonMode,
-    ).toBe("off");
+      ),
+    ).toMatchObject({
+      jsonMode: "off",
+      jsonRetries: 0,
+    });
     expect(llmJsonModeOptions.map((option) => option.label)).toEqual([
       "自动兼容",
       "严格 JSON",
@@ -90,6 +96,7 @@ describe("LLM settings persistence", () => {
         timeoutMs: 30000,
         maxTokens: 4096,
         jsonMode: "auto",
+        jsonRetries: 1,
       }),
     ).toBe("deepseek");
 
@@ -101,6 +108,7 @@ describe("LLM settings persistence", () => {
         timeoutMs: 30000,
         maxTokens: 4096,
         jsonMode: "auto",
+        jsonRetries: 1,
       }),
     ).toBe("");
   });
@@ -116,6 +124,7 @@ describe("LLM settings persistence", () => {
         timeoutMs: 25000,
         maxTokens: 2048,
         jsonMode: "strict",
+        jsonRetries: 3,
       },
       storage,
     );
@@ -127,6 +136,7 @@ describe("LLM settings persistence", () => {
       timeoutMs: 25000,
       maxTokens: 2048,
       jsonMode: "strict",
+      jsonRetries: 3,
     });
   });
 
@@ -141,6 +151,7 @@ describe("LLM settings persistence", () => {
       timeoutMs: 15000,
       maxTokens: 1024,
       jsonMode: "auto",
+      jsonRetries: 1,
     });
   });
 
@@ -154,6 +165,7 @@ describe("LLM settings persistence", () => {
         timeoutMs: 12000,
         maxTokens: 4096,
         jsonMode: "off",
+        jsonRetries: 0,
       },
       storage,
     );
@@ -201,6 +213,7 @@ describe("LLM settings persistence", () => {
           timeoutMs: 30000,
           maxTokens: 4096,
           jsonMode: "auto",
+          jsonRetries: 2,
         },
         true,
       ),
@@ -211,6 +224,7 @@ describe("LLM settings persistence", () => {
       secretLabel: "密钥已在本地配置",
       budgetLabel: "30 秒 / 4096 Token",
       jsonModeLabel: "自动兼容",
+      retryBudgetLabel: "最多 2 次",
       savedLabel: "已保存",
     });
 
@@ -222,6 +236,7 @@ describe("LLM settings persistence", () => {
         timeoutMs: 15000,
         maxTokens: 2048,
         jsonMode: "off",
+        jsonRetries: 0,
       },
       false,
     );
@@ -229,6 +244,7 @@ describe("LLM settings persistence", () => {
     expect(customSummary.providerLabel).toBe("本地兼容");
     expect(customSummary.secretLabel).toBe("未配置密钥");
     expect(customSummary.jsonModeLabel).toBe("关闭格式参数");
+    expect(customSummary.retryBudgetLabel).toBe("不重试");
     expect(customSummary.savedLabel).toBe("有未保存更改");
     expect(JSON.stringify(customSummary)).not.toContain(secret);
   });
@@ -248,6 +264,7 @@ describe("LLM settings persistence", () => {
         timeoutMs: 30000,
         maxTokens: 4096,
         jsonMode: "auto",
+        jsonRetries: 1,
       },
     );
 
@@ -279,6 +296,7 @@ describe("LLM settings persistence", () => {
           timeoutMs: 30000,
           maxTokens: 4096,
           jsonMode: "auto",
+          jsonRetries: 1,
         },
       ),
     ).toMatchObject({
@@ -302,6 +320,7 @@ describe("LLM settings persistence", () => {
           timeoutMs: 15000,
           maxTokens: 4096,
           jsonMode: "off",
+          jsonRetries: 0,
         },
       ),
     ).toMatchObject({

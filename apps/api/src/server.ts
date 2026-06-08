@@ -376,6 +376,12 @@ export const buildServer = (options: ServerOptions = {}) => {
     return scenario;
   };
   const envJsonMode = LlmJsonModeSchema.safeParse(process.env.LLM_JSON_MODE);
+  const envJsonRetries = z.coerce
+    .number()
+    .int()
+    .min(0)
+    .max(5)
+    .safeParse(process.env.LLM_JSON_RETRIES);
   const envLlmConfig: OpenAICompatibleOptions = {
     baseUrl: process.env.LLM_BASE_URL,
     apiKey: process.env.LLM_API_KEY,
@@ -387,6 +393,7 @@ export const buildServer = (options: ServerOptions = {}) => {
       ? Number(process.env.LLM_MAX_TOKENS)
       : undefined,
     jsonMode: envJsonMode.success ? envJsonMode.data : undefined,
+    jsonRetries: envJsonRetries.success ? envJsonRetries.data : undefined,
   };
   const envLlm = createLlmClient(envLlmConfig);
   const llmOptionsForConfig = (
@@ -400,6 +407,7 @@ export const buildServer = (options: ServerOptions = {}) => {
     timeoutMs: config.timeoutMs,
     maxTokens: config.maxTokens,
     jsonMode: config.jsonMode,
+    jsonRetries: config.jsonRetries,
     ...(onUsage ? { onUsage } : {}),
     ...(onDiagnostic ? { onDiagnostic } : {}),
   });

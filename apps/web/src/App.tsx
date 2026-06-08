@@ -2320,6 +2320,22 @@ const LlmSettingsPanel = ({
           }
         </small>
       </label>
+      <label>
+        <span>JSON 重试次数</span>
+        <input
+          type="number"
+          min={0}
+          max={5}
+          step={1}
+          value={settings.jsonRetries}
+          onChange={(event) =>
+            onChange({ ...settings, jsonRetries: Number(event.target.value) })
+          }
+        />
+        <small className="settings-hint">
+          结构化输出校验失败后最多重试 5 次
+        </small>
+      </label>
     </div>
     <div className="llm-runtime-summary" aria-label="LLM 运行摘要">
       <div>
@@ -2345,6 +2361,10 @@ const LlmSettingsPanel = ({
       <div>
         <span>JSON 模式</span>
         <strong>{runtimeSummary.jsonModeLabel}</strong>
+      </div>
+      <div>
+        <span>重试预算</span>
+        <strong>{runtimeSummary.retryBudgetLabel}</strong>
       </div>
       <div>
         <span>状态</span>
