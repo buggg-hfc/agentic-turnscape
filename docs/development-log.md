@@ -4,6 +4,15 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added tested interactive RPG map actions. Map nodes can now be selected to show a location detail panel with public facts, and `写入前往` / `写入调查` fills the normal Chinese freeform composer with editable intent text instead of forcing the player into fixed choices.
+- Captured a runtime screenshot after selecting `黑石矿区` and writing a map-driven investigation draft:
+
+![Interactive RPG map action draft](screenshots/rpg-world-map-interactive-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- apps/web/src/worldMap.test.ts --reporter=dot`
+  - `npm run typecheck`
+
 - Added a tested RPG world map GUI to the main turn screen. Visible `WorldState` now becomes map nodes with current-location routing, danger labels, NPC counts, visible clock summaries, and faction pressure bars, giving the Chinese interface a more game-like spatial layer before the player chooses fixed or freeform actions.
 - Captured a runtime screenshot after starting `边境七日`, showing six location nodes and five route lines in the main game UI:
 

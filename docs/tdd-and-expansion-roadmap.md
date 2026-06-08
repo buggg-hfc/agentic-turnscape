@@ -31,6 +31,8 @@ For gameplay work, tests should prove the rule invariant rather than a single lu
 
 ## Verified Slices
 
+- The main GUI now has tested interactive RPG map actions: selecting a map location reveals public facts and can write `前往` or `调查` into the normal freeform composer, making map play easier without limiting open-ended player intent.
+
 - The main GUI now has a tested RPG world map layer: player-visible `WorldState` is converted into current-location map nodes, route lines, danger tones, NPC/clock summaries, and faction pressure bars, and the Chinese turn screen shows this map before action selection.
 
 - Creator tooling now supports tested editable faction doctrine fields: support and pressure faction internal conflict, operating style, and bottom line feed generated `WorldState.factions[*]` values, while the Chinese draft preview exposes `分歧`, `风格`, and `底线` before import.

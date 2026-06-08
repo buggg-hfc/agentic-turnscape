@@ -2,6 +2,27 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Interactive RPG Map Actions
+
+### Scope
+
+- Added TDD coverage for map node selection, public location facts, and map-generated freeform action drafts.
+- The main RPG map is now interactive: clicking a location selects it, reveals a compact detail panel, and exposes `写入前往` / `写入调查` commands.
+- The write commands fill the normal `自由行动` composer with editable Chinese intent text, preserving the unlimited-action pipeline while making map-driven play easier for new players.
+
+### Runtime Screenshot
+
+![Interactive RPG map action draft](screenshots/rpg-world-map-interactive-runtime-2026-06-08.png)
+
+The screenshot was captured from the local Web + API runtime after starting `边境七日`, selecting `黑石矿区`, and writing an investigation draft into the freeform composer. Runtime assertions confirmed `6` map nodes, `5` route lines, a non-empty freeform draft, and absence of secret-shaped rendered text.
+
+### Verification
+
+```bash
+npm test -- apps/web/src/worldMap.test.ts --reporter=dot
+npm run typecheck
+```
+
 ## 2026-06-08 - RPG World Map GUI
 
 ### Scope

@@ -94,7 +94,14 @@ import {
   type LlmProviderPresetId,
 } from "./llmSettings.js";
 import { displayPlayerAction } from "./playerActionDisplay.js";
-import { buildWorldMap, type WorldMapView } from "./worldMap.js";
+import {
+  buildWorldMap,
+  buildWorldMapActionDraft,
+  getSelectedWorldMapNode,
+  type WorldMapActionDraftKind,
+  type WorldMapNode,
+  type WorldMapView,
+} from "./worldMap.js";
 import {
   formatCreatorScenarioDefinition,
   getSavedCreatorScenarioDefinition,
@@ -221,6 +228,7 @@ export const App = () => {
   const [transparency, setTransparency] =
     useState<TransparencyMode>("inference");
   const [selectedAction, setSelectedAction] = useState<PlayerAction>();
+  const [selectedMapNodeId, setSelectedMapNodeId] = useState<string>();
   const [freeformActionText, setFreeformActionText] = useState(() =>
     loadFreeformActionDraft(),
   );
@@ -480,6 +488,10 @@ export const App = () => {
 
   const location = state ? state.locations[state.currentLocationId] : undefined;
   const worldMap = useMemo(() => (state ? buildWorldMap(state) : undefined), [state]);
+  const selectedMapNode = useMemo(
+    () => (worldMap ? getSelectedWorldMapNode(worldMap, selectedMapNodeId) : undefined),
+    [selectedMapNodeId, worldMap],
+  );
   const visibleClocks = useMemo(
     () =>
       state ? Object.values(state.clocks).filter((clock) => clock.visible) : [],
@@ -647,6 +659,14 @@ export const App = () => {
     }
   };
 
+  const writeMapActionDraft = (
+    node: WorldMapNode,
+    kind: WorldMapActionDraftKind,
+  ) => {
+    setFreeformActionText(buildWorldMapActionDraft(node, kind));
+    setSelectedAction(undefined);
+  };
+
   const testLlmConnection = async () => {
     setLlmConnectionStatus({
       kind: "running",
@@ -797,7 +817,15 @@ export const App = () => {
             <ScrollText size={19} />
             <h2>当前场景</h2>
           </div>
-          {worldMap ? <WorldMapPanel map={worldMap} /> : null}
+          {worldMap ? (
+            <WorldMapPanel
+              map={worldMap}
+              selectedNode={selectedMapNode}
+              disabled={loadState === "running"}
+              onSelectNode={setSelectedMapNodeId}
+              onWriteDraft={writeMapActionDraft}
+            />
+          ) : null}
           <p className="scene-text">{location.description}</p>
           <div className="fact-list">
             {location.publicInfo.map((fact) => (
@@ -841,6 +869,7 @@ export const App = () => {
             </div>
             <textarea
               aria-label="自由行动"
+              data-freeform-composer="true"
               placeholder="意图：保护；目标：诊所；资源：情报，金钱；方式：伪装成药材队；避免：伤害平民。"
               value={freeformActionText}
               maxLength={FREEFORM_ACTION_MAX_LENGTH}
@@ -2671,7 +2700,19 @@ const Narration = ({
   </section>
 );
 
-const WorldMapPanel = ({ map }: { map: WorldMapView }) => (
+const WorldMapPanel = ({
+  map,
+  selectedNode,
+  disabled,
+  onSelectNode,
+  onWriteDraft,
+}: {
+  map: WorldMapView;
+  selectedNode: WorldMapNode | undefined;
+  disabled: boolean;
+  onSelectNode: (nodeId: string) => void;
+  onWriteDraft: (node: WorldMapNode, kind: WorldMapActionDraftKind) => void;
+}) => (
   <section className="world-map">
     <div className="world-map-header">
       <div className="panel-heading compact">
@@ -2693,35 +2734,83 @@ const WorldMapPanel = ({ map }: { map: WorldMapView }) => (
         ))}
       </svg>
       {map.nodes.map((node) => (
-        <div
+        <button
           key={node.id}
           className={`map-node ${node.dangerTone} ${
             node.isCurrent ? "current" : ""
-          }`}
+          } ${selectedNode?.id === node.id ? "selected" : ""}`}
           style={{
             left: `${node.x}%`,
             top: `${node.y}%`,
           }}
+          type="button"
           aria-label={`${node.name}，${node.summary}`}
+          aria-pressed={selectedNode?.id === node.id}
+          data-map-node-id={node.id}
+          disabled={disabled}
+          onClick={() => onSelectNode(node.id)}
         >
           <span className="map-node-name">{node.name}</span>
           <span className="map-node-meta">{node.dangerLabel}</span>
           <i style={{ width: `${node.pressurePercent}%` }} />
-        </div>
+        </button>
       ))}
     </div>
     <div className="world-map-node-list">
       {map.nodes.map((node) => (
-        <div key={node.id} className={node.isCurrent ? "active" : ""}>
+        <button
+          key={node.id}
+          type="button"
+          className={`${node.isCurrent ? "active" : ""} ${
+            selectedNode?.id === node.id ? "selected" : ""
+          }`}
+          disabled={disabled}
+          data-map-list-id={node.id}
+          onClick={() => onSelectNode(node.id)}
+        >
           <strong>{node.name}</strong>
           <span>{node.summary}</span>
           <small>
             NPC：{node.npcNames.join("，") || "暂无"}；时钟：
             {node.clockNames.join("，") || "暂无"}
           </small>
-        </div>
+        </button>
       ))}
     </div>
+    {selectedNode ? (
+      <div className="world-map-detail">
+        <div>
+          <strong>{selectedNode.name}</strong>
+          <span>{selectedNode.description}</span>
+        </div>
+        <div className="world-map-detail-facts">
+          {(selectedNode.publicFacts.length > 0
+            ? selectedNode.publicFacts
+            : ["暂无公开线索"]
+          ).map((fact) => (
+            <span key={fact}>{fact}</span>
+          ))}
+        </div>
+        <div className="world-map-detail-actions">
+          <button
+            type="button"
+            disabled={disabled}
+            data-map-draft="travel"
+            onClick={() => onWriteDraft(selectedNode, "travel")}
+          >
+            写入前往
+          </button>
+          <button
+            type="button"
+            disabled={disabled}
+            data-map-draft="investigate"
+            onClick={() => onWriteDraft(selectedNode, "investigate")}
+          >
+            写入调查
+          </button>
+        </div>
+      </div>
+    ) : null}
     <div className="world-map-legend">
       {map.legend.map((item) => (
         <span key={item}>{item}</span>

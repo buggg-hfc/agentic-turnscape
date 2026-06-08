@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import type { WorldState } from "@agentic-turnscape/shared";
-import { buildWorldMap } from "./worldMap.js";
+import {
+  buildWorldMap,
+  buildWorldMapActionDraft,
+  getSelectedWorldMapNode,
+} from "./worldMap.js";
 
 const baseCharacter = {
   role: "见证人",
@@ -175,6 +179,7 @@ describe("world map view model", () => {
       clockNames: ["瘟疫扩散"],
       pressurePercent: 63,
       summary: "危险 4 / NPC 1 / 时钟 1",
+      publicFacts: ["药品即将耗尽", "护士愿意协助"],
     });
 
     const mine = map.nodes.find((node) => node.id === "mine");
@@ -192,5 +197,28 @@ describe("world map view model", () => {
       { from: "clinic", to: "mine", fromX: 24, fromY: 34, toX: 76, toY: 36 },
     ]);
     expect(map.legend).toEqual(["当前位置", "危险等级", "阵营压力"]);
+  });
+
+  it("selects a stable map detail node", () => {
+    const map = buildWorldMap(state);
+
+    expect(getSelectedWorldMapNode(map)?.id).toBe("clinic");
+    expect(getSelectedWorldMapNode(map, "mine")?.name).toBe("矿区");
+    expect(getSelectedWorldMapNode(map, "unknown")?.id).toBe("clinic");
+  });
+
+  it("builds freeform action drafts from map nodes", () => {
+    const map = buildWorldMap(state);
+    const mine = getSelectedWorldMapNode(map, "mine");
+    const clinic = getSelectedWorldMapNode(map, "clinic");
+
+    expect(mine).toBeDefined();
+    expect(clinic).toBeDefined();
+    expect(buildWorldMapActionDraft(mine!, "travel")).toBe(
+      "意图：前往；目标：矿区；方式：沿已知路线移动并观察沿途异常；避免：暴露队伍弱点。",
+    );
+    expect(buildWorldMapActionDraft(clinic!, "investigate")).toBe(
+      "意图：调查；目标：诊所；方式：查看现场线索并询问相关人物；避免：贸然升级冲突。",
+    );
   });
 });

@@ -6,6 +6,7 @@ export type WorldMapNode = {
   id: string;
   name: string;
   description: string;
+  publicFacts: string[];
   x: number;
   y: number;
   isCurrent: boolean;
@@ -34,6 +35,8 @@ export type WorldMapView = {
   connections: WorldMapConnection[];
   legend: string[];
 };
+
+export type WorldMapActionDraftKind = "travel" | "investigate";
 
 const mapSlots = [
   [50, 55],
@@ -110,6 +113,7 @@ export const buildWorldMap = (state: WorldState): WorldMapView => {
       id,
       name: location.name,
       description: location.description,
+      publicFacts: location.publicInfo,
       x: position.x,
       y: position.y,
       isCurrent: id === state.currentLocationId,
@@ -144,4 +148,22 @@ export const buildWorldMap = (state: WorldState): WorldMapView => {
     connections,
     legend: ["当前位置", "危险等级", "阵营压力"],
   };
+};
+
+export const getSelectedWorldMapNode = (
+  map: WorldMapView,
+  selectedNodeId?: string,
+): WorldMapNode | undefined =>
+  map.nodes.find((node) => node.id === selectedNodeId) ??
+  map.nodes.find((node) => node.isCurrent) ??
+  map.nodes[0];
+
+export const buildWorldMapActionDraft = (
+  node: WorldMapNode,
+  kind: WorldMapActionDraftKind,
+): string => {
+  if (kind === "travel") {
+    return `意图：前往；目标：${node.name}；方式：沿已知路线移动并观察沿途异常；避免：暴露队伍弱点。`;
+  }
+  return `意图：调查；目标：${node.name}；方式：查看现场线索并询问相关人物；避免：贸然升级冲突。`;
 };
