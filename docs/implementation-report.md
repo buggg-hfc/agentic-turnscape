@@ -2,6 +2,29 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Freeform Boundary Result Feedback
+
+### Scope
+
+- Added TDD coverage for referee results when a freeform action includes `方式` and `避免` metadata.
+- The referee now records these as public result context, for example `方式：伪装成药材队` and `底线：避免伤害平民`, and tags the event with `approach` / `constraint`.
+- This preserves player-authored method and boundaries after adjudication while keeping them as intent metadata rather than automatic rule bonuses or direct state mutation.
+
+### Runtime Screenshot
+
+![Freeform boundary result](screenshots/freeform-boundary-result-runtime-2026-06-08.png)
+
+The screenshot was captured from the local Web + API runtime after directly executing a Border Seven Days freeform protection action with `方式：伪装成药材队` and `避免：伤害平民`. The narration strip, turn progress, and replay panel all show the referee-recorded method and bottom line after the turn resolves.
+
+### Verification
+
+```bash
+npm test -- packages/core/src/core.test.ts --reporter=dot
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
+```
+
 ## 2026-06-08 - Freeform Custom Target Result Confirmation
 
 ### Scope

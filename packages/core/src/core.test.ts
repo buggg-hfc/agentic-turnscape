@@ -246,6 +246,18 @@ describe("dice and adjudication", () => {
     expect(resolution.roll.attribute).toBe("will");
     expect(resolution.roll.skill).toBe("defense");
     expect(resolution.roll.modifier).toBe(3);
+    expect(resolution.publicSummary).toContain("方式：伪装成药材队");
+    expect(resolution.publicSummary).toContain("底线：避免伤害平民");
+
+    const next = applyStatePatch(state, resolution.patch);
+    const freeformEvent = next.publicEvents.find((item) =>
+      item.tags.includes("freeform"),
+    );
+    expect(freeformEvent?.body).toContain("方式：伪装成药材队");
+    expect(freeformEvent?.body).toContain("底线：避免伤害平民");
+    expect(freeformEvent?.tags).toEqual(
+      expect.arrayContaining(["approach", "constraint"]),
+    );
 
     const withRealLeverage = adjudicateTurn({
       state,

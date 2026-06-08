@@ -31,6 +31,8 @@ For gameplay work, tests should prove the rule invariant rather than a single lu
 
 ## Verified Slices
 
+- Freeform method and boundary metadata now have tested referee-result feedback: `方式` and `避免` remain visible in public summaries, events, and replay as recorded player intent, without becoming automatic mechanical bonuses.
+
 - Freeform custom-target results now have tested referee feedback: public summaries and events mark player-authored targets as needing later referee confirmation, preserving unlimited intent without silently creating authoritative world objects.
 
 - Freeform custom targets now have tested GUI confirmation: unknown explicit targets remain valid player-authored hooks, but the composer marks them as `新目标：...需由裁判确认` until the referee produces authoritative state changes.

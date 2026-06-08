@@ -4,6 +4,17 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added tested referee-result feedback for freeform method and boundary metadata. Custom actions with `方式` and `避免` now keep those choices visible after adjudication as `方式：...` and `底线：避免...`, while still not granting automatic dice leverage or direct state changes.
+- Captured a runtime screenshot after directly executing a freeform protection action, showing method and bottom-line feedback in narration, turn progress, and replay:
+
+![Freeform boundary result](screenshots/freeform-boundary-result-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- packages/core/src/core.test.ts --reporter=dot`
+  - `npm run typecheck`
+  - `npm test -- --reporter=dot`
+  - `npm run build`
+
 - Added tested referee-result confirmation for custom freeform targets. Successful or blocked custom-target actions now keep the target as player-authored intent, add a `custom_target` public-event tag, and surface `新目标“东门水塔”需要后续裁判确认` in the result summary instead of silently turning the target into a world fact.
 - Captured a runtime screenshot after directly executing a freeform investigation of `东门水塔`, showing the confirmation note in narration, turn progress, and replay:
 
