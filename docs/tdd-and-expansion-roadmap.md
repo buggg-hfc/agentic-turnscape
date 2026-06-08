@@ -31,6 +31,7 @@ For gameplay work, tests should prove the rule invariant rather than a single lu
 
 ## Verified Slices
 
+- Failed queued turns now remain recoverable in persistent resume flows: Prisma `failTurn` records failure events and hidden memory, refreshes campaign activity ordering, and the Chinese resume list labels failed or pending campaigns before the player re-enters them.
 - Turn progress feedback now has tested Chinese display rows: queued work, status, Agent proposal counts, referee summaries, narration, completion, and secret-shaped text redaction are rendered through a shared helper, with a final-event fetch/fallback preventing completed queued turns from staying on internal worker tokens.
 - Freeform player actions now have tested local draft persistence: unfinished open-ended text is restored from browser storage, auto-saved under the action length limit, clearable from the Chinese GUI, and removed after a successful referee-owned custom action.
 - LLM settings now show a tested non-secret runtime summary in the Chinese GUI: provider, model, endpoint, timeout/token budget, save state, and local-key presence are visible before a turn runs, while the key value stays out of rendered text and game state.

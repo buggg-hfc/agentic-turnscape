@@ -4,6 +4,14 @@ This log records tested implementation slices as the project moves from the Bord
 
 ## 2026-06-08
 
+- Added tested failed-turn resume visibility for persistent campaigns. Prisma-backed `failTurn` now records the hidden failure log and refreshes campaign activity time, so a failed queued turn rises to the top of the resume list; the web resume helper shows `上回合失败` and `结算中`.
+- Captured a runtime screenshot showing failed and pending campaign resume rows in the Chinese GUI:
+
+![Failed turn resume visibility](screenshots/resume-failed-turn-runtime-2026-06-08.png)
+
+- Verification used for this slice:
+  - `npm test -- apps/api/src/prismaStore.test.ts apps/web/src/campaignResume.test.ts --reporter=dot`
+
 - Added tested Chinese summaries for queued turn progress. The action column now translates turn status, Agent proposal counts, referee output, narration, and completion into player-facing Chinese rows, redacts secret-shaped text, and fetches final events after queued completion so the panel does not get stuck on `turn_waiting_for_worker`.
 - Captured a runtime screenshot showing completed turn progress in the Chinese GUI:
 

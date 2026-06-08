@@ -521,6 +521,10 @@ export class PrismaCampaignStore implements CampaignStore {
           completedAt,
         },
       });
+      await tx.campaign.update({
+        where: { id: campaignId },
+        data: { pendingAction: Prisma.DbNull },
+      });
       await tx.event.create({
         data: {
           id: crypto.randomUUID(),

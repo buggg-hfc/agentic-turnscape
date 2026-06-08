@@ -2,6 +2,26 @@
 
 This report records verified runtime slices for the multi-Agent turn-based simulation MVP and its expansion path.
 
+## 2026-06-08 - Failed Turn Resume Visibility
+
+### Scope
+
+- Added TDD coverage proving Prisma-backed failed turns write `turn_failed` events, hidden memory logs, failed turn status, and refreshed campaign activity time.
+- Fixed the persistent `failTurn` path so a queued-turn failure moves the affected campaign to the top of the resume list instead of leaving it behind older activity.
+- Added Chinese resume-list status labels for recoverable states: `上回合失败` and `结算中`.
+
+### Runtime Screenshot
+
+![Failed turn resume visibility](screenshots/resume-failed-turn-runtime-2026-06-08.png)
+
+The screenshot was captured from the local web GUI with API responses mocked to show one failed campaign and one still-pending campaign. The backend persistence behavior is covered by the Prisma store test, while the screenshot verifies the player-facing Chinese resume list state.
+
+### Verification
+
+```bash
+npm test -- apps/api/src/prismaStore.test.ts apps/web/src/campaignResume.test.ts --reporter=dot
+```
+
 ## 2026-06-08 - Chinese Turn Progress Summary
 
 ### Scope

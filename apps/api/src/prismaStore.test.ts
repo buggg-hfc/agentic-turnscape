@@ -464,6 +464,85 @@ describe("PrismaCampaignStore", () => {
     await expect(store.listRuntimeScenarios()).resolves.toEqual([]);
   });
 
+  it("marks failed queued turns as the latest persistent campaign activity", async () => {
+    vi.useFakeTimers();
+    try {
+      const prisma = new FakePrismaClient();
+      const store = new PrismaCampaignStore(prisma as any);
+      const action: PlayerAction = {
+        actionType: "investigate",
+        label: "追查失败任务",
+        description: "测试失败回合是否会进入恢复列表。",
+        targetId: "old_outpost",
+        leverage: [],
+        riskLevel: "medium",
+      };
+
+      vi.setSystemTime(new Date("2026-06-08T00:00:00.000Z"));
+      const failedCampaign = await store.create({
+        id: "campaign-failed-latest",
+        title: "失败恢复",
+        scenario: "border-seven-days",
+        state: createBorderSevenDaysWorld(),
+      });
+      const turn = await store.createTurn(failedCampaign.id, action);
+
+      vi.setSystemTime(new Date("2026-06-08T00:05:00.000Z"));
+      await store.create({
+        id: "campaign-older-active",
+        title: "较新的正常战役",
+        scenario: "border-seven-days",
+        state: createBorderSevenDaysWorld(),
+      });
+
+      vi.setSystemTime(new Date("2026-06-08T00:10:00.000Z"));
+      await store.failTurn(
+        failedCampaign.id,
+        turn.id,
+        "LLM provider timed out",
+      );
+
+      const loaded = await store.get(failedCampaign.id);
+      expect(loaded?.turns[0]).toEqual(
+        expect.objectContaining({
+          id: turn.id,
+          status: "failed",
+          completedAt: "2026-06-08T00:10:00.000Z",
+        }),
+      );
+      expect(loaded?.events).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            turnId: turn.id,
+            kind: "turn_failed",
+            visible: false,
+            payload: { error: "LLM provider timed out" },
+          }),
+        ]),
+      );
+      expect(loaded?.memoryLog).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            turnId: turn.id,
+            hidden: true,
+            summary: "LLM provider timed out",
+          }),
+        ]),
+      );
+
+      await expect(store.list()).resolves.toEqual([
+        expect.objectContaining({
+          id: failedCampaign.id,
+          lastTurnStatus: "failed",
+          updatedAt: "2026-06-08T00:10:00.000Z",
+        }),
+        expect.objectContaining({ id: "campaign-older-active" }),
+      ]);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("can close the underlying Prisma connection", async () => {
     const prisma = new FakePrismaClient();
     const store = new PrismaCampaignStore(prisma as any);
